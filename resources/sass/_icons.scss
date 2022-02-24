@@ -1,0 +1,58 @@
+$bg: #fff;
+$light_gray: #fff;
+$cursor: #171E27;
+
+.my-icon-user {
+  background: url('../js/icons/svg/user.svg') center center no-repeat;
+  background-size: 14px;
+}
+
+.my-icon-user:before {
+  content: "替";
+  font-size: 16px;
+  visibility: hidden;
+}
+
+.my-icon-password {
+  background: url('../js/icons/svg/password.svg') center center no-repeat;
+  background-size: 14px;
+}
+
+.my-icon-password:before {
+  content: "替";
+  font-size: 16px;
+  visibility: hidden;
+}
+
+.my-icon-eye {
+  background: url('../js/icons/svg/eye.svg') center center no-repeat;
+  background-size: 14px;
+}
+
+.my-icon-eye:before {
+  content: "替";
+  font-size: 16px;
+  visibility: hidden;
+}
+
+.my-icon-eye-open {
+  background: url('../js/icons/svg/eye-open.svg') center center no-repeat;
+  background-size: 14px;
+}
+
+.my-icon-eye-open:before {
+  content: "替";
+  font-size: 16px;
+  visibility: hidden;
+}
+
+.my-icon-email {
+  background: url('../js/icons/svg/email.svg') center center no-repeat;
+  background-size: 14px;
+}
+
+.my-icon-email:before {
+  content: "替";
+  font-size: 16px;
+  visibility: hidden;
+}
