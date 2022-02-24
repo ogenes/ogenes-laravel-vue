@@ -191,27 +191,3 @@
     },
   };
 </script>
-<style lang="less">
-  .user-info-container {
-    height: 100%;
-
-    .el-card {
-      height: 100%;
-
-      .user-info {
-        width: 40%;
-        margin: 10% 25%;
-
-        .info-row {
-          height: 50px;
-          line-height: 50px;
-
-          .info-title {
-            text-align: right;
-            margin-right: 10px;
-          }
-        }
-      }
-    }
-  }
-</style>

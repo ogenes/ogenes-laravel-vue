@@ -183,34 +183,3 @@
     },
   };
 </script>
-<style lang="less">
-  .pictures-container {
-    height: 100%;
-
-    .el-card {
-      height: 100%;
-
-      .pictures-form {
-        border-bottom: 1px solid #AAAAAD;
-
-        .form-element-item {
-          width: 252px;
-        }
-      }
-
-      .pictures-content {
-        .pictures-pagination {
-          text-align: right;
-          margin-top: 30px;
-        }
-
-        .pictures-table {
-          .el-input-group__prepend {
-            width: 120px;
-            text-align: center;
-          }
-        }
-      }
-    }
-  }
-</style>

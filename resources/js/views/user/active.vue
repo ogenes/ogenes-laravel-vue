@@ -53,38 +53,3 @@
   }
 </script>
 
-<style lang="less">
-  .active-container {
-    border-radius: 0;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-
-    .el-card {
-      height: 100%;
-      overflow: auto;
-      display: flex;
-      flex-direction: column;
-
-      .title {
-        border-bottom: 1px solid #AAAAAD;
-        max-height: 100px;
-        line-height: 50px;
-
-        h1 {
-          letter-spacing: 2px
-        }
-      }
-
-      .active-content {
-        margin: 30%;
-        text-align: center;
-      }
-
-      .active-detail {
-        width: 50%;
-        text-align: left;
-      }
-    }
-  }
-</style>
