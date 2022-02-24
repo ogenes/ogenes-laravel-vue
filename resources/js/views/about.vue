@@ -18,22 +18,7 @@
       return {}
     },
     watch: {},
-    created() {
-    },
 
     methods: {},
   };
 </script>
-<style lang="less">
-  .about-container {
-    height: 100%;
-
-    .el-card {
-      height: 100%;
-    }
-
-    .notice-content {
-      margin-left: 20px;
-    }
-  }
-</style>

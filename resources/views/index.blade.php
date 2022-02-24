@@ -5,13 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Laravel</title>
     <link href="{{ asset('css/app.css')  }}" rel="stylesheet">
-    <style>
-        html, body, #app {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-    </style>
 </head>
 <body>
 <div id="app">

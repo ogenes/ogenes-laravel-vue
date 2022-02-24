@@ -19,6 +19,12 @@ use App\Http\Controllers\User\UserController;
 */
 
 Route::middleware(['language'])->group(function () {
+    Route::prefix('tmp')->group(function () {
+        Route::any('userInfo', [\App\Http\Controllers\TmpController::class, 'userInfo'])->name('tmp.userInfo');
+        Route::any('login', [\App\Http\Controllers\TmpController::class, 'login'])->name('tmp.login');
+        Route::any('logout', [\App\Http\Controllers\TmpController::class, 'logout'])->name('tmp.logout');
+    });
+    
     Route::prefix('auth')->group(function () {
         Route::post('register', [AuthController::class, 'register'])->name('user.register');
         Route::post('activeUser', [AuthController::class, 'activeUser'])->name('user.activeUser');
