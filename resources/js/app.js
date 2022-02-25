@@ -10,12 +10,14 @@ window.Vue = require('vue').default;
 
 import 'normalize.css/normalize.css' // a modern alternative to CSS resets
 
-import ElementUI from 'element-ui';
-import './styles/element-variables.module.scss'
-import i18n from './i18n/i18n';
+import ElementUI from 'element-ui'
+import 'element-theme-chalk';
 import 'element-ui/lib/theme-chalk/index.css';
-import '@/styles/index.scss' // global css
 
+import i18n from './i18n/i18n';
+
+import '@/styles/element-variables.module.scss'
+import '@/styles/index.scss' // global css
 import router from '@/router';
 import store from '@/store';
 import '@/permission' // permission control
