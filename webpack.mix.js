@@ -12,12 +12,28 @@ const path = require('path');
  */
 
 mix.js('resources/js/app.js', 'public/js')
-    .vue();
+  .vue();
 mix.alias({
-    '@': path.join(__dirname, 'resources/js')
+  '@': path.join(__dirname, 'resources/js')
 });
+
 mix.webpackConfig({
-    output:{
-        chunkFilename:'js/vuejs_code_split/[name].js',
+  output: {
+    chunkFilename: 'js/vuejs_code_split/[name].js',
+  }
+});
+
+Mix.listen('configReady', (webpackConfig) => {
+  webpackConfig.module.rules.push(
+    {
+      test: /\.svg$/,
+      loader: 'svg-sprite-loader',
+      include: path.resolve(__dirname, 'resources/js/icons/svg'),
+      options: {
+        symbolId: 'icon-[name]',
+      }
     }
+  );
+  let fontLoaderConfig = webpackConfig.module.rules.find(rule => String(rule.test) === String(/(\.(png|jpe?g|gif|webp|avif)$|^((?!font).)*\.svg$)/));
+  fontLoaderConfig.exclude = /(resources\/js\/icons)/;
 });
