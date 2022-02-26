@@ -19,7 +19,7 @@ mix.alias({
 
 mix.webpackConfig({
   output: {
-    chunkFilename: 'js/vuejs_code_split/[name].js',
+    chunkFilename: 'js/split/[name].js',
   }
 });
 
