@@ -7,7 +7,7 @@ use App\Exceptions\ErrorCode;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
-class SendBindCode extends FormRequest
+class LoginRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,10 +27,11 @@ class SendBindCode extends FormRequest
     public function rules()
     {
         return [
-            'mobile' => 'required',
+            'account' => 'required',
+            'password' => 'required|min:6',
         ];
     }
-
+    
     /**
      * @param Validator $validator
      * @throws CommonException

@@ -11,7 +11,7 @@ namespace App\Http\Middleware\Api;
 
 use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
-use App\Services\User\AuthService;
+use App\Services\AuthService;
 use Closure;
 
 class AuthMiddleware

@@ -9,7 +9,6 @@
 namespace App\Services;
 
 
-use App\Services\User\AuthService;
 use Illuminate\Redis\Connections\Connection as RedisConnection;
 use Illuminate\Support\Facades\Redis;
 
@@ -18,7 +17,7 @@ class BaseService
     /**
      * @var array
      */
-    protected static $instance = [];
+    protected static array $instance = [];
 
     /**
      * @return static
@@ -31,7 +30,7 @@ class BaseService
         }
         self::$instance[$className] = new static();
         if (!self::$instance[$className] instanceof AuthService) {
-            self::$instance[$className]->userId = AuthService::getInstance()->userId;
+            self::$instance[$className]->uid = AuthService::getInstance()->uid;
         }
         return self::$instance[$className];
     }
@@ -39,8 +38,11 @@ class BaseService
     /**
      * @var int
      */
-    public $userId = 0;
-
+    public int $uid = 0;
+    
+    /**
+     * @return RedisConnection
+     */
     public function getRedis(): RedisConnection
     {
         return Redis::connection('default');

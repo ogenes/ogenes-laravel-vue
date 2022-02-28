@@ -37,8 +37,8 @@ class LanguageService extends BaseService
     
     protected function getLangKey(): string
     {
-        if ($this->userId > 0) {
-            $key = self::LANG_KEY . 'USER:' . $this->userId;
+        if ($this->uid > 0) {
+            $key = self::LANG_KEY . 'USER:' . $this->uid;
         } else {
             $uniqReq = Cookie::get('UNIQ-REQ');
             if ($uniqReq) {

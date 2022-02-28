@@ -74,7 +74,7 @@ export function validUpperCase(str) {
  * @returns {Boolean}
  */
 export function validAlphabets(str) {
-  const reg = /^[A-Za-z]+$/
+  const reg = /^[A-Za-z0-9]+$/
   return reg.test(str)
 }
 
