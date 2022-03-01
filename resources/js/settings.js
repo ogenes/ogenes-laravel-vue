@@ -1,5 +1,5 @@
 module.exports = {
-  title: 'Vue Element Admin',
+  title: '权限管理系统',
 
   /**
    * @type {boolean} true | false
@@ -25,6 +25,8 @@ module.exports = {
    */
   sidebarLogo: false,
 
+  darkTheme: false,
+
   /**
    * @type {string | array} 'production' | ['production', 'development']
    * @description Need show err logs component.
@@ -32,4 +34,4 @@ module.exports = {
    * If you want to also use it in dev, you can pass ['production', 'development']
    */
   errorLog: 'production'
-}
+};

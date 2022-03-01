@@ -4,8 +4,8 @@
       <h3 class="drawer-title">Page style setting</h3>
 
       <div class="drawer-item">
-        <span>Theme Color</span>
-        <theme-picker style="float: right;height: 26px;margin: -3px 8px 0 0;" @change="themeChange" />
+        <span>Dark Theme</span>
+        <el-switch v-model="darkTheme" class="drawer-switch" />
       </div>
 
       <div class="drawer-item">
@@ -28,14 +28,23 @@
 </template>
 
 <script>
-import ThemePicker from '@/components/ThemePicker'
 
 export default {
-  components: { ThemePicker },
   data() {
     return {}
   },
   computed: {
+    darkTheme: {
+      get() {
+        return this.$store.state.settings.darkTheme
+      },
+      set(val) {
+        this.$store.dispatch('settings/changeSetting', {
+          key: 'darkTheme',
+          value: val
+        })
+      }
+    },
     fixedHeader: {
       get() {
         return this.$store.state.settings.fixedHeader
@@ -71,12 +80,6 @@ export default {
     }
   },
   methods: {
-    themeChange(val) {
-      this.$store.dispatch('settings/changeSetting', {
-        key: 'theme',
-        value: val
-      })
-    }
   }
 }
 </script>
