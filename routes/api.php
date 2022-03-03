@@ -1,11 +1,9 @@
 <?php
 
-use App\Http\Controllers\FileController;
-use App\Http\Controllers\SystemController;
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\User\AuthController;
-use App\Http\Controllers\User\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,12 +19,17 @@ use App\Http\Controllers\User\UserController;
 Route::middleware(['language'])->group(function () {
     
     Route::prefix('user')->group(function () {
-        Route::any('login', [\App\Http\Controllers\UserController::class, 'login'])->name('user.login');
+        Route::any('login', [UserController::class, 'login'])->name('user.login');
     });
     Route::middleware(['api.auth'])->group(function () {
         Route::prefix('user')->group(function () {
-            Route::any('logout', [\App\Http\Controllers\UserController::class, 'logout'])->name('user.logout');
-            Route::any('info', [\App\Http\Controllers\UserController::class, 'info'])->name('user.info');
+            Route::any('logout', [UserController::class, 'logout'])->name('user.logout');
+            Route::any('info', [UserController::class, 'info'])->name('user.info');
+        });
+        Route::prefix('department')->group(function () {
+            Route::any('list', [DepartmentController::class, 'list'])->name('department.list');
+            Route::any('save', [DepartmentController::class, 'save'])->name('department.save');
+            Route::any('remove', [DepartmentController::class, 'remove'])->name('department.remove');
         });
     });
 });

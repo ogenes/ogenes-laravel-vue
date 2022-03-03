@@ -29,7 +29,7 @@ const state = {
   tagsView: getItem('tagsView', tagsView),
   fixedHeader: getItem('fixedHeader', fixedHeader),
   sidebarLogo: getItem('sidebarLogo', sidebarLogo),
-  darkTheme: getItem('darkTheme', darkTheme),
+  // darkTheme: getItem('darkTheme', darkTheme),
 };
 
 console.log(state);

@@ -125,47 +125,28 @@ export const constantRoutes = [
  */
 export const asyncRoutes = [
   {
-    path: '/permission',
+    path: '/system',
     component: Layout,
-    redirect: '/permission/page',
+    redirect: '/system/department',
     alwaysShow: true, // will always show the root menu
-    name: 'Permission',
+    name: 'System',
     meta: {
-      title: 'Permission',
-      icon: 'lock',
-      roles: ['admin', 'editor'] // you can set roles in root nav
+      title: '系统管理',
+      icon: 'setting',
+      roles: ['system'] // you can set roles in root nav
     },
     children: [
       {
-        path: 'page',
-        component: () => import('@/views/permission/page'),
-        name: 'PagePermission',
+        path: 'department',
+        component: () => import('@/views/system/department'),
+        name: 'DepartmentManage',
         meta: {
-          title: 'Page Permission',
-          roles: ['admin'] // or you can only set roles in sub nav
+          title: '部门管理',
+          roles: ['system-department'] // or you can only set roles in sub nav
         }
       },
-      {
-        path: 'directive',
-        component: () => import('@/views/permission/directive'),
-        name: 'DirectivePermission',
-        meta: {
-          title: 'Directive Permission'
-          // if do not set roles, means: this page does not require permission
-        }
-      },
-      {
-        path: 'role',
-        component: () => import('@/views/permission/role'),
-        name: 'RolePermission',
-        meta: {
-          title: 'Role Permission',
-          roles: ['admin']
-        }
-      }
     ]
   },
-
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ];
