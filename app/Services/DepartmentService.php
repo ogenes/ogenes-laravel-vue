@@ -66,10 +66,9 @@ class DepartmentService extends BaseService
         if ($id > 0) {
             $exist = Department::whereId($id)->first();
             if ($exist) {
-                $ret =$exist->update([
-                    'parent_id' => $parentId,
-                    'name' => $name,
-                ]);
+                $exist->setAttribute('parent_id', $parentId);
+                $exist->setAttribute('name', $name);
+                $ret =$exist->save();
             }
         } else {
             $ret = Department::insertGetId([
@@ -94,16 +93,27 @@ class DepartmentService extends BaseService
     
     public function saveDepartmentDing(int $dingDeptId, int $dingParentId, string $name): bool
     {
-        $parentId = DepartmentDing::whereDingDeptId($dingParentId)->first()->id;
+        $parentId = DepartmentDing::whereDingDeptId($dingParentId)->first()->dept_id;
+        
         $exist = DepartmentDing::whereDingDeptId($dingDeptId)->first();
         if ($exist) {
-            $exist->update([
-                'parent_id' => $parentId,
-                'ding_parent_id' => $dingParentId,
-                'name' > $name,
-            ]);
+            $exist->setAttribute('parent_id', $parentId);
+            $exist->setAttribute('ding_parent_id', $dingParentId);
+            $exist->setAttribute('name', $name);
+            $exist->save();
+            
+            $departmentModel = Department::whereId($exist->dept_id);
+            $departmentModel->setAttribute('parent_id', $parentId);
+            $departmentModel->setAttribute('name', $name);
+            $departmentModel->save();
         } else {
+            $deptId = Department::insertGetId([
+                'parent_id' => $parentId,
+                'name' => $name,
+                'created_at' => date('Y-m-d H:i:s'),
+            ]);
             DepartmentDing::insertGetId([
+                'dept_id' => $deptId,
                 'ding_dept_id' => $dingDeptId,
                 'parent_id' => $parentId,
                 'ding_parent_id' => $dingParentId,

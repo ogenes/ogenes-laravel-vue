@@ -8,6 +8,10 @@
 namespace App\Helpers;
 
 
+use App\Models\DepartmentDing;
+use App\Models\User;
+use App\Models\UserDing;
+use App\Models\UserHasDepartment;
 use App\Services\BaseService;
 use App\Services\DepartmentService;
 
@@ -58,5 +62,87 @@ class DingHelper extends BaseService
         return $ret;
     }
     
+    public function syncUser(int $deptId): bool
+    {
+        $token = $this->getToken();
+        $uri = "https://oapi.dingtalk.com/topapi/v2/user/list?access_token={$token}";
+        $params['dept_id'] = $deptId;
+        $params['language'] = 'zh_CN';
+        $params['cursor'] = 0;
+        $params['size'] = 10;
+        
+        do {
+            $resp = CurlHelper::post($uri, $params);
+            $data = json_decode($resp, true, 512, JSON_THROW_ON_ERROR);
+            $result = $data['result'] ?? [];
+            if (empty($result)) {
+                break;
+            }
+            foreach ($result['list'] as $item) {
+                $this->saveUser($item, $deptId);
+            }
+            if (!$result['has_more']) {
+                break;
+            }
+            $params['cursor'] = $result['next_cursor'];
+        } while (true);
+        
+        return true;
+    }
     
+    protected function saveUser(array $user, int $dingDeptId)
+    {
+        $now = date('Y-m-d H:i:s');
+        
+        $hireTime = substr($user['hired_date'] ?? '', 0, 10);
+        $data = [
+            'userid' => $user['userid'] ?? '',
+            'unionid' => $user['unionid'] ?? '',
+            'name' => $user['name'] ?? '',
+            'mobile' => $user['mobile'] ?? '',
+            'email' => $user['email'] ?? '',
+            'title' => $user['title'] ?? '',
+            'boss' => $user['boss'] ?? '',
+            'active' => $user['active'] ?? '',
+            'leader' => $user['leader'] ?? '',
+            'avatar' => $user['avatar'] ?? '',
+        ];
+        $hireTime && $data['hired_date'] = date('Y-m-d H:i:s', $hireTime);
+        $deptId = DepartmentDing::whereDingDeptId($dingDeptId)->first()->dept_id;
+        $exist = UserDing::whereUserid($user['userid'])->first();
+        if ($exist) {
+            $exist->update($data);
+            $uid = $exist->uid;
+        } else {
+            $userExist = User::whereMobile($user['mobile'])->first();
+            if ($userExist) {
+                $uid = $userExist->uid;
+            } else {
+                $uid = User::insertGetId([
+                    'account' => $user['mobile'] ?? '',
+                    'username' => $user['name'] ?? '',
+                    'mobile' => $user['mobile'] ?? '',
+                    'email' => $user['email'] ?? '',
+                    'avatar' => $user['avatar'] ?? '',
+                    'created_at' => $now,
+                ]);
+            }
+            $data['uid'] = $uid;
+            $data['created_at'] = $now;
+            UserDing::insertGetId($data);
+        }
+        //关联关系
+        $relation = UserHasDepartment::whereUid($uid)
+            ->where('dept_id', '=', $deptId)
+            ->first();
+        if (empty($relation)) {
+            UserHasDepartment::insertGetId([
+                'uid' => $uid,
+                'dept_id' => $deptId,
+                'created_at' => $now,
+            ]);
+        }
+        
+        return true;
+    }
 }

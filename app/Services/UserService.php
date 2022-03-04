@@ -40,7 +40,7 @@ class UserService extends BaseService
                 'avatar',
             ])
             ->first()
-            ->attributesToArray();
+            ->toArray();
         $data['code'] = '';
         $this->cacheUserInfo($data);
         return $data ?: [];

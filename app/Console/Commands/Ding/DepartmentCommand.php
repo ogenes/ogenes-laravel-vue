@@ -1,27 +1,32 @@
 <?php
-/**
- * Created by ogenes-permission.
- * User: ogenes
- * Date: 2022/3/2
- */
 
-namespace App\Console\Commands;
-
+namespace App\Console\Commands\Ding;
 
 use App\Helpers\DingHelper;
 use Illuminate\Console\Command;
 
 class DepartmentCommand extends Command
 {
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
     protected $signature = 'department:sync';
     
-    protected $description = '同步部门';
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = '从钉钉同步部门';
     
-    public function handle() {
+    public function handle()
+    {
         $this->line($this->now() . ': Begin sync...');
         $data = DingHelper::getInstance()->syncDepartment(1);
         print_r($data);
-        exit;
+        return 0;
     }
     
     private function now()

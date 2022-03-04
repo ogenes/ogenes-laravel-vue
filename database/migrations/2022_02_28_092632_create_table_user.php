@@ -35,6 +35,12 @@ class CreateTableUser extends Migration
             $table->index(['email'], 'idx_email');
         });
         DB::statement("alter table `user` comment = '用户基础信息表'");
+        DB::table('user')->insert([
+            'account' => env('ADMIN_ACCOUNT', 'admin'),
+            'username' => '系统管理员',
+            'password' => md5(env('SALT', '') . env('ADMIN_PASSWORD', '123456')),
+            'created_at' => date('Y-m-d H:i:s'),
+        ]);
     }
 
     /**

@@ -16,9 +16,10 @@ class UserSeeder extends Seeder
     public function run()
     {
         DB::table('user')->insert([
-            'account' => env('ADMIN_ACCOUNT', 'admin'),
-            'username' => '系统管理员',
-            'password' => md5(env('SALT', '') . env('ADMIN_PASSWORD', '123456')),
+            'account' => 'developer',
+            'username' => '开发人员',
+            'password' => md5(env('SALT', '') . '123456'),
+            'created_at' => date('Y-m-d H:i:s'),
         ]);
     }
 }

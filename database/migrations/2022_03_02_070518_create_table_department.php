@@ -24,6 +24,12 @@ class CreateTableDepartment extends Migration
             $table->collation = 'utf8mb4_general_ci';
         });
         DB::statement("alter table `department` comment = '部门表'");
+        DB::table('department')->insert([
+            'id' => 1,
+            'name' => config('common.corp', '研发测试有限公司'),
+            'parent_id' => 0,
+            'created_at' => date('Y-m-d H:i:s'),
+        ]);
     }
 
     /**

@@ -99,7 +99,11 @@ class AuthService extends BaseService
             }
             $this->uid = $uid;
             $userInfo = UserService::getInstance()->getInfoFromCache($uid);
-            if (empty($userInfo) || $userInfo['code'] !== $code) {
+            if (empty($userInfo)) {
+                return false;
+            }
+            
+            if ($userInfo['code'] !== $code && config('common.loginUnique')) {
                 return false;
             }
             

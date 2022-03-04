@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTableDingDepartment extends Migration
+class CreateTableDepartmentDing extends Migration
 {
     /**
      * Run the migrations.
@@ -28,6 +28,14 @@ class CreateTableDingDepartment extends Migration
             $table->unique(['ding_dept_id'], 'unx_ding_dept_id');
         });
         DB::statement("alter table `department_ding` comment = '钉钉部门表'");
+        DB::table('department_ding')->insert([
+            'name' => config('common.corp', '研发测试有限公司'),
+            'dept_id' => 1,
+            'ding_dept_id' => 1,
+            'parent_id' => 0,
+            'ding_parent_id' => 0,
+            'created_at' => date('Y-m-d H:i:s'),
+        ]);
     }
 
     /**

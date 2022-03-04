@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property int $id 主键
  * @property string $name 部门名字
+ * @property int $dept_id 部门ID
  * @property int $parent_id 上级部门ID
  * @property int $ding_dept_id 钉钉部门ID
  * @property int $ding_parent_id 钉钉上级部门ID
@@ -19,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|DepartmentDing newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|DepartmentDing query()
  * @method static \Illuminate\Database\Eloquent\Builder|DepartmentDing whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|DepartmentDing whereDeptId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|DepartmentDing whereDingDeptId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|DepartmentDing whereDingParentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|DepartmentDing whereId($value)
