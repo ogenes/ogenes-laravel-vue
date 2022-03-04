@@ -8,12 +8,12 @@
 namespace App\Helpers;
 
 
+use App\Models\Department;
 use App\Models\DepartmentDing;
 use App\Models\User;
 use App\Models\UserDing;
 use App\Models\UserHasDepartment;
 use App\Services\BaseService;
-use App\Services\DepartmentService;
 
 class DingHelper extends BaseService
 {
@@ -52,7 +52,7 @@ class DingHelper extends BaseService
         }
         $ret = [];
         foreach ($result as $item) {
-            DepartmentService::getInstance()->saveDepartmentDing($item['dept_id'], $item['parent_id'], $item['name']);
+            $this->saveDepartmentDing($item['dept_id'], $item['parent_id'], $item['name']);
             echo $item['dept_id'] . ' ';
             echo $item['name'] . PHP_EOL;
             $tmp = $this->syncDepartment($item['dept_id']);
@@ -61,6 +61,41 @@ class DingHelper extends BaseService
         }
         return $ret;
     }
+    
+    public function saveDepartmentDing(int $dingDeptId, int $dingParentId, string $name): bool
+    {
+        $parentId = DepartmentDing::whereDingDeptId($dingParentId)->first()->dept_id;
+        
+        $exist = DepartmentDing::whereDingDeptId($dingDeptId)->first();
+        if ($exist) {
+            $exist->setAttribute('parent_id', $parentId);
+            $exist->setAttribute('ding_parent_id', $dingParentId);
+            $exist->setAttribute('name', $name);
+            $exist->save();
+    
+    
+            $departmentModel = Department::whereId($exist->dept_id)->first();
+            $departmentModel->setAttribute('parent_id', $parentId);
+            $departmentModel->setAttribute('name', $name);
+            $departmentModel->save();
+        } else {
+            $deptId = Department::insertGetId([
+                'parent_id' => $parentId,
+                'name' => $name,
+                'created_at' => date('Y-m-d H:i:s'),
+            ]);
+            DepartmentDing::insertGetId([
+                'dept_id' => $deptId,
+                'ding_dept_id' => $dingDeptId,
+                'parent_id' => $parentId,
+                'ding_parent_id' => $dingParentId,
+                'name' => $name,
+                'created_at' => date('Y-m-d H:i:s'),
+            ]);
+        }
+        return true;
+    }
+    
     
     public function syncUser(int $deptId): bool
     {
@@ -90,7 +125,7 @@ class DingHelper extends BaseService
         return true;
     }
     
-    protected function saveUser(array $user, int $dingDeptId)
+    protected function saveUser(array $user, int $dingDeptId): bool
     {
         $now = date('Y-m-d H:i:s');
         

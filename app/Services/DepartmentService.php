@@ -9,7 +9,6 @@ namespace App\Services;
 
 
 use App\Models\Department;
-use App\Models\DepartmentDing;
 
 class DepartmentService extends BaseService
 {
@@ -91,36 +90,4 @@ class DepartmentService extends BaseService
         return $ret;
     }
     
-    public function saveDepartmentDing(int $dingDeptId, int $dingParentId, string $name): bool
-    {
-        $parentId = DepartmentDing::whereDingDeptId($dingParentId)->first()->dept_id;
-        
-        $exist = DepartmentDing::whereDingDeptId($dingDeptId)->first();
-        if ($exist) {
-            $exist->setAttribute('parent_id', $parentId);
-            $exist->setAttribute('ding_parent_id', $dingParentId);
-            $exist->setAttribute('name', $name);
-            $exist->save();
-            
-            $departmentModel = Department::whereId($exist->dept_id);
-            $departmentModel->setAttribute('parent_id', $parentId);
-            $departmentModel->setAttribute('name', $name);
-            $departmentModel->save();
-        } else {
-            $deptId = Department::insertGetId([
-                'parent_id' => $parentId,
-                'name' => $name,
-                'created_at' => date('Y-m-d H:i:s'),
-            ]);
-            DepartmentDing::insertGetId([
-                'dept_id' => $deptId,
-                'ding_dept_id' => $dingDeptId,
-                'parent_id' => $parentId,
-                'ding_parent_id' => $dingParentId,
-                'name' => $name,
-                'created_at' => date('Y-m-d H:i:s'),
-            ]);
-        }
-        return true;
-    }
 }
