@@ -39,6 +39,7 @@ class CreateTableUser extends Migration
             'account' => config('common.admin.account', 'admin'),
             'username' => '系统管理员',
             'password' => md5(env('SALT', '') . config('common.admin.password', '123456')),
+            'mobile' => config('common.admin.mobile', '18888888888'),
             'created_at' => date('Y-m-d H:i:s'),
         ]);
     }

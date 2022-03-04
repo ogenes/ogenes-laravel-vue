@@ -10,6 +10,7 @@ return [
     'admin' => [
         'account' => 'admin',
         'password' => '123456',
+        'mobile' => '',
     ],
     'loginUnique' => true,
 ];

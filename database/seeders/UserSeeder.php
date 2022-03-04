@@ -19,6 +19,7 @@ class UserSeeder extends Seeder
             'account' => 'developer',
             'username' => '开发人员',
             'password' => md5(env('SALT', '') . '123456'),
+            'mobile' => '16666666666',
             'created_at' => date('Y-m-d H:i:s'),
         ]);
     }
