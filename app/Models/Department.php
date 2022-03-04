@@ -11,16 +11,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id 主键
  * @property string $name 部门名字
  * @property int $parent_id 上级部门ID
- * @property int $ding_dept_id 钉钉部门ID
- * @property int $ding_parent_id 钉钉上级部门ID
  * @property \Illuminate\Support\Carbon $created_at 创建时间
  * @property \Illuminate\Support\Carbon $updated_at 更新时间
  * @method static \Illuminate\Database\Eloquent\Builder|Department newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Department newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Department query()
  * @method static \Illuminate\Database\Eloquent\Builder|Department whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Department whereDingDeptId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Department whereDingParentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Department whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Department whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Department whereParentId($value)

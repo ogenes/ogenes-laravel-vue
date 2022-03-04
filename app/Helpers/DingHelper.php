@@ -48,7 +48,7 @@ class DingHelper extends BaseService
         }
         $ret = [];
         foreach ($result as $item) {
-            DepartmentService::getInstance()->saveDepartment($item['dept_id'], $item['parent_id'], $item['name']);
+            DepartmentService::getInstance()->saveDepartmentDing($item['dept_id'], $item['parent_id'], $item['name']);
             echo $item['dept_id'] . ' ';
             echo $item['name'] . PHP_EOL;
             $tmp = $this->syncDepartment($item['dept_id']);
