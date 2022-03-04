@@ -7,5 +7,9 @@
 
 return [
     'corp' => '研测有限公司',
+    'admin' => [
+        'account' => 'admin',
+        'password' => '123456',
+    ],
     'loginUnique' => true,
 ];
