@@ -1,6 +1,8 @@
 <template>
   <div class="app-container">
     <el-card>
+
+      <!--新增按钮-->
       <div slot="header" class="clearfix">
         <span>部门管理</span>
         <el-button
@@ -12,29 +14,40 @@
           新增
         </el-button>
       </div>
+
+      <!--表单-->
       <div>
         <el-table
+          ref="departmentTree"
           :data="list"
           row-key="id"
           :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+          default-expand-all
+          :row-class-name="departmentRowClassName"
         >
-          <el-table-column prop="name" label="部门">
+          <el-table-column prop="name" width="400" label="部门">
             <template slot="header" slot-scope="scope">
-              <span>部门</span>
+              <span>部门 </span>
+              <el-button type="text" @click="toggleRowExpansion">
+                全部{{ isExpansion ? "收缩" : "展开" }}
+              </el-button>
             </template>
           </el-table-column>
-          <el-table-column prop="id" label="部门ID"/>
-          <el-table-column prop="parentId" label="PID"/>
-          <el-table-column label="操作" align="center">
+          <el-table-column prop="id" width="150" align="center" label="部门ID"/>
+          <el-table-column prop="parent" width="500" label="上级部门"/>
+          <el-table-column prop="parentId" width="150" align="center" label="上级部门ID"/>
+          <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button type="primary" @click="showEdit(scope.row)">编辑</el-button>
-              <el-button type="danger" @click="remove(scope.row.id)">删除</el-button>
+              <el-button v-if="scope.row.id > 1" type="danger" @click="remove(scope.row.id)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
       </div>
+
     </el-card>
 
+    <!--编辑弹窗-->
     <el-dialog
       :title="dialogTitle"
       :visible.sync="showDialog"
@@ -49,13 +62,15 @@
             v-model="departmentParams.parentId"
             :options="selectOptions"
             :props="defaultProps"
+            :disabled="departmentParams.id === 1"
+            placeholder="请选择上级部门"
             filterable
             clearable
             style="width: 100%"
           />
         </el-form-item>
         <el-form-item label="部门：" prop="name">
-          <el-input v-model="departmentParams.name" placeholder="请输入" clearable style="width: 100%"/>
+          <el-input v-model="departmentParams.name" placeholder="请输入部门名字" clearable style="width: 100%"/>
         </el-form-item>
       </el-form>
       <div slot="footer">
@@ -63,6 +78,7 @@
         <el-button type="info" @click="closeDialog">取消</el-button>
       </div>
     </el-dialog>
+
   </div>
 </template>
 
@@ -75,6 +91,7 @@
     data() {
       return {
         loading: false,
+        isExpansion: true,
 
         showDialog: false,
         dialogTitle: '添加部门',
@@ -83,7 +100,6 @@
           name: '',
           parentId: ''
         },
-        editDialog: true,
         departmentRules: {
           name: [{required: true, message: '请输入部门名字', trigger: 'change'}],
           parentId: [{required: true, message: '请选择上级部门', trigger: 'change'}]
@@ -128,11 +144,6 @@
 
     async created() {
       await this.queryList();
-      if (this.list.length > 0) {
-        this.$nextTick(() => {
-          document.getElementsByClassName('el-table__expand-icon')[0].click();
-        });
-      }
     },
 
     methods: {
@@ -196,7 +207,11 @@
       },
 
       showEdit(row) {
-        this.departmentParams = row;
+        this.departmentParams = {
+          id: row.id,
+          name: row.name,
+          parentId: row.parentId,
+        };
         this.dialogTitle = '编辑';
         this.showDialog = true;
       },
@@ -204,11 +219,54 @@
       closeDialog() {
         this.showDialog = false;
         this.departmentParams = {};
-      }
+      },
+
+      departmentRowClassName({row, rowIndex}) {
+        return 'row' + row.level;
+      },
+      // 切换数据表格树形展开
+      toggleRowExpansion() {
+        this.isExpansion = !this.isExpansion;
+        this.toggleRowExpansionAll(this.list, this.isExpansion);
+      },
+      toggleRowExpansionAll(data, isExpansion) {
+        data.forEach((item) => {
+          this.$refs.departmentTree.toggleRowExpansion(item, isExpansion);
+          if (item.children !== undefined && item.children !== null) {
+            this.toggleRowExpansionAll(item.children, isExpansion);
+          }
+        });
+      },
     }
   }
 </script>
 
+<style>
+  .el-table .row1 {
+    background: #26c2ff;
+  }
+
+  .el-table .row2 {
+    background: #7ec24e;
+  }
+
+  .el-table .row3 {
+    background: #E6A23C;
+  }
+
+  .el-table .row4 {
+    background: #999512;
+  }
+
+  .el-table .row5 {
+    background: #8e9982;
+  }
+
+  .el-table .row6 {
+    background: #909399;
+  }
+
+</style>
 <style scoped>
 
 </style>

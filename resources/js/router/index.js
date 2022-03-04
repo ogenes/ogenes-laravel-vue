@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-Vue.use(Router)
+Vue.use(Router);
 
 /* Layout */
 import Layout from '@/layout'
@@ -132,7 +132,7 @@ export const asyncRoutes = [
     name: 'System',
     meta: {
       title: '系统管理',
-      icon: 'setting',
+      icon: 'system',
       roles: ['system'] // you can set roles in root nav
     },
     children: [
@@ -142,6 +142,7 @@ export const asyncRoutes = [
         name: 'DepartmentManage',
         meta: {
           title: '部门管理',
+          icon: 'department',
           roles: ['system-department'] // or you can only set roles in sub nav
         }
       },
@@ -157,11 +158,11 @@ const createRouter = () => new Router({
   routes: constantRoutes
 });
 
-const router = createRouter()
+const router = createRouter();
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
-  const newRouter = createRouter()
+  const newRouter = createRouter();
   router.matcher = newRouter.matcher // reset router
 }
 

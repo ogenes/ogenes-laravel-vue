@@ -27,13 +27,16 @@ class DepartmentService extends BaseService
         if (!$ret) {
             return [];
         }
-        $ret['children'] = $this->getChildrenDepartment(self::ROOT_ID);
+        $ret['level'] = 1;
+        $ret['parents'] = [];
+        $ret['parent'] = '/';
+        $ret['children'] = $this->getChildrenDepartment($ret);
         return [$ret];
     }
     
-    protected function getChildrenDepartment(int $id): array
+    protected function getChildrenDepartment(array $dept): array
     {
-        $data = Department::whereParentId($id)
+        $data = Department::whereParentId($dept['id'])
             ->get([
                 'id',
                 'name',
@@ -45,7 +48,11 @@ class DepartmentService extends BaseService
         }
         $ret = [];
         foreach ($data as $item) {
-            $tmp = $this->getChildrenDepartment($item['id']);
+            $item['parents'] = $dept['parents'];
+            $item['parents'][] = $dept['name'];
+            $item['level'] = count($item['parents']) + 1;
+            $tmp = $this->getChildrenDepartment($item);
+            $item['parent'] = implode(' / ', $item['parents']);
             $tmp && $item['children'] = $tmp;
             $ret[] = $item;
         }
