@@ -44,7 +44,16 @@ function getRandStr(int $len, array $conf = ['number', 'upper', 'lower']): strin
     in_array('upper', $conf, true) && $match .= $upper;
     in_array('lower', $conf, true) && $match .= $lower;
     in_array('special', $conf, true) && $match .= $special;
-
+    
     $match = str_shuffle($match);
     return substr($match, 0, $len);
+}
+
+function formatDateTime(string $dateTime): string
+{
+    $ret = date('Y-m-d H:i:s', strtotime($dateTime));
+    if ($ret === '2000-01-01 00:00:01') {
+        $ret = '/';
+    }
+    return $ret;
 }

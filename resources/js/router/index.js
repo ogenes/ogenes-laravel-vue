@@ -146,6 +146,16 @@ export const asyncRoutes = [
           roles: ['system-department'] // or you can only set roles in sub nav
         }
       },
+      {
+        path: 'user',
+        component: () => import('@/views/system/user'),
+        name: 'UserManage',
+        meta: {
+          title: '用户管理',
+          icon: 'user',
+          roles: ['system-user'] // or you can only set roles in sub nav
+        }
+      },
     ]
   },
   // 404 page must be placed at the end !!!

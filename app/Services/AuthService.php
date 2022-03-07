@@ -11,6 +11,7 @@ namespace App\Services;
 use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use function App\Helpers\getRealIp;
 use function App\Helpers\getUniqId;
@@ -20,7 +21,7 @@ class AuthService extends BaseService
     private const
         LOGIN_KEY_PREFIX = 'CYNIC:LOGIN:',
         LOGIN_EXP = 86400 * 30,
-        REFRESH_EXP = 600;
+        REFRESH_EXP = 300;
     
     /**
      * @param string $account
@@ -58,6 +59,7 @@ class AuthService extends BaseService
             json_encode($loginInfo, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE),
             self::LOGIN_EXP
         );
+        UserService::getInstance()->updateLoginInfo($exist->uid, $loginInfo['last_login_at'], $loginInfo['last_login_ip']);
         if (!$ret) {
             throw new CommonException(ErrorCode::LOGIN_FAILED);
         }
@@ -110,6 +112,7 @@ class AuthService extends BaseService
             if ($diffTime > self::REFRESH_EXP) {
                 $loginInfo['last_login_at'] = date('Y-m-d H:i:s');
                 $loginInfo['last_login_ip'] = getRealIp();
+                UserService::getInstance()->updateLoginInfo($uid, $loginInfo['last_login_at'], $loginInfo['last_login_ip']);
                 $this->getRedis()->set(
                     $loginKey,
                     json_encode($loginInfo, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE),

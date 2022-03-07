@@ -2,7 +2,7 @@ import variables from '@/styles/element-variables.module.scss'
 import defaultSettings from '@/settings'
 import { theme } from '@/utils/theme'
 
-const { showSettings, tagsView, fixedHeader, sidebarLogo, darkTheme } = defaultSettings;
+const { showSettings, tagsView, fixedHeader, sidebarLogo, darkTheme, englishLanguage } = defaultSettings;
 
 function getItem(key, def) {
   const ret = localStorage.getItem(key) === null ? def : localStorage.getItem(key) > 0;
@@ -29,10 +29,9 @@ const state = {
   tagsView: getItem('tagsView', tagsView),
   fixedHeader: getItem('fixedHeader', fixedHeader),
   sidebarLogo: getItem('sidebarLogo', sidebarLogo),
+  englishLanguage: getItem('englishLanguage', englishLanguage),
   // darkTheme: getItem('darkTheme', darkTheme),
 };
-
-console.log(state);
 
 const mutations = {
   CHANGE_SETTING: (state, { key, value }) => {

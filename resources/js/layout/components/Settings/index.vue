@@ -3,10 +3,10 @@
     <div>
       <h3 class="drawer-title">Page style setting</h3>
 
-      <div class="drawer-item">
-        <span>Dark Theme</span>
-        <el-switch v-model="darkTheme" class="drawer-switch" />
-      </div>
+<!--      <div class="drawer-item">-->
+<!--        <span>Dark Theme</span>-->
+<!--        <el-switch v-model="darkTheme" class="drawer-switch" />-->
+<!--      </div>-->
 
       <div class="drawer-item">
         <span>Open Tags-View</span>
@@ -21,6 +21,11 @@
       <div class="drawer-item">
         <span>Sidebar Logo</span>
         <el-switch v-model="sidebarLogo" class="drawer-switch" />
+      </div>
+
+      <div class="drawer-item">
+        <span>Language English</span>
+        <el-switch v-model="englishLanguage" class="drawer-switch" />
       </div>
 
     </div>
@@ -74,6 +79,19 @@ export default {
       set(val) {
         this.$store.dispatch('settings/changeSetting', {
           key: 'sidebarLogo',
+          value: val
+        })
+      }
+    },
+    englishLanguage: {
+      get() {
+        let val = this.$store.state.settings.englishLanguage;
+        this.$i18n.locale = val ? 'en' : 'zh';
+        return val;
+      },
+      set(val) {
+        this.$store.dispatch('settings/changeSetting', {
+          key: 'englishLanguage',
           value: val
         })
       }

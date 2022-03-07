@@ -41,5 +41,6 @@ use Illuminate\Database\Eloquent\Model;
 class User extends Model
 {
     use HasFactory;
+    protected $fillable = ['last_login_ip', 'last_login_at'];
     protected $table = 'user';
 }

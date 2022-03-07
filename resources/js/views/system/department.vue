@@ -36,6 +36,7 @@
           <el-table-column prop="id" width="150" align="center" label="部门ID"/>
           <el-table-column prop="parent" width="500" label="上级部门"/>
           <el-table-column prop="parentId" width="150" align="center" label="上级部门ID"/>
+          <el-table-column prop="cnt" width="150" align="center" label="部门人数"/>
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button type="primary" @click="showEdit(scope.row)">编辑</el-button>
@@ -246,7 +247,7 @@
     background: #26c2ff;
   }
 
-  .el-table .row2 {
+  /*.el-table .row2 {
     background: #7ec24e;
   }
 
@@ -264,7 +265,7 @@
 
   .el-table .row6 {
     background: #909399;
-  }
+  }*/
 
 </style>
 <style scoped>

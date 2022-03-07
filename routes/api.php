@@ -25,6 +25,7 @@ Route::middleware(['language'])->group(function () {
         Route::prefix('user')->group(function () {
             Route::any('logout', [UserController::class, 'logout'])->name('user.logout');
             Route::any('info', [UserController::class, 'info'])->name('user.info');
+            Route::any('list', [UserController::class, 'list'])->name('user.list');
         });
         Route::prefix('department')->group(function () {
             Route::any('list', [DepartmentController::class, 'list'])->name('department.list');

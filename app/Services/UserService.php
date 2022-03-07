@@ -9,6 +9,10 @@ namespace App\Services;
 
 
 use App\Models\User;
+use App\Models\UserHasDepartment;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use function App\Helpers\formatDateTime;
 
 class UserService extends BaseService
 {
@@ -72,12 +76,75 @@ class UserService extends BaseService
         return json_decode($cache, true, 512, JSON_THROW_ON_ERROR);
     }
     
+    public function getList(string $username, string $userStatus, string $mobile, array $deptIds, int $page, int $pageSize): array
+    {
+        $ret = [
+            'cnt' => 0,
+            'list' => [],
+            'page' => $page,
+            'pageSize' => $pageSize,
+        ];
+        $userTb = (new User())->getTable();
+        $userHasDepartmentTb = (new UserHasDepartment())->getTable();
+        $query = DB::table("{$userTb} as u")
+            ->leftJoin("{$userHasDepartmentTb} as uhd", 'u.uid', '=', 'uhd.uid')
+            ->select([
+                'u.*',
+                DB::raw('GROUP_CONCAT(uhd.dept_id) as dept_ids')
+            ]);
+        $username && $query->where('username', 'like', "%{$username}%");
+        $mobile && $query->where('mobile', 'like', "%{$mobile}%");
+        $deptIds && $query->whereIn('uhd.dept_id', $deptIds);
+        $userStatus !== '' && $query->where('user_status', '=', $userStatus);
+        
+        $query->groupBy(['u.uid'])->orderBy('u.uid', 'desc');
+        $resp = $query->paginate($pageSize, ['*'], 'page', $page)->toArray();
+        if (empty($resp)) {
+            return $ret;
+        }
+        
+        $ret['cnt'] = $resp['total'];
+        $ret['page'] = $resp['current_page'];
+        $ret['pageSize'] = $resp['per_page'];
+        
+        $departmentMap = DepartmentService::getInstance()->getDepartmentMap();
+        foreach ($resp['data'] as $item) {
+            $item = json_decode(json_encode($item, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
+            $item['last_login_at'] = formatDateTime($item['last_login_at']);
+            $item['created_at'] = formatDateTime($item['created_at']);
+            $item['updated_at'] = formatDateTime($item['updated_at']);
+            $deptIds = $item['dept_ids'];
+            $item['dept_id_arr'] = explode(',', $deptIds);
+            sort($item['dept_id_arr']);
+            foreach ($item['dept_id_arr'] as $deptId) {
+                $tmpDepartment = $departmentMap[$deptId] ?? [];
+                $item['departments'][] = $tmpDepartment['fullName'] ?? '';
+            }
+            $tmp = [];
+            foreach ($item as $key => $value) {
+                $tmp[Str::camel($key)] = $value;
+            }
+            $ret['list'][] = $tmp;
+        }
+        return $ret;
+        
+    }
+    
     protected function cacheUserField(int $uid, string $field, string $value): void
     {
         $userInfo = $this->getInfoFromCache($uid);
         !$userInfo && $userInfo['id'] = $uid;
         $userInfo[$field] = $value;
         $this->cacheUserInfo($userInfo);
+    }
+    
+    public function updateLoginInfo(int $uid, string $loginAt, string $loginIp): void
+    {
+        User::whereUid($uid)->update([
+            'last_login_at' => $loginAt,
+            'last_login_ip' => $loginIp,
+            'updated_at' => DB::raw('`updated_at`')
+        ]);
     }
     
 }

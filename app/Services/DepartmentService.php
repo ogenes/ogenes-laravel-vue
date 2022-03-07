@@ -9,6 +9,8 @@ namespace App\Services;
 
 
 use App\Models\Department;
+use App\Models\UserHasDepartment;
+use Illuminate\Support\Facades\DB;
 
 class DepartmentService extends BaseService
 {
@@ -30,11 +32,13 @@ class DepartmentService extends BaseService
         $ret['level'] = 1;
         $ret['parents'] = [];
         $ret['parent'] = '/';
-        $ret['children'] = $this->getChildrenDepartment($ret);
+        $cntMap = $this->getUserCount();
+        $ret['cnt'] = $cntMap[self::ROOT_ID] ?? 0;
+        $ret['children'] = $this->getChildrenDepartment($ret, $cntMap);
         return [$ret];
     }
     
-    protected function getChildrenDepartment(array $dept): array
+    protected function getChildrenDepartment(array $dept, array $cntMap): array
     {
         $data = Department::whereParentId($dept['id'])
             ->get([
@@ -51,7 +55,8 @@ class DepartmentService extends BaseService
             $item['parents'] = $dept['parents'];
             $item['parents'][] = $dept['name'];
             $item['level'] = count($item['parents']) + 1;
-            $tmp = $this->getChildrenDepartment($item);
+            $item['cnt'] = $cntMap[$item['id']] ?? 0;
+            $tmp = $this->getChildrenDepartment($item, $cntMap);
             $item['parent'] = implode(' / ', $item['parents']);
             $tmp && $item['children'] = $tmp;
             $ret[] = $item;
@@ -67,7 +72,7 @@ class DepartmentService extends BaseService
             if ($exist) {
                 $exist->setAttribute('parent_id', $parentId);
                 $exist->setAttribute('name', $name);
-                $ret =$exist->save();
+                $ret = $exist->save();
             }
         } else {
             $ret = Department::insertGetId([
@@ -79,15 +84,58 @@ class DepartmentService extends BaseService
         return $ret;
     }
     
-    public function remove(int $id):bool 
+    public function remove(int $id): bool
     {
         $ret = false;
         //check
         $exist = Department::whereId($id)->first();
         if ($exist) {
-            $ret =$exist->delete();
+            $ret = $exist->delete();
         }
         return $ret;
     }
     
+    protected function getUserCount(): array
+    {
+        $data = UserHasDepartment::select([
+            'dept_id',
+            DB::raw('count(1) as cnt'),
+        ])
+            ->groupBy(['dept_id'])
+            ->get()
+            ->toArray();
+        return $data ? array_column($data, 'cnt', 'dept_id') : [];
+    }
+    
+    public function getDepartmentMap(): array
+    {
+        $data = Department::get([
+            'id',
+            'name',
+            'parent_id as parentId',
+        ])
+            ->toArray();
+        $map = array_column($data, null, 'id');
+        $ret = [];
+        foreach ($data as $item) {
+            $item['parents'] = array_filter($this->getParents($item['parentId'], $map));
+            $item['parentName'] = $item['parents'] ? implode(' / ', array_column($item['parents'], 'name')) : '';
+            $item['fullName'] = ($item['parentName'] ? $item['parentName'] . ' / ' : '') . $item['name'];
+            $ret[$item['id']] = $item;
+        }
+        return $ret;
+    }
+    
+    protected function getParents(int $parentId, array $map): array
+    {
+        $parentData = $map[$parentId] ?? [];
+        $parents = [];
+        $parents[] = $parentData ?? '';
+        
+        if (isset($parentData['parentId']) && $parentData['parentId'] > 0) {
+            $tmpParents = $this->getParents($parentData['parentId'], $map);
+            array_unshift($parents, ...$tmpParents);
+        }
+        return $parents;
+    }
 }

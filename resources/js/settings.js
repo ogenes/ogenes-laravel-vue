@@ -27,6 +27,8 @@ module.exports = {
 
   darkTheme: false,
 
+  englishLanguage: false,
+
   /**
    * @type {string | array} 'production' | ['production', 'development']
    * @description Need show err logs component.
