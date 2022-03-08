@@ -67,8 +67,8 @@
               v-if="scope.row.avatar"
               placement="right-start"
               trigger="hover">
-              <el-avatar :size="200" :src="scope.row.avatar+'?imageView2/1/w/80/h/80'"/>
-              <el-avatar slot="reference" :src="scope.row.avatar+'?imageView2/1/w/80/h/80'"/>
+              <el-avatar :size="200" fit="cover" :src="scope.row.avatar"/>
+              <el-avatar slot="reference" fit="cover" :src="scope.row.avatar"/>
             </el-popover>
             <el-avatar v-else icon="el-icon-user-solid"/>
             <div>

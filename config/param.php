@@ -10,6 +10,15 @@ $ding = [
     'appSecret' => env('DING_APP_SECRET', ''),
 ];
 
+$alioss = [
+    'accessKeyId' => env('OSS_ACCESS_ID', ''),
+    'accessKeySecret' => env('OSS_ACCESS_KEY', ''),
+    'endpoint' => env('OSS_ENDPOINT', ''),
+    'bucket' => env('OSS_BUCKET', ''),
+    'cdnDomain' => env('OSS_CDN_DOMAIN', ''),
+];
+
 return [
-    'ding' => $ding
+    'ding' => $ding,
+    'alioss' => $alioss,
 ];

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\FileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +30,9 @@ Route::middleware(['language'])->group(function () {
             Route::any('save', [UserController::class, 'save'])->name('user.save');
             Route::any('switchStatus', [UserController::class, 'switchStatus'])->name('user.switchStatus');
             Route::any('resetPassByUid', [UserController::class, 'resetPassByUid'])->name('user.resetPassByUid');
+        });
+        Route::prefix('file')->group(function () {
+            Route::any('upload', [FileController::class, 'upload'])->name('file.upload');
         });
         Route::prefix('department')->group(function () {
             Route::any('list', [DepartmentController::class, 'list'])->name('department.list');
