@@ -170,7 +170,6 @@
             }
             this.loading = false
           }).catch((e) => {
-            this.$message.error('操作失败：' + e);
             this.loading = false
           });
           this.loading = false;
@@ -197,7 +196,6 @@
               }
               this.loading = false
             }).catch((e) => {
-              this.$message.error('新增出错：' + e);
               this.loading = false
             })
           } else {

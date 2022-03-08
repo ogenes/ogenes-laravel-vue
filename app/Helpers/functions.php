@@ -9,6 +9,7 @@ namespace App\Helpers;
 
 
 use Godruoyi\Snowflake\Snowflake;
+use Illuminate\Http\Request;
 
 function getRealIp(): string
 {
@@ -56,4 +57,9 @@ function formatDateTime(string $dateTime): string
         $ret = '/';
     }
     return $ret;
+}
+
+function getParams($request): array
+{
+    return is_array($request['data']) ? $request['data'] : json_decode($request['data'], true, 512, JSON_THROW_ON_ERROR);
 }

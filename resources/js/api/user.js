@@ -26,13 +26,37 @@ export function getList(data) {
   return request({
     url: '/api/user/list',
     method: 'get',
-    params: { data }
+    params: {data}
+  })
+}
+
+export function save(data) {
+  return request({
+    url: '/api/user/save',
+    method: 'post',
+    data: {data},
+  })
+}
+
+export function switchStatus(data) {
+  return request({
+    url: '/api/user/switchStatus',
+    method: 'post',
+    data: {data},
+  })
+}
+
+export function resetPassByUid(data) {
+  return request({
+    url: '/api/user/resetPassByUid',
+    method: 'post',
+    data: {data},
   })
 }
 
 export const USER_STATUS_OPTION = [
   {
-    label: '正常',
+    label: '启用',
     value: 1,
   },
   {

@@ -11,14 +11,16 @@
       >
         <el-row>
           <el-form-item label="用户名:">
-            <el-input v-model="queryParams.username" @keyup.enter.native="queryList" class="form-item" placeholder="支持模糊搜索"/>
+            <el-input v-model="queryParams.username" @keyup.enter.native="queryList" class="form-item-width"
+                      placeholder="支持模糊搜索"/>
           </el-form-item>
           <el-form-item label="手机号:">
-            <el-input v-model="queryParams.mobile" @keyup.enter.native="queryList" class="form-item" placeholder="支持模糊搜索"/>
+            <el-input v-model="queryParams.mobile" @keyup.enter.native="queryList" class="form-item-width"
+                      placeholder="支持模糊搜索"/>
           </el-form-item>
           <el-form-item label="状态:">
-            <el-select v-model="queryParams.userStatus" clearable class="form-item">
-              <el-option v-for="(v, k) in userStatusOption" :key="k" :value="v.value" :label="v.label" />
+            <el-select v-model="queryParams.userStatus" clearable class="form-item-width">
+              <el-option v-for="(v, k) in userStatusOption" :key="k" :value="v.value" :label="v.label"/>
             </el-select>
           </el-form-item>
 
@@ -32,7 +34,7 @@
               placeholder="请选择"
               filterable
               clearable
-              class="form-item"
+              class="form-item-width"
             />
           </el-form-item>
           <el-form-item label=" ">
@@ -77,10 +79,17 @@
         <el-table-column fixed label="用户账号" prop="account" width="120px" align="center"/>
         <el-table-column label="手机号" prop="mobile" width="120px" align="center"/>
         <el-table-column label="邮箱" prop="email" width="200px" align="left"/>
-        <el-table-column label="状态" prop="userStatus" width="100px" align="center">
+        <el-table-column label="状态" prop="userStatus" width="200px" align="center">
           <template slot-scope="scope">
-            <el-tag v-if="scope.row.userStatus > 0" type="success">正常</el-tag>
-            <el-tag v-else type="danger">禁用</el-tag>
+            <el-switch
+              v-model="scope.row.userStatus"
+              active-text="启用"
+              inactive-text="禁用"
+              active-color="#67C23A"
+              inactive-color="#F56C6C"
+              @change="switchStatus($event, scope.row)"
+            >
+            </el-switch>
           </template>
         </el-table-column>
         <el-table-column label="部门" prop="departments" width="500px" align="left">
@@ -107,13 +116,31 @@
         <el-table-column fixed="right" label="操作" align="center" width="200px">
           <template slot-scope="scope">
             <div>
-              <el-button type="primary">编辑</el-button>
-              <el-button :disabled="scope.row.uid === 1" type="danger">禁用</el-button>
+              <el-button type="text" @click="showEdit(scope.row)">编辑</el-button>
+              <el-button type="text" :disabled="scope.row.uid === 1" @click="resetPass(scope.row)">重置密码</el-button>
             </div>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
+
+    <el-drawer
+      v-if="showDialog"
+      :title="dialogTitle"
+      direction="rtl"
+      size="30%"
+      :visible.sync="showDialog"
+      :wrapper-closable="false"
+      style="padding-left: 20px"
+      custom-class="overflow-auto"
+    >
+      <user-form
+        :departments="departments"
+        :default-props="defaultProps"
+        :user-params="userParams"
+        :close-dialog="closeDialog"
+      />
+    </el-drawer>
   </div>
 </template>
 
@@ -121,11 +148,19 @@
   import {getList as getDepartmentList} from '@/api/system/department';
   import {
     getList,
+    switchStatus,
+    resetPassByUid,
     USER_STATUS_OPTION
   } from '@/api/user';
 
+  import userForm from "./components/user-form";
+
   export default {
     name: "UserManage",
+
+    components: {
+      userForm,
+    },
 
     data() {
       return {
@@ -149,13 +184,22 @@
           userStatus: '',
           deptIds: []
         },
-        pageSizes: [20, 50, 100, 200],
+        pageSizes: [10, 20, 50, 100, 200],
         result: {
           list: [],
           cnt: 0
         },
 
         showDialog: false,
+        dialogTitle: '添加用户',
+        userParams: {
+          id: 0,
+          username: '',
+          mobile: '',
+          email: '',
+          avatar: '',
+          deptIds: [],
+        },
       }
     },
 
@@ -187,7 +231,9 @@
             this.queryParams.pageSize = parseInt(res.data.pageSize);
             this.result.cnt = parseInt(res.data.cnt);
             this.result.list = res.data.list;
-            console.log(this.result);
+            this.result.list.forEach(item => {
+              item.userStatus = item.userStatus > 0
+            })
           }
           this.loading = false
         }).catch((e) => {
@@ -204,23 +250,101 @@
         this.queryParams.page = currentPage;
         this.getList()
       },
+
+      showEdit(row) {
+        this.userParams = {
+          id: row.uid,
+          username: row.username,
+          mobile: row.mobile,
+          email: row.email,
+          avatar: row.avatar,
+          deptIds: row.deptIdArr,
+        };
+        this.dialogTitle = '修改用户';
+        this.showDialog = true;
+      },
+
+      closeDialog() {
+        this.showDialog = false;
+        this.userParams = {};
+        this.dialogTitle = '添加用户';
+        this.queryList();
+      },
+
+      switchStatus($event, row) {
+        const label = $event ? '启用' : '禁用';
+        row.userStatus = !row.userStatus;
+        this.$confirm('确认' + label + '用户?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.loading = true;
+          switchStatus({id: row.uid, userStatus: $event}).then((res) => {
+            if (res.data.code > 0) {
+              this.$message.error(res.data.msg)
+            } else {
+              this.$message.success('操作成功');
+              this.queryList();
+            }
+            this.loading = false
+          }).catch((e) => {
+            this.loading = false
+          });
+          this.loading = false;
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });
+        });
+      },
+
+      resetPass(row) {
+        this.$confirm('确认重置用户密码?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.loading = true;
+          resetPassByUid({id: row.uid}).then((res) => {
+            if (res.data.code > 0) {
+              this.$message.error(res.data.msg)
+            } else {
+              this.$message.success('操作成功');
+              this.$alert(row.username + '的新密码是 ' + res.data.password, '密码重置', {
+                confirmButtonText: '确定',
+              });
+            }
+            this.loading = false
+          }).catch((e) => {
+            this.loading = false
+          });
+          this.loading = false;
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });
+        });
+      }
     }
   }
 </script>
 
 <style scoped lang="scss">
-.app-container {
-  .form-item {
-    width: 300px
-  }
+  .app-container {
+    .form-item-width {
+      width: 300px
+    }
 
-  .page-position {
-    text-align: right;
-    margin: 10px 0;
-  }
+    .page-position {
+      text-align: right;
+      margin: 10px 0;
+    }
 
-  .span-color {
-    color: #1482f0
+    .span-color {
+      color: #1482f0
+    }
   }
-}
 </style>

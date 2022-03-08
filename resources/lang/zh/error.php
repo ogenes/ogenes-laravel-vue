@@ -17,4 +17,5 @@ return [
     'VERIFICATION_CODE_ERROR' => '验证码错误！',
     'UPLOAD_FAILED' => '上传失败！',
     'INVALID_FILE_TYPE' => '暂不支持此类型的文件！',
+    'MOBILE_EXISTS' => '手机号已存在！',
 ];

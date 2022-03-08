@@ -43,4 +43,14 @@ class User extends Model
     use HasFactory;
     protected $fillable = ['last_login_ip', 'last_login_at'];
     protected $table = 'user';
+    protected $primaryKey = 'uid';
+    
+    public const 
+        STATUS_NORMAL = 1,
+        STATUS_DISABLE = 0;
+    
+    public const STATUS_MAP = [
+        self::STATUS_DISABLE => '禁用',  
+        self::STATUS_NORMAL => '启用',  
+    ];
 }

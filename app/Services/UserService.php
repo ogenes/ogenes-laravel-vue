@@ -8,11 +8,14 @@
 namespace App\Services;
 
 
+use App\Exceptions\CommonException;
+use App\Exceptions\ErrorCode;
 use App\Models\User;
 use App\Models\UserHasDepartment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use function App\Helpers\formatDateTime;
+use function App\Helpers\getRandStr;
 
 class UserService extends BaseService
 {
@@ -147,4 +150,120 @@ class UserService extends BaseService
         ]);
     }
     
+    
+    /**
+     * @param int $uid
+     * @param string $avatar
+     * @param string $username
+     * @param string $mobile
+     * @param string $email
+     * @param array $deptIds
+     * @return bool
+     * @throws \Throwable
+     */
+    public function save(
+        int $uid,
+        string $avatar,
+        string $username,
+        string $mobile,
+        string $email,
+        array $deptIds
+    ): bool
+    {
+        if (User::whereMobile($mobile)->where('uid', '!=', $uid)->exists()) {
+            throw new CommonException(ErrorCode::MOBILE_EXISTS);
+        }
+        DB::beginTransaction();
+        try {
+            if ($uid > 0) {
+                $exists = User::where('uid', '=', $uid)->first();
+                if (!$exists) {
+                    throw new CommonException(ErrorCode::NO_USER_FOUND);
+                }
+                $exists->setAttribute('avatar', $avatar);
+                $exists->setAttribute('account', $mobile);
+                $exists->setAttribute('username', $username);
+                $exists->setAttribute('mobile', $mobile);
+                $exists->setAttribute('email', $email);
+                $exists->save();
+            } else {
+                $uid = User::insertGetId([
+                    'avatar' => $avatar,
+                    'username' => $username,
+                    'mobile' => $mobile,
+                    'email' => $email,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]);
+            }
+            $ret = $this->saveUserHasDepartment($uid, $deptIds);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+        return $ret;
+    }
+    
+    protected function saveUserHasDepartment(int $uid, array $deptIds): bool
+    {
+        $exists = UserHasDepartment::whereUid($uid)
+            ->get()
+            ->toArray();
+        if ($exists) {
+            $existIds = array_column($exists, 'dept_id');
+            $addIds = array_diff($deptIds, $existIds);
+            $delIds = array_diff($existIds, $deptIds);
+            UserHasDepartment::whereUid($uid)
+                ->whereIn('dept_id', $delIds)
+                ->delete();
+        } else {
+            $addIds = $deptIds;
+        }
+        $insertData = [];
+        foreach ($addIds as $deptId) {
+            $insertData[] = [
+                'uid' => $uid,
+                'dept_id' => $deptId,
+                'created_at' => date('Y-m-d H:i:s'),
+            ];
+        }
+        UserHasDepartment::insert($insertData);
+        return true;
+    }
+    
+    public function switchStatus(int $uid, int $userStatus): bool
+    {
+        $exists = User::whereUid($uid)->first();
+        if (!$exists) {
+            throw new CommonException(ErrorCode::NO_USER_FOUND);
+        }
+        
+        if (!array_key_exists($userStatus, User::STATUS_MAP)) {
+            throw new CommonException(ErrorCode::INVALID_ARGUMENT);
+        }
+        
+        if ($exists->user_status !== $userStatus) {
+            $exists->user_status = $userStatus;
+            $exists->save();
+            //record log
+        }
+        return true;
+        
+    }
+    
+    public function resetPassByUid(int $uid): array
+    {
+        $exists = User::whereUid($uid)->first();
+        if (!$exists) {
+            throw new CommonException(ErrorCode::NO_USER_FOUND);
+        }
+        $password = getRandStr(8, ['number', 'lower']);
+        $plain = md5(env('SALT', '') . $password);
+        $exists->setAttribute('password', $plain);
+        $exists->save();
+        //record log
+        return [
+            'password' => $password,
+        ];
+    }
 }
