@@ -3,7 +3,7 @@
     <el-card>
       <!--新增按钮-->
       <div slot="header" class="clearfix">
-        <span>菜单管理</span>
+        <span>权限管理</span>
       </div>
 
       <div>

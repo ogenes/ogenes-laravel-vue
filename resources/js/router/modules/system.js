@@ -37,7 +37,7 @@ const systemRouter = {
       component: () => import('@/views/system/menu'),
       name: 'MenuManage',
       meta: {
-        title: '菜单管理',
+        title: '权限管理',
         icon: 'menu',
         roles: ['system-menu'] // or you can only set roles in sub nav
       }
