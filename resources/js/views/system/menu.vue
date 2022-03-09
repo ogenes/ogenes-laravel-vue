@@ -47,7 +47,6 @@
 
     async created() {
       await this.getOptions();
-      console.log(this.options, 'this.options')
     },
 
     methods: {

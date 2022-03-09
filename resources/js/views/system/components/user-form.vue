@@ -162,7 +162,6 @@
           this.$message.error(ret.msg);
         } else {
           this.$message.success('上传成功！');
-          console.log('ret.data.path', ret.data.path);
           this.userParams.avatar = ret.data.path;
         }
       },

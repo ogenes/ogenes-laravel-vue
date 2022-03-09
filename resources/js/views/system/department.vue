@@ -122,7 +122,6 @@
       selectOptions() {
 
         function dealDisabled(id, data, disabled) {
-          console.log(id, data, disabled);
           if (data?.id === id) {
             disabled = true;
           }
