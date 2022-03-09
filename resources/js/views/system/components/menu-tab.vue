@@ -71,6 +71,19 @@
         <el-form-item label="System：" prop="systemId">
           <el-input v-model="system" placeholder="请输入" readonly style="width: 100%"/>
         </el-form-item>
+        <el-form-item label="Name：" prop="menuName">
+          <template slot="label">
+            <span>Name</span>
+            <el-popover trigger="hover">
+              <div>
+                此内容请跟开发人员确认，需要与代码中保持一致！
+              </div>
+              <i class="el-icon-question" slot="reference"></i>
+            </el-popover>
+            <span>：</span>
+          </template>
+          <el-input v-model="menuParams.menuName" placeholder="此内容请跟开发人员确认，需要与代码中保持一致！" clearable style="width: 100%"/>
+        </el-form-item>
         <el-form-item label="上级菜单：" prop="parentId">
           <el-cascader
             v-model="menuParams.parentId"
@@ -91,9 +104,6 @@
               :value="key">
             </el-option>
           </el-select>
-        </el-form-item>
-        <el-form-item label="Name：" prop="menuName">
-          <el-input v-model="menuParams.menuName" placeholder="请输入" clearable style="width: 100%"/>
         </el-form-item>
         <el-form-item label="菜单名称：" prop="title">
           <el-input v-model="menuParams.title" placeholder="请输入" clearable style="width: 100%"/>
@@ -199,7 +209,7 @@
             disabled = true;
           }
           if (typeof data === 'object') {
-            data.disabled = data.type === 3 ? true : disabled;
+            data.disabled = disabled;
             const children = data?.children || [];
             if (children) {
               children.forEach(item => {
