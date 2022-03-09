@@ -126,4 +126,31 @@ class MenuService extends BaseService
         }
         return $ret;
     }
+    
+    public function getMenuMap(int $systemId): array
+    {
+        $exists = Menu::where('system_id', '=', $systemId)
+            ->whereIn('type', [1, 2])
+            ->get([
+                'id',
+                'menu_name',
+                'type',
+                'title',
+                'icon',
+                'roles',
+            ])
+            ->toArray();
+        if (!$exists) {
+            return [];
+        }
+        $ret = [];
+        foreach ($exists as $item) {
+            $upperItem = [];
+            foreach ($item as $key => $value) {
+                $upperItem[Str::camel($key)] = $value;
+            }
+            $ret[$item['menu_name']] = $upperItem;
+        }
+        return $ret;
+    }
 }

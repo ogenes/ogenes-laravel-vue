@@ -224,7 +224,7 @@
         this.loading = true;
         getList(this.queryParams).then((res) => {
           if (res.code > 0) {
-            this.$message.error(res.data.msg)
+            this.$message.error(res.msg)
           } else {
             this.queryParams.page = parseInt(res.data.page);
             this.queryParams.pageSize = parseInt(res.data.pageSize);
@@ -280,8 +280,8 @@
         }).then(() => {
           this.loading = true;
           switchStatus({id: row.uid, userStatus: $event}).then((res) => {
-            if (res.data.code > 0) {
-              this.$message.error(res.data.msg)
+            if (res.code > 0) {
+              this.$message.error(res.msg)
             } else {
               this.$message.success('操作成功');
               this.queryList();
@@ -307,8 +307,8 @@
         }).then(() => {
           this.loading = true;
           resetPassByUid({id: row.uid}).then((res) => {
-            if (res.data.code > 0) {
-              this.$message.error(res.data.msg)
+            if (res.code > 0) {
+              this.$message.error(res.msg)
             } else {
               this.$message.success('操作成功');
               this.$alert(row.username + '的新密码是 ' + res.data.password, '密码重置', {

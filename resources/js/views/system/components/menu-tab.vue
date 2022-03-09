@@ -245,8 +245,8 @@
         }).then(() => {
           this.loading = true;
           remove({id}).then((res) => {
-            if (res.data.code > 0) {
-              this.$message.error(res.data.msg)
+            if (res.code > 0) {
+              this.$message.error(res.msg)
             } else {
               this.$message.success('操作成功');
               this.queryList();
@@ -270,8 +270,8 @@
             this.loading = true;
             this.menuParams.systemId = this.systemId;
             save(this.menuParams).then((res) => {
-              if (res.data.code > 0) {
-                this.$message.error(res.data.msg)
+              if (res.code > 0) {
+                this.$message.error(res.msg)
               } else {
                 this.$message.success('操作成功');
                 this.closeDialog();

@@ -109,8 +109,8 @@
           if (valid) {
             this.loading = true;
             save(this.userParams).then((res) => {
-              if (res.data.code > 0) {
-                this.$message.error(res.data.msg)
+              if (res.code > 0) {
+                this.$message.error(res.msg)
               } else {
                 this.$message.success('操作成功');
                 this.closeDialog();

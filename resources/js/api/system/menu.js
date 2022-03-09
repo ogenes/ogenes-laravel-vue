@@ -8,6 +8,14 @@ export function getList(data) {
   })
 }
 
+export function getMenuMap(data) {
+  return request({
+    url: '/api/menu/menuMap',
+    method: 'get',
+    params: {data},
+  })
+}
+
 export function getOptions() {
   return request({
     url: '/api/menu/options',

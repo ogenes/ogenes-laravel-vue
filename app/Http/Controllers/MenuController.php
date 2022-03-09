@@ -71,4 +71,16 @@ class MenuController extends Controller
             'data' => $ret,
         ]);
     }
+    
+    public function menuMap(Request $request)
+    {
+        $params = getParams($request);
+        $systemId = $params['systemId'] ?? 1;
+        $ret = MenuService::getInstance()->getMenuMap($systemId);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
 }

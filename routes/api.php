@@ -38,6 +38,7 @@ Route::middleware(['language'])->group(function () {
         });
         Route::prefix('menu')->group(function () {
             Route::any('list', [MenuController::class, 'list'])->name('menu.list');
+            Route::any('menuMap', [MenuController::class, 'menuMap'])->name('menu.menuMap');
             Route::any('save', [MenuController::class, 'save'])->name('menu.save');
             Route::any('options', [MenuController::class, 'options'])->name('menu.options');
             Route::any('remove', [MenuController::class, 'remove'])->name('menu.remove');

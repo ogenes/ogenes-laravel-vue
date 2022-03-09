@@ -162,8 +162,8 @@
         }).then(() => {
           this.loading = true;
           remove({id}).then((res) => {
-            if (res.data.code > 0) {
-              this.$message.error(res.data.msg)
+            if (res.code > 0) {
+              this.$message.error(res.msg)
             } else {
               this.$message.success('操作成功');
               this.queryList();
@@ -185,8 +185,8 @@
           if (valid) {
             this.loading = true;
             save(this.departmentParams).then((res) => {
-              if (res.data.code > 0) {
-                this.$message.error(res.data.msg)
+              if (res.code > 0) {
+                this.$message.error(res.msg)
               } else {
                 this.$message.success('操作成功');
                 this.closeDialog();
