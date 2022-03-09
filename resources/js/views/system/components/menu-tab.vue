@@ -308,6 +308,7 @@
           id: 0,
           type: "2",
         };
+        location.reload();
       },
 
       menuRowClassName({row, rowIndex}) {

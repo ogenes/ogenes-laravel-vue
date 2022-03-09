@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import getters from './getters';
 import user from './modules/user';
+import menu from './modules/menu';
 import tagsView from './modules/tagsView';
 import app from './modules/app';
 import settings from './modules/settings';
@@ -13,6 +14,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   modules: {
     user,
+    menu,
     tagsView,
     app,
     settings,

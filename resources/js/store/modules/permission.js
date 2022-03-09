@@ -1,4 +1,5 @@
 import { asyncRoutes, constantRoutes } from '@/router'
+import store from '@/store'
 
 /**
  * Use meta.role to determine if the current user has permission
@@ -6,7 +7,7 @@ import { asyncRoutes, constantRoutes } from '@/router'
  * @param route
  */
 function hasPermission(roles, route) {
-  if (route.meta && route.meta.roles) {
+  if (!roles.includes('admin') && route.meta && route.meta.roles) {
     return roles.some(role => route.meta.roles.includes(role))
   } else {
     return true
@@ -24,12 +25,21 @@ export function filterAsyncRoutes(routes, roles) {
   routes.forEach(route => {
     const tmp = { ...route }
     if (hasPermission(roles, tmp)) {
+      const map = store.getters.menuMap[tmp?.name || ''] || [];
+      if (map) {
+        tmp.meta = {
+          ...tmp.meta,
+          title: map.title,
+          icon: map.icon,
+          roles: map.roles,
+        };
+      }
       if (tmp.children) {
         tmp.children = filterAsyncRoutes(tmp.children, roles)
       }
       res.push(tmp)
     }
-  })
+  });
 
   return res
 }
@@ -37,29 +47,25 @@ export function filterAsyncRoutes(routes, roles) {
 const state = {
   routes: [],
   addRoutes: []
-}
+};
 
 const mutations = {
   SET_ROUTES: (state, routes) => {
-    state.addRoutes = routes
+    state.addRoutes = routes;
     state.routes = constantRoutes.concat(routes)
   }
-}
+};
 
 const actions = {
   generateRoutes({ commit }, roles) {
     return new Promise(resolve => {
-      let accessedRoutes
-      if (roles.includes('admin')) {
-        accessedRoutes = asyncRoutes || []
-      } else {
-        accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
-      }
-      commit('SET_ROUTES', accessedRoutes)
-      resolve(accessedRoutes)
+      let accessedRoutes;
+      accessedRoutes = filterAsyncRoutes(asyncRoutes, roles);
+      commit('SET_ROUTES', accessedRoutes);
+      resolve(accessedRoutes);
     })
   }
-}
+};
 
 export default {
   namespaced: true,

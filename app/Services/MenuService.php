@@ -145,6 +145,7 @@ class MenuService extends BaseService
         }
         $ret = [];
         foreach ($exists as $item) {
+            $item['roles'] = explode(PHP_EOL, $item['roles']);
             $upperItem = [];
             foreach ($item as $key => $value) {
                 $upperItem[Str::camel($key)] = $value;
