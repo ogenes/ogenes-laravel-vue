@@ -18,4 +18,6 @@ return [
     'UPLOAD_FAILED' => '上传失败！',
     'INVALID_FILE_TYPE' => '暂不支持此类型的文件！',
     'MOBILE_EXISTS' => '手机号已存在！',
+    'RECORD_EXCEPTION' => '数据异常！',
+    'RECORD_EXISTS' => '记录已存在！',
 ];

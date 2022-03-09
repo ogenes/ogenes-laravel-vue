@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\MenuController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +27,7 @@ Route::middleware(['language'])->group(function () {
         Route::prefix('user')->group(function () {
             Route::any('logout', [UserController::class, 'logout'])->name('user.logout');
             Route::any('info', [UserController::class, 'info'])->name('user.info');
+            Route::any('departmentList', [DepartmentController::class, 'list'])->name('user.departmentList');
             Route::any('list', [UserController::class, 'list'])->name('user.list');
             Route::any('save', [UserController::class, 'save'])->name('user.save');
             Route::any('switchStatus', [UserController::class, 'switchStatus'])->name('user.switchStatus');
@@ -33,6 +35,12 @@ Route::middleware(['language'])->group(function () {
         });
         Route::prefix('file')->group(function () {
             Route::any('upload', [FileController::class, 'upload'])->name('file.upload');
+        });
+        Route::prefix('menu')->group(function () {
+            Route::any('list', [MenuController::class, 'list'])->name('menu.list');
+            Route::any('save', [MenuController::class, 'save'])->name('menu.save');
+            Route::any('options', [MenuController::class, 'options'])->name('menu.options');
+            Route::any('remove', [MenuController::class, 'remove'])->name('menu.remove');
         });
         Route::prefix('department')->group(function () {
             Route::any('list', [DepartmentController::class, 'list'])->name('department.list');

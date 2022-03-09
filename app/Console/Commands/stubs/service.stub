@@ -1,0 +1,13 @@
+<?php
+/**
+ * Created by cynic-img.
+ * User: ogenes
+ * Date: 2022/2/8
+ */
+
+namespace DummyNamespace;
+
+
+class DummyClass extends BaseService
+{
+}

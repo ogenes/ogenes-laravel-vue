@@ -45,12 +45,12 @@ class User extends Model
     protected $table = 'user';
     protected $primaryKey = 'uid';
     
-    public const 
+    public const
         STATUS_NORMAL = 1,
         STATUS_DISABLE = 0;
     
     public const STATUS_MAP = [
-        self::STATUS_DISABLE => '禁用',  
-        self::STATUS_NORMAL => '启用',  
+        self::STATUS_DISABLE => '禁用',
+        self::STATUS_NORMAL => '启用',
     ];
 }

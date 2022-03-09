@@ -29,6 +29,8 @@ class ErrorCode
     public const UPLOAD_FAILED = 1011;
     public const INVALID_FILE_TYPE = 1012;
     public const MOBILE_EXISTS = 1013;
+    public const RECORD_EXCEPTION = 1014;
+    public const RECORD_EXISTS = 1015;
     
     public static function getMsg($errorCode): string
     {

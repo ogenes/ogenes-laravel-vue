@@ -6,6 +6,7 @@ Vue.use(Router);
 /* Layout */
 import Layout from '@/layout'
 
+import systemRouter from './modules/system'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -79,31 +80,6 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/documentation',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/documentation/index'),
-        name: 'Documentation',
-        meta: { title: 'Documentation', icon: 'documentation', affix: true }
-      }
-    ]
-  },
-  {
-    path: '/guide',
-    component: Layout,
-    redirect: '/guide/index',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/guide/index'),
-        name: 'Guide',
-        meta: { title: 'Guide', icon: 'guide', noCache: true }
-      }
-    ]
-  },
-  {
     path: '/profile',
     component: Layout,
     redirect: '/profile/index',
@@ -117,47 +93,14 @@ export const constantRoutes = [
       }
     ]
   }
-]
+];
 
 /**
  * asyncRoutes
  * the routes that need to be dynamically loaded based on user roles
  */
 export const asyncRoutes = [
-  {
-    path: '/system',
-    component: Layout,
-    redirect: '/system/department',
-    alwaysShow: true, // will always show the root menu
-    name: 'System',
-    meta: {
-      title: '系统管理',
-      icon: 'system',
-      roles: ['system'] // you can set roles in root nav
-    },
-    children: [
-      {
-        path: 'department',
-        component: () => import('@/views/system/department'),
-        name: 'DepartmentManage',
-        meta: {
-          title: '部门管理',
-          icon: 'department',
-          roles: ['system-department'] // or you can only set roles in sub nav
-        }
-      },
-      {
-        path: 'user',
-        component: () => import('@/views/system/user'),
-        name: 'UserManage',
-        meta: {
-          title: '用户管理',
-          icon: 'user',
-          roles: ['system-user'] // or you can only set roles in sub nav
-        }
-      },
-    ]
-  },
+  systemRouter,
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ];

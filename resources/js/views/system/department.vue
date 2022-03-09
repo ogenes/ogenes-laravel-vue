@@ -179,8 +179,6 @@
             message: '已取消删除'
           });
         });
-
-
       },
       async save() {
         this.$refs.departmentParams.validate(valid => {

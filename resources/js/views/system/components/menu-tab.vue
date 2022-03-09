@@ -1,0 +1,351 @@
+<template>
+  <div class="app-container">
+    <!--表单-->
+    <div>
+      <el-table
+        ref="menuTree"
+        :data="list"
+        row-key="id"
+        :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+        default-expand-all
+        :row-class-name="menuRowClassName"
+      >
+        <el-table-column type="" fixed prop="id" width="100" align="center" label="菜单ID"/>
+        <el-table-column fixed prop="title" width="200" align="left" label="菜单">
+          <template slot="header" slot-scope="scope">
+            <span>菜单 </span>
+            <el-button type="text" @click="toggleRowExpansion">
+              全部{{ isExpansion ? "收缩" : "展开" }}
+            </el-button>
+          </template>
+        </el-table-column>
+        <el-table-column fixed prop="menuName" label="Name" width="200"/>
+        <el-table-column prop="类型" width="150" align="center" label="type">
+          <template slot-scope="scope">
+            <el-tag :type="MENU_TYPE_OPTION[scope.row.type].class">
+              {{ MENU_TYPE_OPTION[scope.row.type].label }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="parentId" width="150" align="center" label="上级ID"/>
+        <el-table-column prop="icon" width="150" align="center" label="图标">
+          <template slot-scope="scope">
+            <svg-icon :icon-class="scope.row.icon"/>
+          </template>
+        </el-table-column>
+        <el-table-column prop="roles" width="150" align="left" label="权限标识"/>
+        <el-table-column prop="createdAt" width="160" align="center" label="创建时间"/>
+        <el-table-column prop="updatedAt" width="160" align="center" label="更新时间"/>
+        <el-table-column fixed="right" label="操作" width="200" align="center">
+          <template slot="header" slot-scope="scope">
+            <span>操作 </span>
+            <el-button
+              type="primary"
+              class="el-icon-plus"
+              style="float: right; margin-right: 20px;"
+              @click="showDialog=true"
+            >
+              新增
+            </el-button>
+          </template>
+          <template slot-scope="scope">
+            <el-button type="primary" @click="showEdit(scope.row)">编辑</el-button>
+            <el-button :disabled="scope.row.children !== undefined" type="danger" @click="remove(scope.row.id)">删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+
+
+    <!--编辑弹窗-->
+    <el-dialog
+      :title="dialogTitle"
+      :visible.sync="showDialog"
+      :destroy-on-close="true"
+      :close-on-click-modal="false"
+      :before-close="closeDialog"
+    >
+      <el-form ref="menuParams" v-loading="loading" :rules="menuRules" :model="menuParams"
+               label-width="120px" label-position="right">
+        <el-form-item label="System：" prop="systemId">
+          <el-input v-model="system" placeholder="请输入" readonly style="width: 100%"/>
+        </el-form-item>
+        <el-form-item label="上级菜单：" prop="parentId">
+          <el-cascader
+            v-model="menuParams.parentId"
+            :options="selectOptions"
+            :props="defaultProps"
+            placeholder="请选择上级菜单"
+            filterable
+            clearable
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="类型：" prop="type">
+          <el-select v-model="menuParams.type" placeholder="请选择" style="width: 100%">
+            <el-option
+              v-for="(item, key) in MENU_TYPE_OPTION"
+              :key="key"
+              :label="item.label"
+              :value="key">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Name：" prop="menuName">
+          <el-input v-model="menuParams.menuName" placeholder="请输入" clearable style="width: 100%"/>
+        </el-form-item>
+        <el-form-item label="菜单名称：" prop="title">
+          <el-input v-model="menuParams.title" placeholder="请输入" clearable style="width: 100%"/>
+        </el-form-item>
+        <el-form-item label="权限标识：" prop="roles">
+          <el-input
+            type="textarea"
+            :autosize="{ minRows: 1, maxRows: 6}"
+            v-model="menuParams.roles"
+            placeholder="请输入"
+            clearable
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="图标：" prop="icon">
+          <el-select v-model="menuParams.icon" placeholder="请选择" filterable style="width: 100%">
+            <el-option
+              v-for="(item, key) in svgIcons"
+              :key="key"
+              :label="item"
+              :value="item">
+              <svg-icon :icon-class="item" class-name="disabled"/>
+              <span>{{ item }}</span>
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button type="primary" @click="save"> {{menuParams.id > 0 ? '编辑' : '新增'}}</el-button>
+        <el-button type="info" @click="closeDialog">取消</el-button>
+      </div>
+    </el-dialog>
+
+  </div>
+</template>
+
+<script>
+  import {
+    getList,
+    save,
+    remove,
+    MENU_TYPE_OPTION,
+  } from '@/api/system/menu';
+  import svgIcons from '@/utils/svg-icons'
+
+  export default {
+    name: "MenuManage",
+
+    props: {
+      systemId: {
+        type: String,
+        default: {}
+      },
+      system: {
+        type: String,
+        default: {}
+      },
+    },
+
+    data() {
+      return {
+        svgIcons,
+        MENU_TYPE_OPTION,
+
+        loading: false,
+        isExpansion: true,
+
+        showDialog: false,
+        dialogTitle: '添加菜单',
+        menuParams: {
+          id: 0,
+          menuName: '',
+          title: '',
+          type: "2",
+          parentId: '',
+          icon: '',
+          roles: '',
+        },
+        menuRules: {
+          menuName: [{required: true, message: '请输入Name', trigger: 'change'}],
+          type: [{required: true, message: '请选择菜单类型', trigger: 'change'}],
+          title: [{required: true, message: '请输入菜单名称', trigger: 'change'}],
+          roles: [{required: true, message: '请选择权限标识', trigger: 'change'}],
+        },
+
+        defaultProps: {
+          expandTrigger: 'hover',
+          label: 'title',
+          value: 'id',
+          emitPath: false,
+          checkStrictly: true
+        },
+
+        list: [],
+      }
+    },
+
+    computed: {
+      selectOptions() {
+
+        function dealDisabled(id, data, disabled) {
+          if (data?.id === id) {
+            disabled = true;
+          }
+          if (typeof data === 'object') {
+            data.disabled = data.type === 3 ? true : disabled;
+            const children = data?.children || [];
+            if (children) {
+              children.forEach(item => {
+                dealDisabled(id, item, disabled)
+              })
+            }
+          }
+        }
+
+        const selectedId = this.menuParams?.id || 0;
+        dealDisabled(selectedId, this.list[0], false);
+        return this.list;
+      }
+    },
+
+    async created() {
+      await this.queryList();
+    },
+
+    methods: {
+      async queryList() {
+        this.loading = true;
+        const ret = await getList({systemId: this.systemId});
+        this.list = ret?.data || [];
+        this.loading = false;
+      },
+
+      async remove(id) {
+        this.$confirm('此操作将永久删除该菜单, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.loading = true;
+          remove({id}).then((res) => {
+            if (res.data.code > 0) {
+              this.$message.error(res.data.msg)
+            } else {
+              this.$message.success('操作成功');
+              this.queryList();
+            }
+            this.loading = false
+          }).catch((e) => {
+            this.loading = false
+          });
+          this.loading = false;
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });
+        });
+      },
+
+      async save() {
+        this.$refs.menuParams.validate(valid => {
+          if (valid) {
+            this.loading = true;
+            this.menuParams.systemId = this.systemId;
+            save(this.menuParams).then((res) => {
+              if (res.data.code > 0) {
+                this.$message.error(res.data.msg)
+              } else {
+                this.$message.success('操作成功');
+                this.closeDialog();
+                this.queryList();
+              }
+              this.loading = false
+            }).catch((e) => {
+              this.loading = false
+            })
+          } else {
+            console.log('error submit!!');
+            return false
+          }
+        });
+      },
+
+      showEdit(row) {
+        this.menuParams = {
+          id: row.id,
+          menuName: row.menuName,
+          title: row.title,
+          type: row.type.toString(),
+          parentId: row.parentId,
+          icon: row.icon,
+          roles: row.roles,
+        };
+        this.dialogTitle = '编辑';
+        this.showDialog = true;
+      },
+
+      closeDialog() {
+        this.showDialog = false;
+        this.menuParams = {
+          id: 0,
+          type: "2",
+        };
+      },
+
+      menuRowClassName({row, rowIndex}) {
+        return 'row' + row.level;
+      },
+      // 切换数据表格树形展开
+      toggleRowExpansion() {
+        this.isExpansion = !this.isExpansion;
+        this.toggleRowExpansionAll(this.list, this.isExpansion);
+      },
+      toggleRowExpansionAll(data, isExpansion) {
+        data.forEach((item) => {
+          this.$refs.menuTree.toggleRowExpansion(item, isExpansion);
+          if (item.children !== undefined && item.children !== null) {
+            this.toggleRowExpansionAll(item.children, isExpansion);
+          }
+        });
+      },
+    }
+  }
+</script>
+
+<style>
+  .el-table .row1 {
+    background: #26c2ff;
+  }
+
+  /*.el-table .row2 {
+    background: #7ec24e;
+  }
+
+  .el-table .row3 {
+    background: #E6A23C;
+  }
+
+  .el-table .row4 {
+    background: #999512;
+  }
+
+  .el-table .row5 {
+    background: #8e9982;
+  }
+
+  .el-table .row6 {
+    background: #909399;
+  }*/
+
+</style>
+<style scoped>
+
+</style>

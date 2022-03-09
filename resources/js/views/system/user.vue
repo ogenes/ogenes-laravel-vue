@@ -20,7 +20,7 @@
           </el-form-item>
           <el-form-item label="状态:">
             <el-select v-model="queryParams.userStatus" clearable class="form-item-width">
-              <el-option v-for="(v, k) in userStatusOption" :key="k" :value="v.value" :label="v.label"/>
+              <el-option v-for="(v, k) in USER_STATUS_OPTION" :key="k" :value="v.value" :label="v.label"/>
             </el-select>
           </el-form-item>
 
@@ -145,8 +145,8 @@
 </template>
 
 <script>
-  import {getList as getDepartmentList} from '@/api/system/department';
   import {
+    getDepartmentList,
     getList,
     switchStatus,
     resetPassByUid,
@@ -164,6 +164,8 @@
 
     data() {
       return {
+        USER_STATUS_OPTION,
+
         loading: false,
 
         departments: [],
@@ -204,9 +206,6 @@
     },
 
     computed: {
-      userStatusOption() {
-        return USER_STATUS_OPTION;
-      }
     },
 
     async created() {

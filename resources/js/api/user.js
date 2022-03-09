@@ -22,6 +22,13 @@ export function logout() {
   })
 }
 
+export function getDepartmentList() {
+  return request({
+    url: '/api/user/departmentList',
+    method: 'get',
+  })
+}
+
 export function getList(data) {
   return request({
     url: '/api/user/list',

@@ -50,7 +50,6 @@ const actions = {
       getInfo(state.token).then(response => {
         const { data } = response;
 
-        console.log(data, 'data');
         if (!data) {
           reject('Verification failed, please Login again.')
         }
