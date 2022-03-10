@@ -25,8 +25,8 @@ export function filterAsyncRoutes(routes, roles) {
   routes.forEach(route => {
     const tmp = { ...route }
     if (hasPermission(roles, tmp)) {
-      const map = store.getters.menuMap[tmp?.name || ''] || [];
-      if (map) {
+      const map = store.getters.menuMap[tmp?.name || ''] || {};
+      if (Object.keys(map).length > 0) {
         tmp.meta = {
           ...tmp.meta,
           title: map.title,

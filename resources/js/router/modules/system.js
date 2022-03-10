@@ -27,13 +27,33 @@ const systemRouter = {
       }
     },
     {
-      path: 'menu',
-      component: () => import('@/views/system/menu'),
-      name: 'MenuManage',
+      path: 'permission',
+      component: () => import('@/views/system/permission/index'),
+      name: 'PermissionManage',
       meta: {
-        title: '菜单管理',
-        icon: 'menu',
-      }
+        title: '权限管理',
+        icon: 'permission',
+      },
+      children: [
+        {
+          path: 'menu',
+          component: () => import('@/views/system/permission/menu'),
+          name: 'PermissionMenuManage',
+          meta: {
+            title: '菜单权限',
+            icon: 'menu',
+          }
+        },
+        {
+          path: 'data',
+          component: () => import('@/views/system/permission/data'),
+          name: 'PermissionDataManage',
+          meta: {
+            title: '数据权限',
+            icon: 'data',
+          }
+        },
+      ]
     },
   ]
 };

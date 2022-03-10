@@ -3,7 +3,7 @@
     <el-card>
       <!--新增按钮-->
       <div slot="header" class="clearfix">
-        <span>菜单权限</span>
+        <span>数据权限</span>
       </div>
 
       <div>
@@ -26,11 +26,11 @@
   import {
     getOptions,
   } from '@/api/system/menu';
-  import menuTab from "./components/menu-tab";
+  import menuTab from "../components/menu-tab";
 
 
   export default {
-    name: "MenuManage",
+    name: "DataPermissionManage",
 
     components: {
       menuTab

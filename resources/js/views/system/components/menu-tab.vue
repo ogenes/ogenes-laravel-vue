@@ -19,7 +19,7 @@
             </el-button>
           </template>
         </el-table-column>
-        <el-table-column fixed prop="menuName" label="Name" width="200"/>
+        <el-table-column fixed prop="menuName" label="Name" width="300"/>
         <el-table-column prop="类型" width="150" align="center" label="type">
           <template slot-scope="scope">
             <el-tag :type="MENU_TYPE_OPTION[scope.row.type].class">
@@ -33,7 +33,7 @@
             <svg-icon :icon-class="scope.row.icon"/>
           </template>
         </el-table-column>
-        <el-table-column prop="roles" width="150" align="left" label="权限标识"/>
+        <el-table-column prop="roles" width="300" align="left" label="权限标识"/>
         <el-table-column prop="createdAt" width="160" align="center" label="创建时间"/>
         <el-table-column prop="updatedAt" width="160" align="center" label="更新时间"/>
         <el-table-column fixed="right" label="操作" width="200" align="center">
@@ -82,14 +82,24 @@
             </el-popover>
             <span>：</span>
           </template>
-          <el-input v-model="menuParams.menuName" placeholder="此内容请跟开发人员确认，需要与代码中保持一致！" clearable style="width: 100%"/>
+          <el-input v-model="menuParams.menuName" placeholder="Name 需与代码中保持一致！" clearable style="width: 100%"/>
         </el-form-item>
         <el-form-item label="上级菜单：" prop="parentId">
+          <template slot="label">
+            <span>上级菜单</span>
+            <el-popover trigger="hover">
+              <div>
+                此内容请跟开发人员确认，需要与代码中保持一致！
+              </div>
+              <i class="el-icon-question" slot="reference"></i>
+            </el-popover>
+            <span>：</span>
+          </template>
           <el-cascader
             v-model="menuParams.parentId"
             :options="selectOptions"
             :props="defaultProps"
-            placeholder="请选择上级菜单"
+            placeholder="上级菜单 需与代码中保持一致！"
             filterable
             clearable
             style="width: 100%"
@@ -119,7 +129,7 @@
           />
         </el-form-item>
         <el-form-item label="图标：" prop="icon">
-          <el-select v-model="menuParams.icon" placeholder="请选择" filterable style="width: 100%">
+          <el-select v-model="menuParams.icon" placeholder="请选择" clearable filterable style="width: 100%">
             <el-option
               v-for="(item, key) in svgIcons"
               :key="key"
@@ -132,7 +142,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer">
-        <el-button type="primary" @click="save"> {{menuParams.id > 0 ? '编辑' : '新增'}}</el-button>
+        <el-button type="primary" @click="save"> {{menuParams.id > 0 ? '保存' : '新增'}}</el-button>
         <el-button type="info" @click="closeDialog">取消</el-button>
       </div>
     </el-dialog>
