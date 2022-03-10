@@ -22,8 +22,10 @@
         <el-table-column fixed prop="menuName" label="Name" width="300"/>
         <el-table-column prop="类型" width="150" align="center" label="type">
           <template slot-scope="scope">
-            <el-tag :type="MENU_TYPE_OPTION[scope.row.type].class">
-              {{ MENU_TYPE_OPTION[scope.row.type].label }}
+            <el-tag :type="`${(scope.row.type === 1 && 'info') ||
+                  (scope.row.type === 2 && 'success') ||
+                  (scope.row.type === 3 && 'warning')}`">
+              {{ menuTypeOption[scope.row.type] }}
             </el-tag>
           </template>
         </el-table-column>
@@ -108,9 +110,9 @@
         <el-form-item label="类型：" prop="type">
           <el-select v-model="menuParams.type" placeholder="请选择" style="width: 100%">
             <el-option
-              v-for="(item, key) in MENU_TYPE_OPTION"
+              v-for="(item, key) in menuTypeOption"
               :key="key"
-              :label="item.label"
+              :label="item"
               :value="key">
             </el-option>
           </el-select>
@@ -155,7 +157,6 @@
     getList,
     save,
     remove,
-    MENU_TYPE_OPTION,
   } from '@/api/system/menu';
   import svgIcons from '@/utils/svg-icons'
 
@@ -171,12 +172,15 @@
         type: String,
         default: {}
       },
+      menuTypeOption: {
+        type: Object,
+        default: {}
+      },
     },
 
     data() {
       return {
         svgIcons,
-        MENU_TYPE_OPTION,
 
         loading: false,
         isExpansion: true,

@@ -14,7 +14,7 @@
             :label="item"
             :lazy="true"
           >
-            <menu-tab :system-id="key" :system="item"/>
+            <menu-tab :system-id="key" :system="item" :menu-type-option="options.menuTypeOption"/>
           </el-tab-pane>
         </el-tabs>
       </div>

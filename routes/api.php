@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\FileController;
-use App\Http\Controllers\MenuController;
+use App\Http\Controllers\Permission\MenuController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 

@@ -5,11 +5,11 @@
  * Date: 2022/2/8
  */
 
-namespace DummyNamespace;
+namespace App\Services\Permission;
 
 
 use App\Services\BaseService;
 
-class DummyClass extends BaseService
+class DataService extends BaseService
 {
 }

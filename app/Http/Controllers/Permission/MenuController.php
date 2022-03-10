@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Permission;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Menu\SaveRequest;
-use App\Services\MenuService;
+use App\Services\Permission\MenuService;
 use Illuminate\Http\Request;
 use function App\Helpers\getParams;
 
@@ -12,6 +13,7 @@ class MenuController extends Controller
     public function options(Request $request)
     {
         $ret['system'] = MenuService::SYSTEM;
+        $ret['menuTypeOption'] = MenuService::MENU_TYPE_OPTION;
         return response()->json([
             'code' => 0,
             'msg' => 'success',

@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Permission;
 
 
 use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
 use App\Models\Menu;
+use App\Services\BaseService;
 use Illuminate\Support\Str;
 use function App\Helpers\formatDateTime;
 
@@ -19,6 +20,17 @@ class MenuService extends BaseService
         1 => '权限管理系统',
         2 => '商品系统',
         3 => 'ERP系统',
+    ];
+    
+    public const 
+        MENU_TYPE_DIR = 1,
+        MENU_TYPE_PAGE = 2,
+        MENU_TYPE_BTN = 3;
+    
+    public const MENU_TYPE_OPTION = [
+        self::MENU_TYPE_DIR => '目录',  
+        self::MENU_TYPE_PAGE => '菜单',  
+        self::MENU_TYPE_BTN => '按钮',  
     ];
     
     public function getList(int $systemId): array 
