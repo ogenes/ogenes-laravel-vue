@@ -33,6 +33,13 @@ Vue.use(ElementUI, {
 import VueResource from 'vue-resource'
 Vue.use(VueResource);
 
+import Editor from 'bin-ace-editor';
+import 'brace/ext/language_tools';
+import 'brace/mode/json';
+import 'brace/snippets/json';
+import 'brace/theme/chrome';
+Vue.component(Editor.name, Editor);
+
 Vue.directive('noMoreClick', {
   inserted(el, binding) {
     el.addEventListener('click', e => {

@@ -80,10 +80,10 @@
             <el-input v-model="permissionParams.dataMark" placeholder="请输入" clearable style="width: 100%"/>
           </el-form-item>
           <el-form-item label="数据权限条件：" prop="conditions">
-            <el-input v-model="permissionParams.conditions" placeholder="请输入" clearable style="width: 100%"/>
+            <b-ace-editor v-model="permissionParams.conditions" lang="json" width="100%"/>
           </el-form-item>
           <el-form-item label="数据权限字段：" prop="fields">
-            <el-input v-model="permissionParams.fields" placeholder="请输入" clearable style="width: 100%"/>
+            <b-ace-editor v-model="permissionParams.fields" lang="json" width="100%"/>
           </el-form-item>
           <el-form-item label=" " align="right">
             <el-button type="primary" @click="save"> {{permissionParams.id > 0 ? '保存' : '新增'}}</el-button>
@@ -126,6 +126,16 @@
     components: {},
 
     data() {
+      const checkObj=(rule, value, callback)=>{
+        try {
+          if(JSON.parse(value.trim())){
+            callback()
+          }
+        }catch (e) {
+          callback('不是标准json')
+        }
+      };
+
       return {
 
         loading: false,
@@ -149,14 +159,16 @@
           resource: '',
           dataMark: "",
           dataName: '',
-          conditions: '',
-          fields: '',
+          conditions: '[]',
+          fields: '[]',
         },
         permissionRules: {
           menuId: [{required: true, message: '请选择菜单', trigger: 'change'}],
           resource: [{required: true, message: '请输入数据源', trigger: 'change'}],
           dataMark: [{required: true, message: '请输入数据权限标识', trigger: 'change'}],
           dataName: [{required: true, message: '请输入数据权限名称', trigger: 'change'}],
+          conditions: [{ validator:checkObj, trigger: 'blur' }],
+          fields: [{ validator:checkObj, trigger: 'blur' }],
         },
 
         defaultProps: {
@@ -283,7 +295,12 @@
         this.showDialog = false;
         this.permissionParams = {
           id: 0,
-          type: "2",
+          menuId: '',
+          resource: '',
+          dataMark: "",
+          dataName: '',
+          conditions: `[]`,
+          fields: `[]`,
         };
       },
     }

@@ -30,6 +30,7 @@
     "vue-template-compiler": "^2.6.12"
   },
   "dependencies": {
+    "bin-ace-editor": "^3.2.0",
     "driver.js": "^0.9.8",
     "echarts": "4.2.1",
     "element-theme-chalk": "^2.15.6",
