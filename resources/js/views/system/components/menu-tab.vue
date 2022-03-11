@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <!--表单-->
-    <div>
+    <el-card>
       <el-table
         ref="menuTree"
         :data="list"
@@ -57,8 +57,7 @@
           </template>
         </el-table-column>
       </el-table>
-    </div>
-
+    </el-card>
 
     <!--编辑弹窗-->
     <el-dialog

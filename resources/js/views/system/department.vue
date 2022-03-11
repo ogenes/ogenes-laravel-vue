@@ -4,7 +4,6 @@
 
       <!--新增按钮-->
       <div slot="header" class="clearfix">
-        <span>部门管理</span>
         <el-button
           type="primary"
           class="el-icon-plus"

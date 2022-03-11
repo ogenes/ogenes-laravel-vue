@@ -1,24 +1,17 @@
 <template>
   <div class="app-container">
-    <el-card>
-      <!--新增按钮-->
-      <div slot="header" class="clearfix">
-        <span>数据权限</span>
-      </div>
-
-      <div>
-        <el-tabs tab-position="top">
-          <el-tab-pane
-            v-for="(item, key) in options.system"
-            :key="key"
-            :label="item"
-            :lazy="true"
-          >
-            <menu-tab :system-id="key" :system="item" :menu-type-option="options.menuTypeOption"/>
-          </el-tab-pane>
-        </el-tabs>
-      </div>
-    </el-card>
+    <div>
+      <el-tabs tab-position="top">
+        <el-tab-pane
+          v-for="(item, key) in options.system"
+          :key="key"
+          :label="item"
+          :lazy="true"
+        >
+          <data-permission-tab :system-id="key" :system="item" :menu-type-option="options.menuTypeOption"/>
+        </el-tab-pane>
+      </el-tabs>
+    </div>
   </div>
 </template>
 
@@ -26,14 +19,14 @@
   import {
     getOptions,
   } from '@/api/system/menu';
-  import menuTab from "../components/menu-tab";
+  import dataPermissionTab from "../components/data-permission-tab";
 
 
   export default {
     name: "DataPermissionManage",
 
     components: {
-      menuTab
+      dataPermissionTab
     },
     data() {
       return {

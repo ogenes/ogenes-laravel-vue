@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-card>
       <div slot="header">
-        <span>用户管理</span>
+        <span>查询条件</span>
       </div>
       <el-form
         :inline="true"
@@ -43,6 +43,12 @@
           </el-form-item>
         </el-row>
       </el-form>
+    </el-card>
+
+    <el-card>
+      <div slot="header">
+        <span>查询结果</span>
+      </div>
       <div class="page-position">
         <el-pagination
           background
@@ -205,8 +211,7 @@
       }
     },
 
-    computed: {
-    },
+    computed: {},
 
     async created() {
       const ret = await getDepartmentList();

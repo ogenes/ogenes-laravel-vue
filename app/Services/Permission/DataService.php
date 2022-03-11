@@ -12,4 +12,28 @@ use App\Services\BaseService;
 
 class DataService extends BaseService
 {
+    public function getList(
+        int $systemId,
+        int $menuId,
+        string $resource,
+        string $dataMark,
+        string $dataName
+    ): array
+    {
+        return [];
+    }
+    
+    public function save(
+        int $id,
+        int $systemId,
+        int $menuId,
+        string $resource,
+        string $dataMark,
+        string $dataName,
+        string $conditions,
+        string $fields
+    ): bool
+    {
+        return true;
+    }
 }

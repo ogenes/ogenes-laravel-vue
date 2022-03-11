@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\Permission\DataController;
 use App\Http\Controllers\Permission\MenuController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +43,11 @@ Route::middleware(['language'])->group(function () {
             Route::any('save', [MenuController::class, 'save'])->name('menu.save');
             Route::any('options', [MenuController::class, 'options'])->name('menu.options');
             Route::any('remove', [MenuController::class, 'remove'])->name('menu.remove');
+        });
+        Route::prefix('data-permission')->group(function () {
+            Route::any('list', [DataController::class, 'list'])->name('data-permission.list');
+            Route::any('save', [DataController::class, 'save'])->name('data-permission.save');
+            Route::any('remove', [DataController::class, 'remove'])->name('data-permission.remove');
         });
         Route::prefix('department')->group(function () {
             Route::any('list', [DepartmentController::class, 'list'])->name('department.list');

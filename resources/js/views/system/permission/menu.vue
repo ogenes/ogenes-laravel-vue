@@ -1,24 +1,17 @@
 <template>
   <div class="app-container">
-    <el-card>
-      <!--新增按钮-->
-      <div slot="header" class="clearfix">
-        <span>菜单权限</span>
-      </div>
-
-      <div>
-        <el-tabs tab-position="top">
-          <el-tab-pane
-            v-for="(item, key) in options.system"
-            :key="key"
-            :label="item"
-            :lazy="true"
-          >
-            <menu-tab :system-id="key" :system="item" :menu-type-option="options.menuTypeOption"/>
-          </el-tab-pane>
-        </el-tabs>
-      </div>
-    </el-card>
+    <div>
+      <el-tabs tab-position="top">
+        <el-tab-pane
+          v-for="(item, key) in options.system"
+          :key="key"
+          :label="item"
+          :lazy="true"
+        >
+          <menu-tab :system-id="key" :system="item" :menu-type-option="options.menuTypeOption"/>
+        </el-tab-pane>
+      </el-tabs>
+    </div>
   </div>
 </template>
 
