@@ -150,14 +150,19 @@ class MenuService extends BaseService
                 'title',
                 'icon',
                 'roles',
+                'parent_id'
             ])
             ->toArray();
         if (!$exists) {
             return [];
         }
         $ret = [];
+        $map = array_column($exists, null, 'id');
         foreach ($exists as $item) {
             $item['roles'] = explode(PHP_EOL, $item['roles']);
+            $parents = array_filter($this->getParents($item['parent_id'], $map));
+            $parentName = $parents ? implode(' / ', array_column($parents, 'title')) : '';
+            $item['fullName'] = ($parentName ? $parentName . ' / ' : '') . $item['title'];
             $upperItem = [];
             foreach ($item as $key => $value) {
                 $upperItem[Str::camel($key)] = $value;
@@ -165,5 +170,18 @@ class MenuService extends BaseService
             $ret[$item['menu_name']] = $upperItem;
         }
         return $ret;
+    }
+    
+    protected function getParents(int $parentId, array $map): array
+    {
+        $parentData = $map[$parentId] ?? [];
+        $parents = [];
+        $parents[] = $parentData ?? '';
+        
+        if (isset($parentData['parentId']) && $parentData['parentId'] > 0) {
+            $tmpParents = $this->getParents($parentData['parentId'], $map);
+            array_unshift($parents, ...$tmpParents);
+        }
+        return $parents;
     }
 }

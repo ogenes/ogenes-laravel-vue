@@ -13,8 +13,8 @@ class DataController extends Controller
     public function list(Request $request)
     {
         $params = getParams($request);
-        $systemId = $params['systemId'] ?? 0;
-        $menuId = $params['menuId'] ?? 0;
+        $systemId = $params['systemId'] ?? 1;
+        $menuId = $params['menuId'] ?: 0;
         $resource = $params['resource'] ?? '';
         $dataMark = $params['dataMark'] ?? '';
         $dataName = $params['dataName'] ?? '';

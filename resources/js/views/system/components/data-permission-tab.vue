@@ -7,8 +7,8 @@
         label-width="100px"
       >
         <el-row>
-          <el-form-item label="用户名:">
-            <el-input v-model="queryParams.username" @keyup.enter.native="queryList" class="form-item-width"
+          <el-form-item label="数据源:">
+            <el-input v-model="queryParams.resou" @keyup.enter.native="queryList" class="form-item-width"
                       placeholder="支持模糊搜索"/>
           </el-form-item>
           <el-form-item label="手机号:">
@@ -21,6 +21,50 @@
           </el-form-item>
         </el-row>
       </el-form>
+      <el-table
+        :data="result.list"
+        border
+        height="600px"
+      >
+        <el-table-column fixed label="权限ID" prop="id" width="80px" align="center"/>
+        <el-table-column fixed label="菜单" prop="menuName" width="200px" align="left"/>
+        <el-table-column fixed label="数据源" prop="resource" width="120px" align="left"/>
+        <el-table-column fixed label="数据权限名称" prop="dataName" width="200px" align="left"/>
+        <el-table-column label="数据权限标识" prop="dataMark" width="200px" align="left"/>
+        <el-table-column label="条件" prop="conditions" width="400px" align="left">
+          <template slot-scope="scope">
+            <b-ace-editor
+              :value="handleJsonFormat(scope.row.conditions)"
+              :wrap="true"
+              :readonly="true"
+              :options="editorOptions"
+              lang="json"
+              width="100%"
+            ></b-ace-editor>
+          </template>
+        </el-table-column>
+        <el-table-column label="字段" prop="fields" width="200px" align="left">
+          <template slot-scope="scope">
+            <b-ace-editor
+              v-model="scope.row.fields"
+              :wrap="true"
+              :readonly="true"
+              :options="editorOptions"
+              lang="json"
+              width="100%"
+            />
+          </template>
+        </el-table-column>
+        <el-table-column label="创建时间" prop="createdAt" width="150px" align="center"/>
+        <el-table-column label="修改时间" prop="updatedAt" width="150px" align="center"/>
+        <el-table-column fixed="right" label="操作" align="center" width="200px">
+          <template slot-scope="scope">
+            <div>
+              <el-button type="text" @click="showEdit(scope.row)">编辑</el-button>
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
     </el-card>
     <el-card>
       <div class="page-position">
@@ -104,6 +148,10 @@
   import {
     getList as getMenuList,
   } from '@/api/system/menu';
+  import {
+    handleJsonFormat
+  } from '@/utils/index';
+
 
   export default {
     name: "DataPermissionManage",
@@ -126,22 +174,32 @@
     components: {},
 
     data() {
-      const checkObj=(rule, value, callback)=>{
+      const checkObj = (rule, value, callback) => {
         try {
-          if(JSON.parse(value.trim())){
+          if (JSON.parse(value.trim())) {
             callback()
           }
-        }catch (e) {
+        } catch (e) {
           callback('不是标准json')
         }
       };
 
       return {
-
+        handleJsonFormat,
         loading: false,
         menuList: [],
 
+        editorOptions: {
+          printMarginColumn: 0,
+          minLines: 10,
+          maxLines: 15,
+        },
+
         queryParams: {
+          menuId: '',
+          resource: '',
+          dataMark: '',
+          dataName: '',
           page: 1,
           pageSize: 20,
         },
@@ -167,8 +225,8 @@
           resource: [{required: true, message: '请输入数据源', trigger: 'change'}],
           dataMark: [{required: true, message: '请输入数据权限标识', trigger: 'change'}],
           dataName: [{required: true, message: '请输入数据权限名称', trigger: 'change'}],
-          conditions: [{ validator:checkObj, trigger: 'blur' }],
-          fields: [{ validator:checkObj, trigger: 'blur' }],
+          conditions: [{validator: checkObj, trigger: 'blur'}],
+          fields: [{validator: checkObj, trigger: 'blur'}],
         },
 
         defaultProps: {
@@ -215,6 +273,7 @@
 
       getList() {
         this.loading = true;
+        this.queryParams.systemId = this.systemId;
         getList(this.queryParams).then((res) => {
           if (res.code > 0) {
             this.$message.error(res.msg)
@@ -238,6 +297,20 @@
       handleListCurrentChange: function (currentPage) {
         this.queryParams.page = currentPage;
         this.getList();
+      },
+
+      showEdit(row) {
+        this.permissionParams = {
+          id: row.id,
+          menuId: row.menuId,
+          resource: row.resource,
+          dataMark: row.dataMark,
+          dataName: row.dataName,
+          conditions: handleJsonFormat(row.conditions),
+          fields: handleJsonFormat(row.fields),
+        };
+        this.dialogTitle = '修改权限';
+        this.showDialog = true;
       },
 
       async remove(id) {
