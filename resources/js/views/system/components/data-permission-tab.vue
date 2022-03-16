@@ -7,12 +7,28 @@
         label-width="100px"
       >
         <el-row>
+          <el-form-item label="菜单：" prop="menuId">
+            <el-cascader
+              v-model="queryParams.menuId"
+              :options="menuList"
+              :props="defaultProps"
+              placeholder="请选择"
+              filterable
+              clearable
+              :collapse-tags="true"
+              class="form-item-width"
+            />
+          </el-form-item>
           <el-form-item label="数据源:">
-            <el-input v-model="queryParams.resou" @keyup.enter.native="queryList" class="form-item-width"
+            <el-input v-model="queryParams.resource" @keyup.enter.native="queryList" class="form-item-width"
                       placeholder="支持模糊搜索"/>
           </el-form-item>
-          <el-form-item label="手机号:">
-            <el-input v-model="queryParams.mobile" @keyup.enter.native="queryList" class="form-item-width"
+          <el-form-item label="数据权限名称:">
+            <el-input v-model="queryParams.dataName" @keyup.enter.native="queryList" class="form-item-width"
+                      placeholder="支持模糊搜索"/>
+          </el-form-item>
+          <el-form-item label="数据权限标识:">
+            <el-input v-model="queryParams.dataMark" @keyup.enter.native="queryList" class="form-item-width"
                       placeholder="支持模糊搜索"/>
           </el-form-item>
           <el-form-item label=" ">
@@ -26,10 +42,10 @@
         border
         height="600px"
       >
-        <el-table-column fixed label="权限ID" prop="id" width="80px" align="center"/>
-        <el-table-column fixed label="菜单" prop="menuName" width="200px" align="left"/>
-        <el-table-column fixed label="数据源" prop="resource" width="120px" align="left"/>
-        <el-table-column fixed label="数据权限名称" prop="dataName" width="200px" align="left"/>
+        <el-table-column label="权限ID" prop="id" width="80px" align="center"/>
+        <el-table-column label="菜单" prop="menuName" width="200px" align="left"/>
+        <el-table-column label="数据源" prop="resource" width="120px" align="left"/>
+        <el-table-column label="数据权限名称" prop="dataName" width="200px" align="left"/>
         <el-table-column label="数据权限标识" prop="dataMark" width="200px" align="left"/>
         <el-table-column label="条件" prop="conditions" width="400px" align="left">
           <template slot-scope="scope">
@@ -142,15 +158,14 @@
 <script>
   import {
     getList,
+    getOptions,
     save,
     remove,
   } from '@/api/system/data-permission';
   import {
-    getList as getMenuList,
-  } from '@/api/system/menu';
-  import {
     handleJsonFormat
   } from '@/utils/index';
+  import {deepClone} from "../../../utils";
 
 
   export default {
@@ -254,14 +269,17 @@
           }
         }
 
-        dealDisabled(this.menuList[0]);
-        return this.menuList;
+        const tmpData = deepClone(this.menuList);
+        tmpData.forEach(item =>{
+          dealDisabled(item);
+        });
+        return tmpData;
       }
     },
 
     async created() {
-      const menuRet = await getMenuList({systemId: this.systemId});
-      this.menuList = menuRet?.data || [];
+      const menuRet = await getOptions({systemId: this.systemId});
+      this.menuList = menuRet?.data?.menuList || [];
       await this.queryList();
     },
 

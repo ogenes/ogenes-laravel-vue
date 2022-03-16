@@ -45,6 +45,7 @@ Route::middleware(['language'])->group(function () {
             Route::any('remove', [MenuController::class, 'remove'])->name('menu.remove');
         });
         Route::prefix('data-permission')->group(function () {
+            Route::any('options', [DataController::class, 'options'])->name('data-permission.options');
             Route::any('list', [DataController::class, 'list'])->name('data-permission.list');
             Route::any('save', [DataController::class, 'save'])->name('data-permission.save');
             Route::any('remove', [DataController::class, 'remove'])->name('data-permission.remove');

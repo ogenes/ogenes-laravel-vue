@@ -22,18 +22,18 @@ class MenuService extends BaseService
         3 => 'ERP系统',
     ];
     
-    public const 
+    public const
         MENU_TYPE_DIR = 1,
         MENU_TYPE_PAGE = 2,
         MENU_TYPE_BTN = 3;
     
     public const MENU_TYPE_OPTION = [
-        self::MENU_TYPE_DIR => '目录',  
-        self::MENU_TYPE_PAGE => '菜单',  
-        self::MENU_TYPE_BTN => '按钮',  
+        self::MENU_TYPE_DIR => '目录',
+        self::MENU_TYPE_PAGE => '菜单',
+        self::MENU_TYPE_BTN => '按钮',
     ];
     
-    public function getList(int $systemId): array 
+    public function getList(int $systemId, array $types = []): array
     {
         $exists = Menu::whereParentId(0)
             ->where('system_id', '=', $systemId)
@@ -47,7 +47,7 @@ class MenuService extends BaseService
             $item['parent'] = '';
             $item['parents'] = [];
             $item['role_arr'] = explode(PHP_EOL, $item['roles']);
-            $tmp = $this->getChildrenMenu($item);
+            $tmp = $this->getChildrenMenu($item, $types);
             $tmp && $item['children'] = $tmp;
             $item['created_at'] = formatDateTime($item['created_at']);
             $item['updated_at'] = formatDateTime($item['updated_at']);
@@ -60,9 +60,12 @@ class MenuService extends BaseService
         return $ret;
     }
     
-    protected function getChildrenMenu(array $menu): array
+    protected function getChildrenMenu(array $menu, array $types = []): array
     {
         $data = Menu::whereParentId($menu['id'])
+            ->when($types, function ($query) use ($types) {
+                return $query->whereIn('type', $types);
+            })
             ->get()
             ->toArray();
         if (!$data) {
@@ -76,7 +79,7 @@ class MenuService extends BaseService
             $item['created_at'] = formatDateTime($item['created_at']);
             $item['updated_at'] = formatDateTime($item['updated_at']);
             $item['role_arr'] = explode(PHP_EOL, $item['roles']);
-            $tmp = $this->getChildrenMenu($item);
+            $tmp = $this->getChildrenMenu($item, $types);
             $item['parent'] = implode(' / ', $item['parents']);
             $tmp && $item['children'] = $tmp;
             $upperItem = [];
@@ -87,7 +90,6 @@ class MenuService extends BaseService
         }
         return $ret;
     }
-    
     
     
     public function save(

@@ -11,10 +11,7 @@ namespace App\Services\Permission;
 use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
 use App\Models\DataPermission;
-use App\Models\User;
-use App\Models\UserHasDepartment;
 use App\Services\BaseService;
-use App\Services\DepartmentService;
 use Illuminate\Support\Str;
 use function App\Helpers\formatDateTime;
 

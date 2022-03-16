@@ -5,11 +5,27 @@ namespace App\Http\Controllers\Permission;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Permission\DataSaveRequest;
 use App\Services\Permission\DataService;
+use App\Services\Permission\MenuService;
 use Illuminate\Http\Request;
 use function App\Helpers\getParams;
 
 class DataController extends Controller
 {
+    public function options(Request $request)
+    {
+        $params = getParams($request);
+        $systemId = $params['systemId'] ?? 1;
+        $ret['menuList'] = MenuService::getInstance()->getList($systemId, [
+            MenuService::MENU_TYPE_DIR,
+            MenuService::MENU_TYPE_PAGE,
+        ]);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
     public function list(Request $request)
     {
         $params = getParams($request);
