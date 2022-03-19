@@ -12,5 +12,5 @@ return [
         'password' => '123456',
         'mobile' => '',
     ],
-    'loginUnique' => true,
+    'loginUnique' => false,
 ];

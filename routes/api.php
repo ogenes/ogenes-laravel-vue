@@ -4,6 +4,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\Permission\DataController;
 use App\Http\Controllers\Permission\MenuController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -54,6 +55,14 @@ Route::middleware(['language'])->group(function () {
             Route::any('list', [DepartmentController::class, 'list'])->name('department.list');
             Route::any('save', [DepartmentController::class, 'save'])->name('department.save');
             Route::any('remove', [DepartmentController::class, 'remove'])->name('department.remove');
+        });
+        Route::prefix('role')->group(function () {
+            Route::any('options', [RoleController::class, 'options'])->name('role.options');
+            Route::any('list', [RoleController::class, 'list'])->name('role.list');
+            Route::any('save', [RoleController::class, 'save'])->name('role.save');
+            Route::any('saveRoleHasData', [RoleController::class, 'saveRoleHasData'])->name('role.saveRoleHasData');
+            Route::any('saveRoleHasMenu', [RoleController::class, 'saveRoleHasMenu'])->name('role.saveRoleHasMenu');
+            Route::any('switchStatus', [RoleController::class, 'switchStatus'])->name('role.switchStatus');
         });
     });
 });

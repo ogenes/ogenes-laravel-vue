@@ -55,6 +55,15 @@ const systemRouter = {
         },
       ]
     },
+    {
+      path: 'role',
+      component: () => import('@/views/system/role'),
+      name: 'RoleManage',
+      meta: {
+        title: '角色管理',
+        icon: 'role',
+      }
+    },
   ]
 };
 
