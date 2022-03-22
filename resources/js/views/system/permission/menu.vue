@@ -19,7 +19,7 @@
   import {
     getOptions,
   } from '@/api/system/menu';
-  import menuTab from "../components/menu-tab";
+  import menuTab from "./components/menu-tab";
 
 
   export default {

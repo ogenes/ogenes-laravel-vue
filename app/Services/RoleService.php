@@ -23,7 +23,7 @@ class RoleService extends BaseService
 {
     public function getOptions(int $systemId): array
     {
-        $ret['menuTree'] = MenuService::getInstance()->getMenuMap($systemId);
+        $ret['menuTree'] = MenuService::getInstance()->getList($systemId);
         $ret['dataTree'] = [];
         return [];
     }

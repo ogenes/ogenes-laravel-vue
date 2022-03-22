@@ -73,6 +73,8 @@
             </el-switch>
           </template>
         </el-table-column>
+        <el-table-column prop="parent" width="200" align="left" label="菜单权限"/>
+        <el-table-column prop="parent" width="200" align="left" label="数据权限"/>
         <el-table-column prop="createdAt" width="160" align="center" label="创建时间"/>
         <el-table-column prop="updatedAt" width="160" align="center" label="更新时间"/>
         <el-table-column fixed="right" label="操作" width="200" align="center">
@@ -122,7 +124,6 @@
 
 <script>
   import {
-    getOptions,
     getList,
     getRoleTree,
     save,
@@ -201,9 +202,7 @@
         }
 
         const selectedId = this.roleParams?.id || 0;
-        console.log(selectedId, 'selectedId');
         const tmpData = deepClone(this.options.roleTree || []);
-        console.log(tmpData, 'tmpData1');
         tmpData.forEach(item => {
           dealDisabled(selectedId, item, false);
         });
@@ -219,8 +218,6 @@
 
     methods: {
       async initOptions() {
-        const ret = await getOptions();
-        this.options = ret?.data || {};
         const roleTreeRet = await getRoleTree();
         this.options.roleTree = roleTreeRet?.data || [];
         this.roleParams = {};

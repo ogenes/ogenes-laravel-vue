@@ -19,7 +19,7 @@
   import {
     getOptions,
   } from '@/api/system/menu';
-  import dataPermissionTab from "../components/data-permission-tab";
+  import dataPermissionTab from "./components/data-permission-tab";
 
 
   export default {
