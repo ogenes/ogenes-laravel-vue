@@ -92,32 +92,13 @@
       :close-on-click-modal="false"
       :before-close="closeDialog"
     >
-      <el-form ref="roleParams" v-loading="loading" :rules="roleRules" :model="roleParams"
-               label-width="120px" label-position="right">
-
-        <el-form-item label="上级角色：" prop="parentId">
-          <el-cascader
-            v-model="roleParams.parentId"
-            :options="selectOptions"
-            :props="defaultProps"
-            placeholder="请选择！"
-            filterable
-            clearable
-            style="width: 100%"
-          />
-        </el-form-item>
-        <el-form-item label="角色：" prop="roleName">
-          <el-input v-model="roleParams.roleName" placeholder="请输入角色名！" clearable style="width: 100%"/>
-        </el-form-item>
-        <el-form-item label="描述：" prop="desc">
-          <el-input v-model="roleParams.desc" type="textarea" autosize placeholder="请输入！" clearable
-                    style="width: 100%"/>
-        </el-form-item>
-      </el-form>
-      <div slot="footer">
-        <el-button type="primary" @click="save"> {{roleParams.id > 0 ? '保存' : '新增'}}</el-button>
-        <el-button type="info" @click="closeDialog">取消</el-button>
-      </div>
+      <role-form
+        :close-dialog="closeDialog"
+        :role-params="roleParams"
+        :default-props="defaultProps"
+        :role-tree="options.roleTree"
+        :select-options="selectOptions"
+      />
     </el-dialog>
   </div>
 </template>
@@ -126,16 +107,20 @@
   import {
     getList,
     getRoleTree,
-    save,
     switchStatus,
     ROLE_STATUS_OPTION
   } from '@/api/system/role';
   import {deepClone} from "@/utils";
 
+  import roleForm from "./components/role-form";
+
+
   export default {
     name: "RoleManage",
 
-    components: {},
+    components: {
+      roleForm
+    },
 
     data() {
       return {
@@ -178,9 +163,6 @@
           roleName: '',
           desc: '',
         },
-        roleRules: {
-          roleName: [{required: true, message: '请输入Name', trigger: 'change'}],
-        },
       }
     },
 
@@ -206,7 +188,6 @@
         tmpData.forEach(item => {
           dealDisabled(selectedId, item, false);
         });
-        console.log(tmpData, 'tmpData2');
         return tmpData;
       }
     },
@@ -256,29 +237,6 @@
         this.getList();
       },
 
-      async save() {
-        this.$refs.roleParams.validate(valid => {
-          if (valid) {
-            this.loading = true;
-            save(this.roleParams).then((res) => {
-              if (res.code > 0) {
-                this.$message.error(res.msg)
-              } else {
-                this.$message.success('操作成功');
-                this.closeDialog();
-                this.queryList();
-              }
-              this.loading = false
-            }).catch((e) => {
-              this.loading = false
-            })
-          } else {
-            console.log('error submit!!');
-            return false
-          }
-        });
-      },
-
       showEdit(row) {
         this.roleParams = {
           id: row.id,
@@ -295,6 +253,7 @@
         this.roleParams = {};
         this.dialogTitle = '添加角色';
         this.queryList();
+        this.initOptions();
       },
 
       switchStatus($event, row) {
