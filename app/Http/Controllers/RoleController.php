@@ -11,7 +11,18 @@ class RoleController extends Controller
     public function options(Request $request)
     {
         $params = getParams($request);
-        $ret = RoleService::getInstance()->getOptions();
+        $systemId = $params['systemId'] ?? 1;
+        $ret = RoleService::getInstance()->getOptions($systemId);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
+    public function roleTree(Request $request)
+    {
+        $ret = RoleService::getInstance()->getRoleTree();
         return response()->json([
             'code' => 0,
             'msg' => 'success',
@@ -22,7 +33,18 @@ class RoleController extends Controller
     public function list(Request $request)
     {
         $params = getParams($request);
-        $ret = RoleService::getInstance()->getList();
+        $name = $params['roleName'] ?: '';
+        $roleStatus = $params['roleStatus'] ?? '';
+        $parentIds = $params['parentIds'] ?? [];
+        $page = $params['page'] ?? 1;
+        $pageSize = $params['pageSize'] ?? 30;
+        $ret = RoleService::getInstance()->getList(
+            $name,
+            $roleStatus,
+            $parentIds,
+            $page,
+            $pageSize
+        );
         return response()->json([
             'code' => 0,
             'msg' => 'success',
@@ -33,7 +55,11 @@ class RoleController extends Controller
     public function save(Request $request)
     {
         $params = getParams($request);
-        $ret = RoleService::getInstance()->save();
+        $name = $params['roleName'] ?? '';
+        $desc = $params['desc'] ?? '';
+        $parentId = $params['parentId'] ?? 0;
+        $id = $params['id'] ?? 0;
+        $ret = RoleService::getInstance()->save($name, $desc, $parentId, $id);
         return response()->json([
             'code' => 0,
             'msg' => 'success',
@@ -44,7 +70,9 @@ class RoleController extends Controller
     public function saveRoleHasData(Request $request)
     {
         $params = getParams($request);
-        $ret = RoleService::getInstance()->saveRoleHasData();
+        $roleId = $params['roleId'] ?? 0;
+        $dataIds = $params['dataIds'] ?? [];
+        $ret = RoleService::getInstance()->saveRoleHasData($roleId, $dataIds);
         return response()->json([
             'code' => 0,
             'msg' => 'success',
@@ -55,7 +83,9 @@ class RoleController extends Controller
     public function saveRoleHasMenu(Request $request)
     {
         $params = getParams($request);
-        $ret = RoleService::getInstance()->saveRoleHasMenu();
+        $roleId = $params['roleId'] ?? 0;
+        $menuIds = $params['menuIds'] ?? [];
+        $ret = RoleService::getInstance()->saveRoleHasMenu($roleId, $menuIds);
         return response()->json([
             'code' => 0,
             'msg' => 'success',
@@ -66,7 +96,9 @@ class RoleController extends Controller
     public function switchStatus(Request $request)
     {
         $params = getParams($request);
-        $ret = RoleService::getInstance()->switchStatus();
+        $roleId = $params['roleId'] ?? 0;
+        $roleStatus = $params['roleStatus'] ?? 0;
+        $ret = RoleService::getInstance()->switchStatus($roleId, $roleStatus);
         return response()->json([
             'code' => 0,
             'msg' => 'success',

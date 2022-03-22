@@ -61,5 +61,8 @@ function formatDateTime(string $dateTime): string
 
 function getParams($request): array
 {
+    if (!isset($request['data'])) {
+        return [];
+    }
     return is_array($request['data']) ? $request['data'] : json_decode($request['data'], true, 512, JSON_THROW_ON_ERROR);
 }

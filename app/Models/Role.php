@@ -31,4 +31,13 @@ class Role extends Model
 {
     use HasFactory;
     protected $table = 'role';
+    
+    public const
+        STATUS_NORMAL = 1,
+        STATUS_DISABLE = 0;
+    
+    public const STATUS_MAP = [
+        self::STATUS_DISABLE => '禁用',
+        self::STATUS_NORMAL => '启用',
+    ];
 }

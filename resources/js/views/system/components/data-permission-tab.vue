@@ -3,8 +3,7 @@
     <el-card>
       <el-form
         :inline="true"
-        label-position="right"
-        label-width="100px"
+        label-position="left"
       >
         <el-row>
           <el-form-item label="菜单：" prop="menuId">
@@ -37,6 +36,19 @@
           </el-form-item>
         </el-row>
       </el-form>
+      <el-divider></el-divider>
+      <div class="page-position">
+        <el-pagination
+          background
+          :page-size="queryParams.pageSize"
+          :page-sizes="pageSizes"
+          :current-page="queryParams.page"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="result.cnt"
+          @size-change="handleListSizeChange"
+          @current-change="handleListCurrentChange"
+        />
+      </div>
       <el-table
         :data="result.list"
         border
@@ -81,20 +93,6 @@
           </template>
         </el-table-column>
       </el-table>
-    </el-card>
-    <el-card>
-      <div class="page-position">
-        <el-pagination
-          background
-          :page-size="queryParams.pageSize"
-          :page-sizes="pageSizes"
-          :current-page="queryParams.page"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="result.cnt"
-          @size-change="handleListSizeChange"
-          @current-change="handleListCurrentChange"
-        />
-      </div>
     </el-card>
 
     <el-drawer
@@ -398,3 +396,11 @@
   }
 </script>
 
+<style scoped lang="scss">
+  .app-container {
+    .page-position {
+      text-align: right;
+      margin: 10px 0;
+    }
+  }
+</style>

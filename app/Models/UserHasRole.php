@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * App\Models\UserHasRole
  *
  * @property int $id 主键
- * @property int $user_id 用户ID
+ * @property int $uid 用户ID
  * @property int $role_id 角色ID
  * @property \Illuminate\Support\Carbon $created_at 创建时间
  * @method static \Illuminate\Database\Eloquent\Builder|UserHasRole newModelQuery()

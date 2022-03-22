@@ -15,7 +15,7 @@ class CreateTableUserHasRole extends Migration
     {
         Schema::create('user_has_role', function (Blueprint $table) {
             $table->increments('id')->comment('主键');
-            $table->integer('user_id')->nullable(false)->comment('用户ID');
+            $table->integer('uid')->nullable(false)->comment('用户ID');
             $table->integer('role_id')->nullable(false)->comment('角色ID');
             $table->timestamp('created_at')->default('2000-01-01 00:00:01')->comment('创建时间');
             $table->engine = 'InnoDB';

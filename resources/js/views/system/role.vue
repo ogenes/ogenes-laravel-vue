@@ -4,34 +4,25 @@
       <div slot="header">
         <span>查询条件</span>
       </div>
-      <el-form
-        :inline="true"
-        label-position="right"
-        label-width="100px"
-      >
+      <el-form :inline="true">
         <el-row>
-          <el-form-item label="用户名:">
-            <el-input v-model="queryParams.username" @keyup.enter.native="queryList" class="form-item-width"
-                      placeholder="支持模糊搜索"/>
-          </el-form-item>
-          <el-form-item label="手机号:">
-            <el-input v-model="queryParams.mobile" @keyup.enter.native="queryList" class="form-item-width"
+          <el-form-item label="角色名:">
+            <el-input v-model="queryParams.roleName" clearable @keyup.enter.native="queryList" class="form-item-width"
                       placeholder="支持模糊搜索"/>
           </el-form-item>
           <el-form-item label="状态:">
-            <el-select v-model="queryParams.userStatus" clearable class="form-item-width">
-              <el-option v-for="(v, k) in USER_STATUS_OPTION" :key="k" :value="v.value" :label="v.label"/>
+            <el-select v-model="queryParams.roleStatus" placeholder="请选择！" clearable class="form-item-width">
+              <el-option v-for="(v, k) in ROLE_STATUS_OPTION" :key="k" :value="v.value" :label="v.label"/>
             </el-select>
           </el-form-item>
-
-          <el-form-item label="部门：" prop="deptIds">
+          <el-form-item label="上级角色:" prop="parentId">
             <el-cascader
-              v-model="queryParams.deptIds"
-              :options="departments"
-              :props="defaultProps"
-              :show-all-levels="false"
+              v-model="queryParams.parentIds"
+              :options="selectOptions"
+              :filterable="true"
               :collapse-tags="true"
-              placeholder="请选择"
+              :props="{...defaultProps, multiple: true}"
+              placeholder="请选择！"
               filterable
               clearable
               class="form-item-width"
@@ -44,7 +35,6 @@
         </el-row>
       </el-form>
     </el-card>
-
     <el-card>
       <div slot="header">
         <span>查询结果</span>
@@ -66,29 +56,14 @@
         border
         height="600px"
       >
-        <el-table-column fixed label="用户ID" prop="uid" width="80px" align="center"/>
-        <el-table-column fixed label="用户名" prop="avatar" width="120px" align="center">
-          <template slot-scope="scope">
-            <el-popover
-              v-if="scope.row.avatar"
-              placement="right-start"
-              trigger="hover">
-              <el-avatar :size="200" fit="cover" :src="scope.row.avatar"/>
-              <el-avatar slot="reference" fit="cover" :src="scope.row.avatar"/>
-            </el-popover>
-            <el-avatar v-else icon="el-icon-user-solid"/>
-            <div>
-              {{ scope.row.username }}
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column fixed label="用户账号" prop="account" width="120px" align="center"/>
-        <el-table-column label="手机号" prop="mobile" width="120px" align="center"/>
-        <el-table-column label="邮箱" prop="email" width="200px" align="left"/>
-        <el-table-column label="状态" prop="userStatus" width="200px" align="center">
+        <el-table-column type="" fixed prop="id" width="100" align="center" label="角色ID"/>
+        <el-table-column fixed prop="roleName" width="150" align="left" label="角色名"/>
+        <el-table-column prop="parentId" width="100" align="center" label="上级ID"/>
+        <el-table-column prop="parent" width="200" align="left" label="上级角色"/>
+        <el-table-column label="状态" prop="roleStatus" width="200px" align="center">
           <template slot-scope="scope">
             <el-switch
-              v-model="scope.row.userStatus"
+              v-model="scope.row.roleStatus"
               active-text="启用"
               inactive-text="禁用"
               active-color="#67C23A"
@@ -98,99 +73,87 @@
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column label="部门" prop="departments" width="500px" align="left">
+        <el-table-column prop="createdAt" width="160" align="center" label="创建时间"/>
+        <el-table-column prop="updatedAt" width="160" align="center" label="更新时间"/>
+        <el-table-column fixed="right" label="操作" width="200" align="center">
           <template slot-scope="scope">
-            <div v-for="(item, key) in scope.row.departments" :key="key" v-if="key < 3">
-              <span class="span-color">{{ item }}</span>
-            </div>
-            <el-popover
-              v-if="scope.row.departments.length > 3"
-              placement="top-end"
-              trigger="hover">
-              <div v-for="(item, key) in scope.row.departments" :key="key">
-                <span class="span-color">{{ item }}</span>
-              </div>
-              <div slot="reference">
-                <span class="span-color">……</span>
-              </div>
-            </el-popover>
-          </template>
-        </el-table-column>
-        <el-table-column label="最近一次登录时间" prop="lastLoginAt" width="160px" align="center"/>
-        <el-table-column label="最近一次登录地" prop="lastLoginIp" width="150px" align="center"/>
-        <el-table-column label="最近一次修改时间" prop="updatedAt" width="160px" align="center"/>
-        <el-table-column fixed="right" label="操作" align="center" width="200px">
-          <template slot-scope="scope">
-            <div>
-              <el-button type="text" @click="showEdit(scope.row)">编辑</el-button>
-              <el-button type="text" :disabled="scope.row.uid === 1" @click="resetPass(scope.row)">重置密码</el-button>
-            </div>
+            <el-button type="primary" @click="showEdit(scope.row)">编辑</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
 
-    <el-drawer
-      v-if="showDialog"
+    <el-dialog
       :title="dialogTitle"
-      direction="rtl"
-      size="30%"
       :visible.sync="showDialog"
-      :wrapper-closable="false"
-      style="padding-left: 20px"
-      custom-class="overflow-auto"
+      :destroy-on-close="true"
+      :close-on-click-modal="false"
+      :before-close="closeDialog"
     >
-      <user-form
-        :departments="departments"
-        :default-props="defaultProps"
-        :user-params="userParams"
-        :close-dialog="closeDialog"
-      />
-    </el-drawer>
+      <el-form ref="roleParams" v-loading="loading" :rules="roleRules" :model="roleParams"
+               label-width="120px" label-position="right">
+
+        <el-form-item label="上级角色：" prop="parentId">
+          <el-cascader
+            v-model="roleParams.parentId"
+            :options="selectOptions"
+            :props="defaultProps"
+            placeholder="请选择！"
+            filterable
+            clearable
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="角色：" prop="roleName">
+          <el-input v-model="roleParams.roleName" placeholder="请输入角色名！" clearable style="width: 100%"/>
+        </el-form-item>
+        <el-form-item label="描述：" prop="desc">
+          <el-input v-model="roleParams.desc" type="textarea" autosize placeholder="请输入！" clearable
+                    style="width: 100%"/>
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button type="primary" @click="save"> {{roleParams.id > 0 ? '保存' : '新增'}}</el-button>
+        <el-button type="info" @click="closeDialog">取消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
   import {
-    getDepartmentList,
+    getOptions,
     getList,
+    getRoleTree,
+    save,
     switchStatus,
-    resetPassByUid,
-    USER_STATUS_OPTION
-  } from '@/api/user';
-
-  import userForm from "./components/user-form";
+    ROLE_STATUS_OPTION
+  } from '@/api/system/role';
+  import {deepClone} from "@/utils";
 
   export default {
-    name: "UserManage",
+    name: "RoleManage",
 
-    components: {
-      userForm,
-    },
+    components: {},
 
     data() {
       return {
-        USER_STATUS_OPTION,
+        ROLE_STATUS_OPTION,
 
         loading: false,
-
-        departments: [],
-        defaultProps: {
-          expandTrigger: 'hover',
-          label: 'name',
-          value: 'id',
-          emitPath: false,
-          multiple: true,
-          checkStrictly: true
+        isExpansion: true,
+        options: {
+          menuTree: [],
+          dataTree: [],
+          roleTree: [],
         },
 
         queryParams: {
+          roleName: '',
+          roleStatus: '',
+          parentIds: [],
           page: 1,
           pageSize: 20,
-          username: '',
-          mobile: '',
-          userStatus: '',
-          deptIds: []
         },
         pageSizes: [10, 20, 50, 100, 200],
         result: {
@@ -198,28 +161,70 @@
           cnt: 0
         },
 
+        defaultProps: {
+          expandTrigger: 'hover',
+          label: 'roleName',
+          value: 'id',
+          emitPath: false,
+          checkStrictly: true
+        },
+
         showDialog: false,
-        dialogTitle: '添加用户',
-        userParams: {
+        dialogTitle: '添加角色',
+        roleParams: {
           id: 0,
-          username: '',
-          mobile: '',
-          email: '',
-          avatar: '',
-          deptIds: [],
+          parentId: '',
+          roleName: '',
+          desc: '',
+        },
+        roleRules: {
+          roleName: [{required: true, message: '请输入Name', trigger: 'change'}],
         },
       }
     },
 
-    computed: {},
+    computed: {
+      selectOptions() {
+        function dealDisabled(id, data, disabled) {
+          if (data?.id === id) {
+            disabled = true;
+          }
+          if (typeof data === 'object') {
+            data.disabled = disabled;
+            const children = data?.children || [];
+            if (children) {
+              children.forEach(item => {
+                dealDisabled(id, item, disabled)
+              })
+            }
+          }
+        }
+
+        const selectedId = this.roleParams?.id || 0;
+        console.log(selectedId, 'selectedId');
+        const tmpData = deepClone(this.options.roleTree || []);
+        console.log(tmpData, 'tmpData1');
+        tmpData.forEach(item => {
+          dealDisabled(selectedId, item, false);
+        });
+        console.log(tmpData, 'tmpData2');
+        return tmpData;
+      }
+    },
 
     async created() {
-      const ret = await getDepartmentList();
-      this.departments = ret?.data || [];
+      await this.initOptions();
       await this.queryList();
     },
 
     methods: {
+      async initOptions() {
+        const ret = await getOptions();
+        this.options = ret?.data || {};
+        const roleTreeRet = await getRoleTree();
+        this.options.roleTree = roleTreeRet?.data || [];
+        this.roleParams = {};
+      },
       async queryList() {
         this.queryParams.page = 1;
         this.getList();
@@ -236,7 +241,7 @@
             this.result.cnt = parseInt(res.data.cnt);
             this.result.list = res.data.list;
             this.result.list.forEach(item => {
-              item.userStatus = item.userStatus > 0
+              item.roleStatus = item.roleStatus > 0;
             })
           }
           this.loading = false
@@ -244,7 +249,6 @@
           this.loading = false
         })
       },
-
       handleListSizeChange: function (val) {
         this.queryParams.page = 1;
         this.queryParams.pageSize = val;
@@ -252,39 +256,60 @@
       },
       handleListCurrentChange: function (currentPage) {
         this.queryParams.page = currentPage;
-        this.getList()
+        this.getList();
+      },
+
+      async save() {
+        this.$refs.roleParams.validate(valid => {
+          if (valid) {
+            this.loading = true;
+            save(this.roleParams).then((res) => {
+              if (res.code > 0) {
+                this.$message.error(res.msg)
+              } else {
+                this.$message.success('操作成功');
+                this.closeDialog();
+                this.queryList();
+              }
+              this.loading = false
+            }).catch((e) => {
+              this.loading = false
+            })
+          } else {
+            console.log('error submit!!');
+            return false
+          }
+        });
       },
 
       showEdit(row) {
-        this.userParams = {
-          id: row.uid,
-          username: row.username,
-          mobile: row.mobile,
-          email: row.email,
-          avatar: row.avatar,
-          deptIds: row.deptIdArr,
+        this.roleParams = {
+          id: row.id,
+          parentId: row.parentId,
+          roleName: row.roleName,
+          desc: row.desc,
         };
-        this.dialogTitle = '修改用户';
+        this.dialogTitle = '修改角色';
         this.showDialog = true;
       },
 
       closeDialog() {
         this.showDialog = false;
-        this.userParams = {};
-        this.dialogTitle = '添加用户';
+        this.roleParams = {};
+        this.dialogTitle = '添加角色';
         this.queryList();
       },
 
       switchStatus($event, row) {
         const label = $event ? '启用' : '禁用';
-        row.userStatus = !row.userStatus;
-        this.$confirm('确认' + label + '用户?', '提示', {
+        row.roleStatus = !row.roleStatus;
+        this.$confirm('确认' + label + '角色?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.loading = true;
-          switchStatus({id: row.uid, userStatus: $event}).then((res) => {
+          switchStatus({roleId: row.id, roleStatus: $event}).then((res) => {
             if (res.code > 0) {
               this.$message.error(res.msg)
             } else {
@@ -303,35 +328,6 @@
           });
         });
       },
-
-      resetPass(row) {
-        this.$confirm('确认重置用户密码?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.loading = true;
-          resetPassByUid({id: row.uid}).then((res) => {
-            if (res.code > 0) {
-              this.$message.error(res.msg)
-            } else {
-              this.$message.success('操作成功');
-              this.$alert(row.username + '的新密码是 ' + res.data.password, '密码重置', {
-                confirmButtonText: '确定',
-              });
-            }
-            this.loading = false
-          }).catch((e) => {
-            this.loading = false
-          });
-          this.loading = false;
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消'
-          });
-        });
-      }
     }
   }
 </script>
