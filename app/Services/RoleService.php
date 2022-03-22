@@ -10,14 +10,10 @@ namespace App\Services;
 
 use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
-use App\Models\Menu;
 use App\Models\Role;
 use App\Models\RoleHasData;
 use App\Models\RoleHasMenu;
-use App\Models\User;
-use App\Models\UserHasDepartment;
 use App\Models\UserHasRole;
-use App\Services\Permission\DataService;
 use App\Services\Permission\MenuService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
