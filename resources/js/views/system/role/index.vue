@@ -73,8 +73,62 @@
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column prop="parent" width="200" align="left" label="菜单权限"/>
-        <el-table-column prop="parent" width="200" align="left" label="数据权限"/>
+        <el-table-column prop="parent" width="400" align="left" label="菜单权限">
+          <template slot="header" slot-scope="scope">
+            <el-select v-model="menuSystemId" size="mini" style="width: 200px">
+              <el-option v-for="(v, k) in options.system" :key="k" :value="k" :label="v"/>
+            </el-select>
+            <span>菜单权限</span>
+          </template>
+          <template slot-scope="scope">
+            <div style="float: left">
+              <el-tree
+                ref="tree"
+                style="border: 1px solid #DCDFE6; width: 300px; border-radius: 5px; padding-top: 10px;"
+                :data="scope.row.menuTree[menuSystemId] || []"
+                default-expand-all
+                :check-strictly="true"
+                node-key="id"
+                :props="{expandTrigger: 'hover', label: 'title', value: 'id'}"
+              >
+              <span slot-scope="{ node, data }" class="custom-tree-node">
+                <span>{{ node.label }} <span style="font-size: 5px;color: gray;">({{ data.menuName }})</span></span>
+              </span>
+              </el-tree>
+            </div>
+            <div style="float: left">
+              <el-button type="text" @click="showRoleHasMenu(scope.row)">编辑</el-button>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="parent" width="400" align="left" label="数据权限">
+          <template slot="header" slot-scope="scope">
+            <el-select v-model="dataSystemId" size="mini" style="width: 200px">
+              <el-option v-for="(v, k) in options.system" :key="k" :value="k" :label="v"/>
+            </el-select>
+            <span>数据权限</span>
+          </template>
+          <template slot-scope="scope">
+            <div style="float: left;">
+              <el-tree
+                ref="tree"
+                style="border: 1px solid #DCDFE6; width: 300px; border-radius: 5px; padding-top: 10px;"
+                :data="scope.row.dataTree[dataSystemId] || []"
+                default-expand-all
+                :check-strictly="true"
+                node-key="id"
+                :props="{expandTrigger: 'hover', label: 'title', value: 'id'}"
+              >
+              <span slot-scope="{ node, data }" class="custom-tree-node">
+                <span>{{ node.label }} <span style="font-size: 5px;color: gray;">({{ data.menuName }})</span></span>
+              </span>
+              </el-tree>
+            </div>
+            <div style="float: left;">
+              <el-button type="text" @click="showRoleHasData(scope.row)">编辑</el-button>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column prop="createdAt" width="160" align="center" label="创建时间"/>
         <el-table-column prop="updatedAt" width="160" align="center" label="更新时间"/>
         <el-table-column fixed="right" label="操作" width="200" align="center">
@@ -100,11 +154,25 @@
         :select-options="selectOptions"
       />
     </el-dialog>
+
+    <el-dialog
+      title="菜单权限"
+      :visible.sync="showRoleHasMenuDialog"
+      :destroy-on-close="true"
+      :close-on-click-modal="false"
+      :before-close="closeDialog"
+    >
+      <menu-form
+        :close-dialog="closeDialog"
+        :role-has-menu-params="roleHasMenuParams"
+      />
+    </el-dialog>
   </div>
 </template>
 
 <script>
   import {
+    getOptions,
     getList,
     getRoleTree,
     switchStatus,
@@ -113,13 +181,15 @@
   import {deepClone} from "@/utils";
 
   import roleForm from "./components/role-form";
+  import menuForm from "./components/menu-form";
 
 
   export default {
     name: "RoleManage",
 
     components: {
-      roleForm
+      roleForm,
+      menuForm
     },
 
     data() {
@@ -129,8 +199,7 @@
         loading: false,
         isExpansion: true,
         options: {
-          menuTree: [],
-          dataTree: [],
+          system: [],
           roleTree: [],
         },
 
@@ -163,6 +232,19 @@
           roleName: '',
           desc: '',
         },
+
+        menuSystemId: '1',
+        dataSystemId: '1',
+        roleHasMenuParams: {
+          roleId: 0,
+          menuIds: []
+        },
+        showRoleHasMenuDialog: false,
+        roleHasDataParams: {
+          roleId: 0,
+          dataIds: []
+        },
+        showRoleHasDataDialog: false,
       }
     },
 
@@ -189,7 +271,7 @@
           dealDisabled(selectedId, item, false);
         });
         return tmpData;
-      }
+      },
     },
 
     async created() {
@@ -199,8 +281,12 @@
 
     methods: {
       async initOptions() {
+        const ret = await getOptions();
+        this.options.system = ret?.data?.system || [];
+
         const roleTreeRet = await getRoleTree();
         this.options.roleTree = roleTreeRet?.data || [];
+
         this.roleParams = {};
       },
       async queryList() {
@@ -248,9 +334,28 @@
         this.showDialog = true;
       },
 
+      async showRoleHasMenu(row) {
+        this.roleHasMenuParams = {
+          roleId: row.id,
+          menuIds: row.menuIds,
+        };
+        this.showRoleHasMenuDialog = true;
+      },
+      showRoleHasData(row) {
+        this.roleHasDataParams = {
+          roleId: row.id,
+          dataIds: row.dataIds,
+        };
+        this.showRoleHasMenuDialog = true;
+      },
+
       closeDialog() {
         this.showDialog = false;
+        this.showRoleHasMenuDialog = false;
+        this.showRoleHasDataDialog = false;
         this.roleParams = {};
+        this.roleHasMenuParams = {};
+        this.roleHasDataParams = {};
         this.dialogTitle = '添加角色';
         this.queryList();
         this.initOptions();
@@ -297,10 +402,6 @@
     .page-position {
       text-align: right;
       margin: 10px 0;
-    }
-
-    .span-color {
-      color: #1482f0
     }
   }
 </style>

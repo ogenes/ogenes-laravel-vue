@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Permission\MenuService;
 use App\Services\RoleService;
 use Illuminate\Http\Request;
 use function App\Helpers\getParams;
@@ -10,9 +11,31 @@ class RoleController extends Controller
 {
     public function options(Request $request)
     {
+        $ret['system'] = MenuService::SYSTEM;
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
+    public function menuTree(Request $request)
+    {
         $params = getParams($request);
         $systemId = $params['systemId'] ?? 1;
-        $ret = RoleService::getInstance()->getOptions($systemId);
+        $ret['menuTree'] = MenuService::getInstance()->getList($systemId);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
+    public function dataTree(Request $request)
+    {
+        $params = getParams($request);
+        $systemId = $params['systemId'] ?? 1;
+        $ret['dataTree'] = [];
         return response()->json([
             'code' => 0,
             'msg' => 'success',

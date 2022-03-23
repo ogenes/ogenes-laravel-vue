@@ -41,7 +41,7 @@ class MenuController extends Controller
         $systemId = $params['systemId'] ?? 0;
         $menuName = $params['menuName'] ?? '';
         $type = $params['type'] ?? 1;
-        $parentId = $params['parentId'] ?? 1;
+        $parentId = $params['parentId'] ?? 0;
         $title = $params['title'] ?? '';
         $icon = $params['icon'] ?? '';
         $roles = $params['roles'] ?? '';

@@ -27,7 +27,7 @@ class CreateTableMenu extends Migration
             $table->engine = 'InnoDB';
             $table->charset = 'utf8mb4';
             $table->collation = 'utf8mb4_general_ci';
-            $table->unique(['menu_name'], 'udx_menu_name');
+            $table->unique(['menu_name', 'system_id'], 'udx_menu_name');
         });
         DB::statement("alter table `menu` comment = '目录配置表'");
     }

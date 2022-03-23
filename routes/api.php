@@ -58,6 +58,8 @@ Route::middleware(['language'])->group(function () {
         });
         Route::prefix('role')->group(function () {
             Route::any('options', [RoleController::class, 'options'])->name('role.options');
+            Route::any('menuTree', [RoleController::class, 'menuTree'])->name('role.menuTree');
+            Route::any('dataTree', [RoleController::class, 'dataTree'])->name('role.dataTree');
             Route::any('roleTree', [RoleController::class, 'roleTree'])->name('role.roleTree');
             Route::any('list', [RoleController::class, 'list'])->name('role.list');
             Route::any('save', [RoleController::class, 'save'])->name('role.save');

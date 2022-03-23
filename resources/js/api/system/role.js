@@ -16,6 +16,22 @@ export function getRoleTree(data) {
   })
 }
 
+export function getMenuTree(data) {
+  return request({
+    url: '/api/role/menuTree',
+    method: 'get',
+    params: {data},
+  })
+}
+
+export function getDataTree(data) {
+  return request({
+    url: '/api/role/dataTree',
+    method: 'get',
+    params: {data},
+  })
+}
+
 export function getList(data) {
   return request({
     url: '/api/role/list',

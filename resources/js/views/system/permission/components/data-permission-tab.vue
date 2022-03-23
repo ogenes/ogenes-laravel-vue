@@ -391,6 +391,7 @@
           conditions: `[]`,
           fields: `[]`,
         };
+        this.dialogTitle = '添加权限';
       },
     }
   }

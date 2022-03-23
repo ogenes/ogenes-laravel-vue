@@ -30,7 +30,6 @@ class SaveRequest extends FormRequest
         return [
             'menuName' => 'required|string',
             'type' => 'required',
-            'parentId' => 'required',
             'title' => 'required|string',
             'roles' => 'required',
         ];

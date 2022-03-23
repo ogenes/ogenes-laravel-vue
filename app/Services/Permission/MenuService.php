@@ -103,6 +103,7 @@ class MenuService extends BaseService
     ): bool
     {
         $exists = Menu::whereMenuName($menuName)
+            ->where('system_id', '=', $systemId)
             ->where('id', '!=', $id)
             ->first();
         if ($exists) {

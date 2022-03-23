@@ -14,20 +14,12 @@ use App\Models\Role;
 use App\Models\RoleHasData;
 use App\Models\RoleHasMenu;
 use App\Models\UserHasRole;
-use App\Services\Permission\MenuService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use function App\Helpers\formatDateTime;
 
 class RoleService extends BaseService
 {
-    public function getOptions(int $systemId): array
-    {
-        $ret['menuTree'] = MenuService::getInstance()->getList($systemId);
-        $ret['dataTree'] = [];
-        return [];
-    }
-    
     public function getList(
         string $name, 
         string $roleStatus, 
@@ -76,6 +68,8 @@ class RoleService extends BaseService
             $item['created_at'] = formatDateTime($item['created_at']);
             $item['updated_at'] = formatDateTime($item['updated_at']);
             $item['parent'] = $roleMap[$item['id']]['parent'] ?? '';
+            $item['menuTree'] = [];
+            $item['dataTree'] = [];
             $tmp = [];
             foreach ($item as $key => $value) {
                 $tmp[Str::camel($key)] = $value;
