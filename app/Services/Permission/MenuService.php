@@ -163,6 +163,7 @@ class MenuService extends BaseService
         foreach ($exists as $item) {
             $item['roles'] = explode(PHP_EOL, $item['roles']);
             $parents = array_filter($this->getParents($item['parent_id'], $map));
+            $item['level'] = count($parents) + 1;
             $parentName = $parents ? implode(' / ', array_column($parents, 'title')) : '';
             $item['fullName'] = ($parentName ? $parentName . ' / ' : '') . $item['title'];
             $upperItem = [];

@@ -21,9 +21,14 @@ class RoleController extends Controller
     
     public function menuTree(Request $request)
     {
-        $params = getParams($request);
-        $systemId = $params['systemId'] ?? 1;
-        $ret['menuTree'] = MenuService::getInstance()->getList($systemId);
+        $system = MenuService::SYSTEM;
+        $ret = [];
+        foreach ($system as $systemId => $systemName) {
+            $tmp['systemId'] = $systemId;
+            $tmp['systemName'] = $systemName;
+            $tmp['menu'] = MenuService::getInstance()->getList($systemId);
+            $ret[$systemId] = $tmp;
+        }
         return response()->json([
             'code' => 0,
             'msg' => 'success',
@@ -59,11 +64,13 @@ class RoleController extends Controller
         $name = $params['roleName'] ?: '';
         $roleStatus = $params['roleStatus'] ?? '';
         $parentIds = $params['parentIds'] ?? [];
+        $menuIds = $params['menuIds'] ?? [];
         $page = $params['page'] ?? 1;
         $pageSize = $params['pageSize'] ?? 30;
         $ret = RoleService::getInstance()->getList(
             $name,
             $roleStatus,
+            $menuIds,
             $parentIds,
             $page,
             $pageSize
@@ -107,8 +114,9 @@ class RoleController extends Controller
     {
         $params = getParams($request);
         $roleId = $params['roleId'] ?? 0;
+        $systemId = $params['systemId'] ?? 1;
         $menuIds = $params['menuIds'] ?? [];
-        $ret = RoleService::getInstance()->saveRoleHasMenu($roleId, $menuIds);
+        $ret = RoleService::getInstance()->saveRoleHasMenu($roleId, $systemId, $menuIds);
         return response()->json([
             'code' => 0,
             'msg' => 'success',

@@ -15,6 +15,25 @@
               <el-option v-for="(v, k) in ROLE_STATUS_OPTION" :key="k" :value="v.value" :label="v.label"/>
             </el-select>
           </el-form-item>
+          <el-form-item label="菜单：" prop="menuId">
+            <el-cascader
+              v-model="queryParams.menuIds"
+              :options="menuOptions"
+              :props="{
+                expandTrigger: 'hover',
+                label: 'title',
+                value: 'id',
+                checkStrictly: true,
+                emitPath: false,
+                multiple: true
+              }"
+              placeholder="请选择"
+              filterable
+              clearable
+              :collapse-tags="true"
+              class="form-item-width"
+            />
+          </el-form-item>
           <el-form-item label="上级角色:" prop="parentId">
             <el-cascader
               v-model="queryParams.parentIds"
@@ -56,11 +75,22 @@
         border
         height="600px"
       >
-        <el-table-column type="" fixed prop="id" width="100" align="center" label="角色ID"/>
-        <el-table-column fixed prop="roleName" width="150" align="left" label="角色名"/>
+        <el-table-column type="" prop="id" width="100" align="center" label="角色ID"/>
+        <el-table-column prop="roleName" width="150" align="left" label="角色名"/>
         <el-table-column prop="parentId" width="100" align="center" label="上级ID"/>
         <el-table-column prop="parent" width="200" align="left" label="上级角色"/>
         <el-table-column label="状态" prop="roleStatus" width="200px" align="center">
+          <template slot="header">
+            <span>状态</span>
+            <el-popover trigger="hover">
+              <div>
+                <h2><p style="color: red;"><b>说明：</b></p></h2>
+                <p>1. 角色禁用状态时，用户不能被授予该角色!</p>
+                <p>2. 角色禁用状态时，已拥有该角色的用户对应的权限失效!</p>
+              </div>
+              <i class="el-icon-question" slot="reference"></i>
+            </el-popover>
+          </template>
           <template slot-scope="scope">
             <el-switch
               v-model="scope.row.roleStatus"
@@ -81,23 +111,25 @@
             <span>菜单权限</span>
           </template>
           <template slot-scope="scope">
-            <div style="float: left">
-              <el-tree
-                ref="tree"
-                style="border: 1px solid #DCDFE6; width: 300px; border-radius: 5px; padding-top: 10px;"
-                :data="scope.row.menuTree[menuSystemId] || []"
-                default-expand-all
-                :check-strictly="true"
-                node-key="id"
-                :props="{expandTrigger: 'hover', label: 'title', value: 'id'}"
-              >
-              <span slot-scope="{ node, data }" class="custom-tree-node">
-                <span>{{ node.label }} <span style="font-size: 5px;color: gray;">({{ data.menuName }})</span></span>
-              </span>
-              </el-tree>
-            </div>
-            <div style="float: left">
-              <el-button type="text" @click="showRoleHasMenu(scope.row)">编辑</el-button>
+            <div v-for="(item, key) in scope.row.system" :key="key" v-if="item.systemId === parseInt(menuSystemId)">
+              <div style="float: left;">
+                <el-tree
+                  style="width: 300px; border-radius: 5px;"
+                  :data="item.menuTree"
+                  :indent="32"
+                  empty-text="无任何权限"
+                  node-key="id"
+                  :default-checked-keys="item.menuIds"
+                  :props="{ expandTrigger: 'hover', label: 'title', value: 'id' }"
+                >
+                  <span slot-scope="{ node, data }" class="custom-tree-node">
+                    <span>{{ node.label }} <span style="font-size: 5px;color: gray;">({{ data.menuName }})</span></span>
+                  </span>
+                </el-tree>
+              </div>
+              <div style="float:left;">
+                <el-button type="text" @click="showRoleHasMenu(scope.row, item.menuIds)">编辑</el-button>
+              </div>
             </div>
           </template>
         </el-table-column>
@@ -110,19 +142,6 @@
           </template>
           <template slot-scope="scope">
             <div style="float: left;">
-              <el-tree
-                ref="tree"
-                style="border: 1px solid #DCDFE6; width: 300px; border-radius: 5px; padding-top: 10px;"
-                :data="scope.row.dataTree[dataSystemId] || []"
-                default-expand-all
-                :check-strictly="true"
-                node-key="id"
-                :props="{expandTrigger: 'hover', label: 'title', value: 'id'}"
-              >
-              <span slot-scope="{ node, data }" class="custom-tree-node">
-                <span>{{ node.label }} <span style="font-size: 5px;color: gray;">({{ data.menuName }})</span></span>
-              </span>
-              </el-tree>
             </div>
             <div style="float: left;">
               <el-button type="text" @click="showRoleHasData(scope.row)">编辑</el-button>
@@ -165,6 +184,7 @@
       <menu-form
         :close-dialog="closeDialog"
         :role-has-menu-params="roleHasMenuParams"
+        :menu-tree="options.menuTree"
       />
     </el-dialog>
   </div>
@@ -174,6 +194,8 @@
   import {
     getOptions,
     getList,
+    getMenuTree,
+    getDataTree,
     getRoleTree,
     switchStatus,
     ROLE_STATUS_OPTION
@@ -200,13 +222,17 @@
         isExpansion: true,
         options: {
           system: [],
+          menuTree: [],
+          dataTree: [],
           roleTree: [],
         },
+        menuOptions: [],
 
         queryParams: {
           roleName: '',
           roleStatus: '',
           parentIds: [],
+          menuIds: [],
           page: 1,
           pageSize: 20,
         },
@@ -237,6 +263,7 @@
         dataSystemId: '1',
         roleHasMenuParams: {
           roleId: 0,
+          systemId: 1,
           menuIds: []
         },
         showRoleHasMenuDialog: false,
@@ -276,6 +303,7 @@
 
     async created() {
       await this.initOptions();
+      await this.initRoleTree();
       await this.queryList();
     },
 
@@ -284,6 +312,22 @@
         const ret = await getOptions();
         this.options.system = ret?.data?.system || [];
 
+        const menuTreeRet = await getMenuTree();
+        this.options.menuTree = menuTreeRet?.data || {};
+        for (const i in this.options.menuTree) {
+          this.menuOptions.push({
+            disabled: true,
+            id: this.options.menuTree[i]?.systemId || 0,
+            title: this.options.menuTree[i]?.systemName || '',
+            children: this.options.menuTree[i]?.menu || []
+          });
+        }
+
+        const dataTreeRet = await getDataTree();
+        this.options.dataTree = dataTreeRet?.data || [];
+
+      },
+      async initRoleTree() {
         const roleTreeRet = await getRoleTree();
         this.options.roleTree = roleTreeRet?.data || [];
 
@@ -334,10 +378,11 @@
         this.showDialog = true;
       },
 
-      async showRoleHasMenu(row) {
+      async showRoleHasMenu(row, menuIds) {
         this.roleHasMenuParams = {
           roleId: row.id,
-          menuIds: row.menuIds,
+          systemId: this.menuSystemId,
+          menuIds: menuIds,
         };
         this.showRoleHasMenuDialog = true;
       },
@@ -358,7 +403,7 @@
         this.roleHasDataParams = {};
         this.dialogTitle = '添加角色';
         this.queryList();
-        this.initOptions();
+        this.initRoleTree();
       },
 
       switchStatus($event, row) {
