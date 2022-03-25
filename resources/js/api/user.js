@@ -61,6 +61,22 @@ export function resetPassByUid(data) {
   })
 }
 
+export function getRoleTree(data) {
+  return request({
+    url: '/api/user/roleTree',
+    method: 'get',
+    params: {data},
+  })
+}
+
+export function saveUserHasRole(data) {
+  return request({
+    url: '/api/user/saveUserHasRole',
+    method: 'post',
+    data: {data},
+  })
+}
+
 export const USER_STATUS_OPTION = [
   {
     label: '启用',

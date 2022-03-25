@@ -34,6 +34,8 @@ Route::middleware(['language'])->group(function () {
             Route::any('save', [UserController::class, 'save'])->name('user.save');
             Route::any('switchStatus', [UserController::class, 'switchStatus'])->name('user.switchStatus');
             Route::any('resetPassByUid', [UserController::class, 'resetPassByUid'])->name('user.resetPassByUid');
+            Route::any('roleTree', [UserController::class, 'roleTree'])->name('user.roleTree');
+            Route::any('saveUserHasRole', [UserController::class, 'saveUserHasRole'])->name('user.saveUserHasRole');
         });
         Route::prefix('file')->group(function () {
             Route::any('upload', [FileController::class, 'upload'])->name('file.upload');

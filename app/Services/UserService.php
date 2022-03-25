@@ -10,8 +10,10 @@ namespace App\Services;
 
 use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
+use App\Models\RoleHasData;
 use App\Models\User;
 use App\Models\UserHasDepartment;
+use App\Models\UserHasRole;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use function App\Helpers\formatDateTime;
@@ -89,11 +91,14 @@ class UserService extends BaseService
         ];
         $userTb = (new User())->getTable();
         $userHasDepartmentTb = (new UserHasDepartment())->getTable();
+        $userHasRoleTb = (new UserHasRole())->getTable();
         $query = DB::table("{$userTb} as u")
             ->leftJoin("{$userHasDepartmentTb} as uhd", 'u.uid', '=', 'uhd.uid')
+            ->leftJoin("{$userHasRoleTb} as uhr", 'u.uid', '=', 'uhr.uid')
             ->select([
                 'u.*',
-                DB::raw('GROUP_CONCAT(uhd.dept_id) as dept_ids')
+                DB::raw('GROUP_CONCAT(DISTINCT uhd.dept_id) as dept_ids'),
+                DB::raw('GROUP_CONCAT(DISTINCT uhr.role_id) as role_ids'),
             ]);
         $username && $query->where('username', 'like', "%{$username}%");
         $mobile && $query->where('mobile', 'like', "%{$mobile}%");
@@ -111,17 +116,27 @@ class UserService extends BaseService
         $ret['pageSize'] = $resp['per_page'];
         
         $departmentMap = DepartmentService::getInstance()->getDepartmentMap();
+        $roleMap = RoleService::getInstance()->getRoleMap();
         foreach ($resp['data'] as $item) {
             $item = json_decode(json_encode($item, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
             $item['last_login_at'] = formatDateTime($item['last_login_at']);
             $item['created_at'] = formatDateTime($item['created_at']);
             $item['updated_at'] = formatDateTime($item['updated_at']);
             $deptIds = $item['dept_ids'];
-            $item['dept_id_arr'] = explode(',', $deptIds);
+            $item['dept_id_arr'] = array_filter(explode(',', $deptIds));
             sort($item['dept_id_arr']);
+            $item['departments'] = [];
             foreach ($item['dept_id_arr'] as $deptId) {
                 $tmpDepartment = $departmentMap[$deptId] ?? [];
                 $item['departments'][] = $tmpDepartment['fullName'] ?? '';
+            }
+            $roleIds = $item['role_ids'];
+            $item['role_id_arr'] = array_filter(explode(',',$roleIds));
+            sort($item['role_id_arr']);
+            $item['roles'] = [];
+            foreach ($item['role_id_arr'] as $roleId) {
+                $tmpRole = $roleMap[$roleId] ?? [];
+                $item['roles'][] = $tmpRole['fullName'] ?? '';
             }
             $tmp = [];
             foreach ($item as $key => $value) {
@@ -265,5 +280,33 @@ class UserService extends BaseService
         return [
             'password' => $password,
         ];
+    }
+    
+    public function saveUserHasRole(int $uid, array $roleIds): bool
+    {
+        $exists = UserHasRole::whereUid($uid)
+            ->get()
+            ->toArray();
+        if ($exists) {
+            $existIds = array_column($exists, 'role_id');
+            $addIds = array_diff($roleIds, $existIds);
+            $delIds = array_diff($existIds, $roleIds);
+            UserHasRole::whereUid($uid)
+                ->whereIn('role_id', $delIds)
+                ->delete();
+        } else {
+            $addIds = $roleIds;
+        }
+        $insertData = [];
+        foreach ($addIds as $roleId) {
+            $insertData[] = [
+                'role_id' => $roleId,
+                'uid' => $uid,
+                'created_at' => date('Y-m-d H:i:s'),
+            ];
+        }
+        UserHasRole::insert($insertData);
+        return true;
+        
     }
 }

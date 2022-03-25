@@ -24,7 +24,7 @@
           default-expand-all
           :row-class-name="departmentRowClassName"
         >
-          <el-table-column prop="name" width="400" label="部门">
+          <el-table-column fixed prop="name" width="400" label="部门">
             <template slot="header" slot-scope="scope">
               <span>部门 </span>
               <el-button type="text" @click="toggleRowExpansion">
@@ -36,7 +36,7 @@
           <el-table-column prop="parent" width="500" label="上级部门"/>
           <el-table-column prop="parentId" width="150" align="center" label="上级部门ID"/>
           <el-table-column prop="cnt" width="150" align="center" label="部门人数"/>
-          <el-table-column label="操作">
+          <el-table-column fixed="right" label="操作" width="200">
             <template slot-scope="scope">
               <el-button type="primary" @click="showEdit(scope.row)">编辑</el-button>
               <el-button v-if="scope.row.id > 1" type="danger" @click="remove(scope.row.id)">删除</el-button>

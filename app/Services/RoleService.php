@@ -47,9 +47,6 @@ class RoleService extends BaseService
             ->leftJoin("{$userHasRoleTb} as uhr", 'r.id', '=', 'uhr.role_id')
             ->select([
                 'r.*',
-//                DB::raw('GROUP_CONCAT(rhm.menu_id) as menus'),
-//                DB::raw('GROUP_CONCAT(rhd.data_id) as datas'),
-//                DB::raw('GROUP_CONCAT(uhr.uid) as users'),
             ]);
         $name && $query->where('r.role_name', 'like', "%{$name}%");
         $roleStatus !== '' && $query->where('r.role_status', '=', $roleStatus);
@@ -77,9 +74,9 @@ class RoleService extends BaseService
             $item = json_decode(json_encode($item, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
             $item['created_at'] = formatDateTime($item['created_at']);
             $item['updated_at'] = formatDateTime($item['updated_at']);
-            $item['parent'] = $roleMap[$item['id']]['parent'] ?? '';
+            $item['parent'] = $roleMap[$item['id']]['parent'] ?: '/';
             $menuMap = $roleHasMenuMap[$item['id']] ?? [];
-            foreach (MenuService::SYSTEM  as $systemId => $systemName) {
+            foreach (MenuService::SYSTEM as $systemId => $systemName) {
                 $systemInfo['systemId'] = $systemId;
                 $systemInfo['systemName'] = $systemName;
                 $map = $menuMap[$systemId] ?? [];
@@ -259,7 +256,7 @@ class RoleService extends BaseService
         return true;
     }
     
-    public function getRoleMap(array $roleIds): array
+    public function getRoleMap(array $roleIds = []): array
     {
         $fields = [
             'id',
@@ -277,7 +274,8 @@ class RoleService extends BaseService
         foreach ($exists as $item) {
             $parents = array_filter($this->getParents($item['parent_id'], $map));
             $item['level'] = count($parents) + 1;
-            $item['parent'] = $parents ? implode(' / ', array_column($parents, 'role_name')) : '/';
+            $item['parent'] = $parents ? implode(' / ', array_column($parents, 'role_name')) : '';
+            $item['fullName'] = ($item['parent'] ? $item['parent'] . ' / ' : '') . $item['role_name'];
             $upperItem = [];
             foreach ($item as $key => $value) {
                 $upperItem[Str::camel($key)] = $value;
@@ -324,7 +322,8 @@ class RoleService extends BaseService
         return $ret;
     }
     
-    protected function filterMenu(array &$menuTree, array $menuIds):void {
+    protected function filterMenu(array &$menuTree, array $menuIds): void
+    {
         foreach ($menuTree as $key => $item) {
             
             if (!in_array($item['id'], $menuIds, false)) {

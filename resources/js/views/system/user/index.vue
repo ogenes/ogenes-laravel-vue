@@ -37,6 +37,26 @@
               class="form-item-width"
             />
           </el-form-item>
+          <el-form-item label="角色：" prop="roleIds">
+            <el-cascader
+              v-model="queryParams.roleIds"
+              :options="options.roleTree"
+              :props="{
+                expandTrigger: 'hover',
+                label: 'roleName',
+                value: 'id',
+                emitPath: false,
+                multiple: true,
+                checkStrictly: true
+              }"
+              :show-all-levels="false"
+              :collapse-tags="true"
+              placeholder="请选择"
+              filterable
+              clearable
+              class="form-item-width"
+            />
+          </el-form-item>
           <el-form-item label=" ">
             <el-button type="primary" @click="queryList">查询</el-button>
             <el-button type="primary" icon="el-icon-plus" @click="showDialog=true">新增</el-button>
@@ -85,6 +105,25 @@
         <el-table-column fixed label="用户账号" prop="account" width="120px" align="center"/>
         <el-table-column label="手机号" prop="mobile" width="120px" align="center"/>
         <el-table-column label="邮箱" prop="email" width="200px" align="left"/>
+        <el-table-column label="角色" prop="email" width="300px" align="left">
+          <template slot-scope="scope">
+            <div v-for="(item, key) in scope.row.roles" :key="key" v-if="key < 3">
+              <el-tag type="info">{{ item }}</el-tag>
+            </div>
+            <el-popover
+              v-if="scope.row.roles.length > 3"
+              placement="top-end"
+              trigger="hover">
+              <div v-for="(item, key) in scope.row.roles" :key="key">
+                <el-tag type="info">{{ item }}</el-tag>
+              </div>
+              <div slot="reference">
+                <el-tag type="">更多……</el-tag>
+              </div>
+            </el-popover>
+            <el-button type="primary" size="mini" @click="showEditRole(scope.row)">修改角色</el-button>
+          </template>
+        </el-table-column>
         <el-table-column label="状态" prop="userStatus" width="200px" align="center">
           <template slot-scope="scope">
             <el-switch
@@ -101,17 +140,17 @@
         <el-table-column label="部门" prop="departments" width="500px" align="left">
           <template slot-scope="scope">
             <div v-for="(item, key) in scope.row.departments" :key="key" v-if="key < 3">
-              <span class="span-color">{{ item }}</span>
+              <el-tag type="success">{{ item }}</el-tag>
             </div>
             <el-popover
               v-if="scope.row.departments.length > 3"
               placement="top-end"
               trigger="hover">
               <div v-for="(item, key) in scope.row.departments" :key="key">
-                <span class="span-color">{{ item }}</span>
+                <el-tag type="success">{{ item }}</el-tag>
               </div>
               <div slot="reference">
-                <span class="span-color">……</span>
+                <el-tag type="">更多……</el-tag>
               </div>
             </el-popover>
           </template>
@@ -119,11 +158,11 @@
         <el-table-column label="最近一次登录时间" prop="lastLoginAt" width="160px" align="center"/>
         <el-table-column label="最近一次登录地" prop="lastLoginIp" width="150px" align="center"/>
         <el-table-column label="最近一次修改时间" prop="updatedAt" width="160px" align="center"/>
-        <el-table-column fixed="right" label="操作" align="center" width="200px">
+        <el-table-column fixed="right" label="操作" align="center" width="220px">
           <template slot-scope="scope">
             <div>
-              <el-button type="text" @click="showEdit(scope.row)">编辑</el-button>
-              <el-button type="text" :disabled="scope.row.uid === 1" @click="resetPass(scope.row)">重置密码</el-button>
+              <el-button type="primary" @click="showEdit(scope.row)">编辑</el-button>
+              <el-button type="danger" :disabled="scope.row.uid === 1" @click="resetPass(scope.row)">重置密码</el-button>
             </div>
           </template>
         </el-table-column>
@@ -147,12 +186,27 @@
         :close-dialog="closeDialog"
       />
     </el-drawer>
+
+    <el-dialog
+      title="编辑角色"
+      :visible.sync="showRoleDialog"
+      :destroy-on-close="true"
+      :close-on-click-modal="false"
+      :before-close="closeDialog"
+    >
+      <user-role
+        :role-tree="options.roleTree"
+        :user-has-role-params="userHasRoleParams"
+        :close-dialog="closeDialog"
+      />
+    </el-dialog>
   </div>
 </template>
 
 <script>
   import {
     getDepartmentList,
+    getRoleTree,
     getList,
     switchStatus,
     resetPassByUid,
@@ -160,12 +214,14 @@
   } from '@/api/user';
 
   import userForm from "./components/user-form";
+  import userRole from "./components/user-role";
 
   export default {
     name: "UserManage",
 
     components: {
       userForm,
+      userRole,
     },
 
     data() {
@@ -173,6 +229,9 @@
         USER_STATUS_OPTION,
 
         loading: false,
+        options: {
+          roleTree: []
+        },
 
         departments: [],
         defaultProps: {
@@ -190,6 +249,7 @@
           username: '',
           mobile: '',
           userStatus: '',
+          roleIds: [],
           deptIds: []
         },
         pageSizes: [10, 20, 50, 100, 200],
@@ -208,6 +268,12 @@
           avatar: '',
           deptIds: [],
         },
+
+        showRoleDialog: false,
+        userHasRoleParams: {
+          uid: 0,
+          roleIds: [],
+        },
       }
     },
 
@@ -216,6 +282,9 @@
     async created() {
       const ret = await getDepartmentList();
       this.departments = ret?.data || [];
+
+      const roleTreeRet = await getRoleTree();
+      this.options.roleTree = roleTreeRet?.data || [];
       await this.queryList();
     },
 
@@ -268,10 +337,20 @@
         this.showDialog = true;
       },
 
+      showEditRole(row) {
+        this.userHasRoleParams = {
+          uid: row.uid,
+          roleIds: row.roleIdArr || [],
+        };
+        this.showRoleDialog = true;
+      },
+
       closeDialog() {
         this.showDialog = false;
         this.userParams = {};
         this.dialogTitle = '添加用户';
+        this.showRoleDialog = false;
+        this.userHasRoleParams = {};
         this.queryList();
       },
 

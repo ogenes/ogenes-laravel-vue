@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\User\SaveRequest;
 use App\Http\Requests\User\LoginRequest;
 use App\Services\AuthService;
+use App\Services\RoleService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use function App\Helpers\getParams;
@@ -115,6 +116,29 @@ class UserController extends Controller
         $params = getParams($request);
         $uid = $params['id'] ?? '';
         $ret = UserService::getInstance()->resetPassByUid($uid);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
+    public function roleTree(Request $request)
+    {
+        $ret = RoleService::getInstance()->getRoleTree();
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
+    public function saveUserHasRole(Request $request)
+    {
+        $params = getParams($request);
+        $uid = $params['uid'] ?? 0;
+        $roleIds = $params['roleIds'] ?? [];
+        $ret = UserService::getInstance()->saveUserHasRole($uid, $roleIds);
         return response()->json([
             'code' => 0,
             'msg' => 'success',

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
 /**
  * App\Models\UserHasRole
  *
@@ -18,7 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|UserHasRole whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserHasRole whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserHasRole whereRoleId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|UserHasRole whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserHasRole whereUid($value)
  * @mixin \Eloquent
  */
 class UserHasRole extends Model

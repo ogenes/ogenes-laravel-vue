@@ -15,7 +15,7 @@
               <el-option v-for="(v, k) in ROLE_STATUS_OPTION" :key="k" :value="v.value" :label="v.label"/>
             </el-select>
           </el-form-item>
-          <el-form-item label="菜单：" prop="menuId">
+          <el-form-item label="菜单权限：" prop="menuId">
             <el-cascader
               v-model="queryParams.menuIds"
               :options="menuOptions"
@@ -79,30 +79,6 @@
         <el-table-column prop="roleName" width="150" align="left" label="角色名"/>
         <el-table-column prop="parentId" width="100" align="center" label="上级ID"/>
         <el-table-column prop="parent" width="200" align="left" label="上级角色"/>
-        <el-table-column label="状态" prop="roleStatus" width="200px" align="center">
-          <template slot="header">
-            <span>状态</span>
-            <el-popover trigger="hover">
-              <div>
-                <h2><p style="color: red;"><b>说明：</b></p></h2>
-                <p>1. 角色禁用状态时，用户不能被授予该角色!</p>
-                <p>2. 角色禁用状态时，已拥有该角色的用户对应的权限失效!</p>
-              </div>
-              <i class="el-icon-question" slot="reference"></i>
-            </el-popover>
-          </template>
-          <template slot-scope="scope">
-            <el-switch
-              v-model="scope.row.roleStatus"
-              active-text="启用"
-              inactive-text="禁用"
-              active-color="#67C23A"
-              inactive-color="#F56C6C"
-              @change="switchStatus($event, scope.row)"
-            >
-            </el-switch>
-          </template>
-        </el-table-column>
         <el-table-column prop="parent" width="400" align="left" label="菜单权限">
           <template slot="header" slot-scope="scope">
             <el-select v-model="menuSystemId" size="mini" style="width: 200px">
@@ -150,6 +126,30 @@
         </el-table-column>
         <el-table-column prop="createdAt" width="160" align="center" label="创建时间"/>
         <el-table-column prop="updatedAt" width="160" align="center" label="更新时间"/>
+        <el-table-column fixed="right" label="状态" prop="roleStatus" width="200px" align="center">
+          <template slot="header">
+            <span>状态</span>
+            <el-popover trigger="hover">
+              <div>
+                <h2><p style="color: red;"><b>说明：</b></p></h2>
+                <p>1. 角色禁用状态时，用户不能被授予该角色!</p>
+                <p>2. 角色禁用状态时，已拥有该角色的用户对应的权限失效!</p>
+              </div>
+              <i class="el-icon-question" slot="reference"></i>
+            </el-popover>
+          </template>
+          <template slot-scope="scope">
+            <el-switch
+              v-model="scope.row.roleStatus"
+              active-text="启用"
+              inactive-text="禁用"
+              active-color="#67C23A"
+              inactive-color="#F56C6C"
+              @change="switchStatus($event, scope.row)"
+            >
+            </el-switch>
+          </template>
+        </el-table-column>
         <el-table-column fixed="right" label="操作" width="200" align="center">
           <template slot-scope="scope">
             <el-button type="primary" @click="showEdit(scope.row)">编辑</el-button>
