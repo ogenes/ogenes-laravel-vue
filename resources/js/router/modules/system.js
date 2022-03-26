@@ -64,6 +64,25 @@ const systemRouter = {
         icon: 'role',
       }
     },
+    {
+      path: 'dict',
+      component: () => import('@/views/system/dict'),
+      name: 'DictManage',
+      meta: {
+        title: '字典管理',
+        icon: 'dict',
+      },
+    },
+    {
+      path: 'dictData',
+      component: () => import('@/views/system/dict/data'),
+      name: 'DictDataManage',
+      hidden: true,
+      meta: {
+        title: '字典数据',
+        icon: 'dict',
+      }
+    },
   ]
 };
 

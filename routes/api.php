@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\DictController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\Permission\DataController;
 use App\Http\Controllers\Permission\MenuController;
@@ -68,6 +69,14 @@ Route::middleware(['language'])->group(function () {
             Route::any('saveRoleHasData', [RoleController::class, 'saveRoleHasData'])->name('role.saveRoleHasData');
             Route::any('saveRoleHasMenu', [RoleController::class, 'saveRoleHasMenu'])->name('role.saveRoleHasMenu');
             Route::any('switchStatus', [RoleController::class, 'switchStatus'])->name('role.switchStatus');
+        });
+    
+        Route::prefix('dict')->group(function () {
+            Route::any('list', [DictController::class, 'list'])->name('dict.list');
+            Route::any('save', [DictController::class, 'save'])->name('dict.save');
+            Route::any('dataList', [DictController::class, 'dataList'])->name('dict.dataList');
+            Route::any('saveData', [DictController::class, 'saveData'])->name('dict.saveData');
+            Route::any('switchDataStatus', [DictController::class, 'switchDataStatus'])->name('dict.switchDataStatus');
         });
     });
 });

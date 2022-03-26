@@ -1,0 +1,92 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Services\DictService;
+use Illuminate\Http\Request;
+use function App\Helpers\getParams;
+
+class DictController extends Controller
+{
+    public function list(Request $request)
+    {
+        $params = getParams($request);
+        $dictName = $params['dictName'] ?: '';
+        $symbol = $params['symbol'] ?? '';
+        $remark = $params['remark'] ?? '';
+        $createdAt = $params['createdAt'] ?? [];
+        $page = $params['page'] ?? 1;
+        $pageSize = $params['pageSize'] ?? 30;
+        $ret = DictService::getInstance()->getList(
+            $dictName,
+            $symbol,
+            $remark,
+            $createdAt,
+            $page,
+            $pageSize
+        );
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
+    public function save(Request $request)
+    {
+        $params = getParams($request);
+        $dictName = $params['dictName'] ?: '';
+        $symbol = $params['symbol'] ?? '';
+        $remark = $params['remark'] ?? '';
+        $id = $params['id'] ?? 0;
+        $ret = DictService::getInstance()->save($dictName, $symbol, $remark, $id);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
+    public function dataList(Request $request)
+    {
+        $params = getParams($request);
+        $symbol = $params['symbol'] ?? '';
+        $dataStatus = $params['dataStatus'] ?? '';
+        $ret = DictService::getInstance()->getDictDataBySymbol($symbol, $dataStatus);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]); 
+    }
+    
+    public function saveData(Request $request)
+    {
+        $params = getParams($request);
+        $dictId = $params['dictId'] ?: 0;
+        $sort = $params['sort'] ?? '';
+        $label = $params['label'] ?? '';
+        $value = $params['value'] ?? '';
+        $remark = $params['remark'] ?? '';
+        $id = $params['id'] ?? 0;
+        $ret = DictService::getInstance()->saveData($dictId, $sort, $label, $value, $remark, $id);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
+    public function switchDataStatus(Request $request)
+    {
+        $params = getParams($request);
+        $dataId = $params['dataId'] ?? 0;
+        $dataStatus = $params['dataStatus'] ?? 0;
+        $ret = DictService::getInstance()->switchDataStatus($dataId, $dataStatus);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+}
