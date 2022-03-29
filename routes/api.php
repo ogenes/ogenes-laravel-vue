@@ -77,6 +77,8 @@ Route::middleware(['language'])->group(function () {
             Route::any('dataList', [DictController::class, 'dataList'])->name('dict.dataList');
             Route::any('saveData', [DictController::class, 'saveData'])->name('dict.saveData');
             Route::any('switchDataStatus', [DictController::class, 'switchDataStatus'])->name('dict.switchDataStatus');
+            Route::any('remove', [DictController::class, 'remove'])->name('dict.remove');
+            Route::any('removeData', [DictController::class, 'removeData'])->name('dict.removeData');
         });
     });
 });

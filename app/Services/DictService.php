@@ -12,6 +12,7 @@ use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
 use App\Models\Dict;
 use App\Models\DictData;
+use App\Models\Menu;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use function App\Helpers\formatDateTime;
@@ -77,7 +78,7 @@ class DictService extends BaseService
         string $symbol,
         string $remark,
         int $id = 0
-    ): array 
+    ): array
     {
         $exists = Dict::whereSymbol($symbol)
             ->where('id', '!=', $id)
@@ -187,8 +188,8 @@ class DictService extends BaseService
     {
         $dictTb = (new Dict())->getTable();
         $dictDataTb = (new DictData())->getTable();
-        $query = DB::table("{$dictTb} as d")
-            ->leftJoin("{$dictDataTb} as dd", 'd.id', '=', 'dd.dict_id')
+        $query = DB::table("{$dictDataTb} as dd")
+            ->leftJoin("{$dictTb} as d", 'd.id', '=', 'dd.dict_id')
             ->select([
                 'dd.*',
             ])
@@ -207,6 +208,35 @@ class DictService extends BaseService
             $ret[] = $tmp;
         }
         return $ret;
-        
+    }
+    
+    public function remove(int $id): bool
+    {
+        $ret = false;
+        $exist = Dict::whereId($id)->first();
+        if ($exist) {
+            $ret = $exist->delete();
+        }
+        $this->removeData($id);
+        return $ret;
+    }
+    
+    public function removeData(int $dictId, $id = 0): bool
+    {
+        $ret = false;
+        $data = DictData::whereDictId($dictId)
+            ->when($id, function ($query) use ($id) {
+                return $query->where('id', '=', $id);
+            })
+            ->get()
+            ->toArray();
+        if ($data) {
+            $ret = DictData::whereDictId($dictId)
+                ->when($id, function ($query) use ($id) {
+                    return $query->where('id', '=', $id);
+                })
+                ->delete();
+        }
+        return $ret;
     }
 }

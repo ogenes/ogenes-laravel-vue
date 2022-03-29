@@ -54,21 +54,21 @@
       </div>
       <el-table
         :data="result.list"
+        :default-sort = "{prop: 'id', order: 'descending'}"
         border
         height="600px"
       >
-        <el-table-column type="" prop="id" width="100" align="center" label="字典ID"/>
-        <el-table-column prop="dictName" width="150" align="center" label="字典名称">
+        <el-table-column type="" prop="id" sortable width="100" align="center" label="字典ID"/>
+        <el-table-column prop="dictName" sortable width="150" align="center" label="字典名称">
           <template slot-scope="scope">
             <el-input v-if="scope.row.showEdit" v-model="scope.row.dictName"/>
             <span v-else> {{ scope.row.dictName }} </span>
           </template>
         </el-table-column>
-        <el-table-column prop="symbol" min-width="100" align="center" label="字典标识">
+        <el-table-column prop="symbol" sortable min-width="100" align="center" label="字典标识">
           <template slot-scope="scope">
             <el-input v-if="scope.row.showEdit" v-model="scope.row.symbol"/>
-            <el-link v-else type="primary" @click="jumpToData(scope.row)"> {{ scope.row.symbol }} </el-link>
-
+            <el-link v-else type="primary" @click="showData(scope.row)"> {{ scope.row.symbol }}</el-link>
           </template>
         </el-table-column>
         <el-table-column prop="remark" min-width="200" align="left" label="备注">
@@ -77,33 +77,52 @@
             <span v-else> {{ scope.row.remark }} </span>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" min-width="160" align="center" label="创建时间"/>
-        <el-table-column prop="updatedAt" min-width="160" align="center" label="更新时间"/>
+        <el-table-column prop="createdAt" sortable min-width="160" align="center" label="创建时间"/>
+        <el-table-column prop="updatedAt" sortable min-width="160" align="center" label="更新时间"/>
         <el-table-column fixed="right" label="操作" min-width="200" align="center">
           <template slot-scope="scope">
             <span v-if="scope.row.showEdit">
                   <el-button type="success" @click="save(scope.row, scope.$index)">保存</el-button>
                   <el-button type="info" @click="cancel(scope.row, scope.$index)">取消</el-button>
             </span>
-            <el-button v-else type="primary" @click="$set(result.list, scope.$index, {...scope.row, showEdit: true})">编辑</el-button>
+            <span v-else>
+              <el-button type="primary"
+                         @click="$set(result.list, scope.$index, {...scope.row, showEdit: true})">编辑</el-button>
+              <el-button type="danger" @click="remove(scope.row.id)">删除</el-button>
+            </span>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
+
+    <el-dialog
+      v-if="showDialog"
+      :title="currentRow.dictName"
+      :destroy-on-close="true"
+      :visible.sync="showDialog"
+      width="80%"
+    >
+      <dict-data :dict="currentRow"/>
+    </el-dialog>
   </div>
 </template>
 
 <script>
   import {
     getList,
-    save
+    save,
+    remove
   } from '@/api/system/dict';
   import {deepClone} from "@/utils";
+  import dictData from "./components/data";
+
 
   export default {
     name: "DictManage",
 
-    components: {},
+    components: {
+      dictData
+    },
 
     data() {
       return {
@@ -134,7 +153,10 @@
           remark: '',
           createdAt: '',
           updatedAt: '',
-        }
+        },
+
+        showDialog: false,
+        currentRow: {},
       }
     },
 
@@ -204,17 +226,37 @@
         })
       },
 
-      jumpToData (row) {
-        console.log(row,'row');
-        this.$router.push({
-          path:'/system/dictData',
-          query:{
-            dictId: row.id,
-            dictName: row.dictName,
-            symbol: row.symbol,
-          }
-        })
-      }
+      showData(row) {
+        this.currentRow = row;
+        this.showDialog = true;
+      },
+
+      async remove(id) {
+        this.$confirm('此操作将永久删除该字典, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.loading = true;
+          remove({id}).then((res) => {
+            if (res.code > 0) {
+              this.$message.error(res.msg)
+            } else {
+              this.$message.success('操作成功');
+              this.getList();
+            }
+            this.loading = false
+          }).catch((e) => {
+            this.loading = false
+          });
+          this.loading = false;
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });
+        });
+      },
     }
   }
 </script>

@@ -50,8 +50,11 @@ function getRandStr(int $len, array $conf = ['number', 'upper', 'lower']): strin
     return substr($match, 0, $len);
 }
 
-function formatDateTime(string $dateTime): string
+function formatDateTime(?string $dateTime): string
 {
+    if (empty($dateTime)) {
+        return '';
+    }
     $ret = date('Y-m-d H:i:s', strtotime($dateTime));
     if ($ret === '2000-01-01 00:00:01') {
         $ret = '/';

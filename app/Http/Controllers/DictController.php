@@ -89,4 +89,29 @@ class DictController extends Controller
             'data' => $ret,
         ]);
     }
+    
+    public function remove(Request $request)
+    {
+        $params = getParams($request);
+        $id = $params['id'] ?? 0;
+        $ret = DictService::getInstance()->remove($id);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
+    public function removeData(Request $request)
+    {
+        $params = getParams($request);
+        $dictId = $params['dictId'] ?? 0;
+        $id = $params['id'] ?? -1;
+        $ret = DictService::getInstance()->removeData($dictId, $id);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
 }

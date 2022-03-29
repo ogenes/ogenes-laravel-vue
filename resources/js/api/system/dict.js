@@ -39,3 +39,17 @@ export function switchDataStatus(data) {
     data: {data},
   })
 }
+export function remove(data) {
+  return request({
+    url: '/api/dict/remove',
+    method: 'post',
+    data: {data},
+  })
+}
+export function removeData(data) {
+  return request({
+    url: '/api/dict/removeData',
+    method: 'post',
+    data: {data},
+  })
+}
