@@ -54,31 +54,32 @@
       </div>
       <el-table
         :data="result.list"
-        :default-sort = "{prop: 'id', order: 'descending'}"
+        :default-sort = "queryParams.sort"
+        @sort-change="sortChange"
         border
         height="600px"
       >
-        <el-table-column type="" prop="id" sortable width="100" align="center" label="字典ID"/>
-        <el-table-column prop="dictName" sortable width="150" align="center" label="字典名称">
+        <el-table-column type="" prop="id" sortable="custom" width="100" align="center" label="字典ID"/>
+        <el-table-column prop="dictName" sortable="custom" width="150" align="center" label="字典名称">
           <template slot-scope="scope">
             <el-input v-if="scope.row.showEdit" v-model="scope.row.dictName"/>
             <span v-else> {{ scope.row.dictName }} </span>
           </template>
         </el-table-column>
-        <el-table-column prop="symbol" sortable min-width="100" align="center" label="字典标识">
+        <el-table-column prop="symbol" sortable="custom" min-width="100" align="center" label="字典标识">
           <template slot-scope="scope">
             <el-input v-if="scope.row.showEdit" v-model="scope.row.symbol"/>
             <el-link v-else type="primary" @click="showData(scope.row)"> {{ scope.row.symbol }}</el-link>
           </template>
         </el-table-column>
-        <el-table-column prop="remark" min-width="200" align="left" label="备注">
+        <el-table-column prop="remark" min-width="200" align="left" label="备2注">
           <template slot-scope="scope">
             <el-input v-if="scope.row.showEdit" v-model="scope.row.remark" type="textarea" autosize/>
             <span v-else> {{ scope.row.remark }} </span>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" sortable min-width="160" align="center" label="创建时间"/>
-        <el-table-column prop="updatedAt" sortable min-width="160" align="center" label="更新时间"/>
+        <el-table-column prop="createdAt" sortable="custom" min-width="160" align="center" label="创建时间"/>
+        <el-table-column prop="updatedAt" sortable="custom" min-width="160" align="center" label="更新时间"/>
         <el-table-column fixed="right" label="操作" min-width="200" align="center">
           <template slot-scope="scope">
             <span v-if="scope.row.showEdit">
@@ -138,6 +139,10 @@
           createdAt: [],
           page: 1,
           pageSize: 20,
+          sort: {
+            prop: 'id',
+            order: 'descending',
+          }
         },
         pageSizes: [10, 20, 50, 100, 200],
         result: {
@@ -200,6 +205,13 @@
       handleListCurrentChange: function (currentPage) {
         this.queryParams.page = currentPage;
         this.getList();
+      },
+      sortChange(col) {
+        this.queryParams.sort = {
+          prop: col.prop,
+          order: col.order
+        };
+        this.queryList();
       },
 
       cancel(row, index) {

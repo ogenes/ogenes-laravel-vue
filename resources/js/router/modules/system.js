@@ -46,6 +46,7 @@ const systemRouter = {
         },
         {
           path: 'data',
+          hidden: true,
           component: () => import('@/views/system/permission/data'),
           name: 'PermissionDataManage',
           meta: {

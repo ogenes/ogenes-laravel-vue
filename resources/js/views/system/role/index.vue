@@ -109,20 +109,20 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="parent" width="400" align="left" label="数据权限">
-          <template slot="header" slot-scope="scope">
-            <el-select v-model="dataSystemId" size="mini" style="width: 200px">
-              <el-option v-for="(v, k) in options.system" :key="k" :value="k" :label="v"/>
-            </el-select>
-            <span>数据权限</span>
-          </template>
-          <template slot-scope="scope">
-            <div style="float: left;">
-            </div>
-            <div style="float: left;">
-              <el-button type="text" @click="showRoleHasData(scope.row)">编辑</el-button>
-            </div>
-          </template>
+<!--        <el-table-column prop="parent" width="400" align="left" label="数据权限">-->
+<!--          <template slot="header" slot-scope="scope">-->
+<!--            <el-select v-model="dataSystemId" size="mini" style="width: 200px">-->
+<!--              <el-option v-for="(v, k) in options.system" :key="k" :value="k" :label="v"/>-->
+<!--            </el-select>-->
+<!--            <span>数据权限</span>-->
+<!--          </template>-->
+<!--          <template slot-scope="scope">-->
+<!--            <div style="float: left;">-->
+<!--            </div>-->
+<!--            <div style="float: left;">-->
+<!--              <el-button type="text" @click="showRoleHasData(scope.row)">编辑</el-button>-->
+<!--            </div>-->
+<!--          </template>-->
         </el-table-column>
         <el-table-column prop="createdAt" width="160" align="center" label="创建时间"/>
         <el-table-column prop="updatedAt" width="160" align="center" label="更新时间"/>

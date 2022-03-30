@@ -17,11 +17,13 @@ class DictController extends Controller
         $createdAt = $params['createdAt'] ?? [];
         $page = $params['page'] ?? 1;
         $pageSize = $params['pageSize'] ?? 30;
+        $sort = $params['sort'] ?? [];
         $ret = DictService::getInstance()->getList(
             $dictName,
             $symbol,
             $remark,
             $createdAt,
+            $sort,
             $page,
             $pageSize
         );

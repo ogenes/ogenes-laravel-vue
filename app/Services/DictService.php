@@ -24,6 +24,7 @@ class DictService extends BaseService
         string $symbol,
         string $remark,
         array $createdAt,
+        array $sort = [],
         int $page = 1,
         int $pageSize = 30
     ): array
@@ -50,7 +51,15 @@ class DictService extends BaseService
             $end = date('Y-m-d 23:59:59', strtotime($createdAt[1]));
             $query->whereBetween('created_at', [$start, $end]);
         }
-        $resp = $query->orderBy('id', 'desc')
+        $prop = 'id';
+        $order = 'desc';
+        if (isset($sort['prop'])) {
+            $prop = Str::snake($sort['prop']);
+        }
+        if (isset($sort['order']) && $sort['order'] === 'ascending') {
+            $order = 'asc';
+        }
+        $resp = $query->orderBy($prop, $order)
             ->paginate($pageSize, ['*'], 'page', $page)
             ->toArray();
         if (empty($resp)) {
