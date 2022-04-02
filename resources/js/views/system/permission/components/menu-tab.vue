@@ -42,17 +42,20 @@
           <template slot="header" slot-scope="scope">
             <span>操作 </span>
             <el-button
+              v-permission="[BTN_MENU_ADD]"
               type="primary"
               class="el-icon-plus"
-              style="float: right; margin-right: 20px;"
               @click="showDialog=true"
             >
-              新增
+              {{ BTN_MAP_MENU[BTN_MENU_ADD] }}
             </el-button>
           </template>
           <template slot-scope="scope">
-            <el-button type="primary" @click="showEdit(scope.row)">编辑</el-button>
-            <el-button :disabled="scope.row.children !== undefined" type="danger" @click="remove(scope.row.id)">删除
+            <el-button v-permission="[BTN_MENU_EDIT]" type="primary" @click="showEdit(scope.row)">
+              {{ BTN_MAP_MENU[BTN_MENU_EDIT] }}
+            </el-button>
+            <el-button v-permission="[BTN_MENU_DEL]" :disabled="scope.row.children !== undefined" type="danger" @click="remove(scope.row.id)">
+              {{ BTN_MAP_MENU[BTN_MENU_DEL] }}
             </el-button>
           </template>
         </el-table-column>
@@ -120,7 +123,16 @@
           <el-input v-model="menuParams.title" placeholder="请输入" clearable style="width: 100%"/>
         </el-form-item>
         <el-form-item label="权限标识：" prop="roles">
+          <el-select v-if="menuParams.type === '3'" v-model="menuParams.roles" placeholder="请选择" style="width: 100%">
+            <el-option
+              v-for="(item, key) in BTN_MAP"
+              :key="key"
+              :label="key"
+              :value="key">
+            </el-option>
+          </el-select>
           <el-input
+            v-else
             type="textarea"
             :autosize="{ minRows: 1, maxRows: 6}"
             v-model="menuParams.roles"
@@ -158,6 +170,13 @@
     remove,
   } from '@/api/system/menu';
   import svgIcons from '@/utils/svg-icons'
+  import {
+    BTN_MAP,
+    BTN_MAP_MENU,
+    BTN_MENU_ADD,
+    BTN_MENU_EDIT,
+    BTN_MENU_DEL,
+  } from '@/api/btn'
 
   export default {
     name: "MenuManage",
@@ -179,6 +198,11 @@
 
     data() {
       return {
+        BTN_MAP,
+        BTN_MAP_MENU,
+        BTN_MENU_ADD,
+        BTN_MENU_EDIT,
+        BTN_MENU_DEL,
         svgIcons,
 
         loading: false,
@@ -278,6 +302,7 @@
       },
 
       async save() {
+        console.log(this.menuParams);
         this.$refs.menuParams.validate(valid => {
           if (valid) {
             this.loading = true;

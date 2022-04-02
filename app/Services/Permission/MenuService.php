@@ -6,6 +6,7 @@ namespace App\Services\Permission;
 use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
 use App\Models\Menu;
+use App\Services\ActionLogService;
 use App\Services\BaseService;
 use Illuminate\Support\Str;
 use function App\Helpers\formatDateTime;
@@ -109,23 +110,55 @@ class MenuService extends BaseService
         if ($exists) {
             throw new CommonException(ErrorCode::RECORD_EXISTS);
         }
+        $ret = false;
         if ($id > 0) {
-            $model = Menu::whereId($id)->first();
-            if (empty($model)) {
-                throw new CommonException(ErrorCode::RECORD_EXCEPTION);
+            $exist = Menu::whereId($id)->first();
+            $data = [];
+            $systemId !== $exist->system_id && $data['system_id'] = $systemId;
+            $menuName !== $exist->menu_name && $data['menu_name'] = $menuName;
+            $type !== $exist->type && $data['type'] = $type;
+            $parentId !== $exist->parent_id && $data['parent_id'] = $parentId;
+            $title !== $exist->title && $data['title'] = $title;
+            $icon !== $exist->icon && $data['icon'] = $icon;
+            $roles !== $exist->roles && $data['roles'] = $roles;
+    
+            if ($data) {
+                $data['updated_at'] = date('Y-m-d H:i:s');
+                foreach ($data as $key => $val) {
+                    $exist->setAttribute($key, $val);
+                }
+                $ret = $exist->save();
+                ActionLogService::getInstance()->insert(
+                    ActionLogService::RESOURCE_MENU,
+                    $id,
+                    $this->uid,
+                    '编辑',
+                    $data
+                );
             }
         } else {
-            $model = new Menu();
+            $data = [
+                'system_id' => $systemId,
+                'menu_name' => $menuName,
+                'type' => $type,
+                'parent_id' => $parentId,
+                'title' => $title,
+                'icon' => $icon,
+                'roles' => $roles,
+                'created_at' => date('Y-m-d H:i:s'),
+            ];
+            $id = Menu::insertGetId($data);
+            $ret = $id > 0;
+            ActionLogService::getInstance()->insert(
+                ActionLogService::RESOURCE_MENU,
+                $id,
+                $this->uid,
+                '新增',
+                $data
+            );
         }
-        $model->system_id = $systemId;
-        $model->menu_name = $menuName;
-        $model->type = $type;
-        $model->parent_id = $parentId;
-        $model->title = $title;
-        $model->icon = $icon;
-        $model->roles = $roles;
-        $model->save();
-        return true;
+
+        return $ret;
     }
     
     public function remove(int $id): bool
@@ -137,6 +170,13 @@ class MenuService extends BaseService
         $exist = Menu::whereId($id)->first();
         if ($exist) {
             $ret = $exist->delete();
+            ActionLogService::getInstance()->insert(
+                ActionLogService::RESOURCE_MENU,
+                $id,
+                $this->uid,
+                '删除',
+                []
+            );
         }
         return $ret;
     }

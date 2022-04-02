@@ -1,14 +1,7 @@
 <template>
   <div class="app-container">
     <el-card>
-      <div slot="header">
-        <span>查询条件</span>
-      </div>
-      <el-form
-        :inline="true"
-        label-position="right"
-        label-width="100px"
-      >
+      <el-form :inline="true" label-width="60px" label-position="left">
         <el-row>
           <el-form-item label="用户名:">
             <el-input v-model="queryParams.username" @keyup.enter.native="queryList" class="form-item-width"
@@ -23,7 +16,7 @@
                       placeholder="支持模糊搜索" clearable/>
           </el-form-item>
           <el-form-item label="状态:">
-            <el-select v-model="queryParams.userStatus" clearable class="form-item-width">
+            <el-select v-model="queryParams.userStatus" placeholder="请选择" clearable class="form-item-width">
               <el-option v-for="(v, k) in USER_STATUS_OPTION" :key="k" :value="v.value" :label="v.label"/>
             </el-select>
           </el-form-item>
@@ -63,16 +56,10 @@
           </el-form-item>
           <el-form-item label=" ">
             <el-button type="primary" @click="queryList">查询</el-button>
-            <el-button v-permission="['UserManageAdd']" type="primary" icon="el-icon-plus" @click="showDialog=true">新增</el-button>
+            <el-button v-permission="[BTN_USER_ADD]" type="primary" icon="el-icon-plus" @click="showDialog=true">{{ BTN_MAP_USER[BTN_USER_ADD]}}</el-button>
           </el-form-item>
         </el-row>
       </el-form>
-    </el-card>
-
-    <el-card>
-      <div slot="header">
-        <span>查询结果</span>
-      </div>
       <div class="page-position">
         <el-pagination
           background
@@ -127,7 +114,7 @@
                 <el-tag type="">更多……</el-tag>
               </div>
             </el-popover>
-            <el-button v-permission="['UserManageEditRole']" type="primary" size="mini" @click="showEditRole(scope.row)">修改角色</el-button>
+            <el-button v-permission="[BTN_USER_ROLE]" type="primary" size="mini" @click="showEditRole(scope.row)">{{ BTN_MAP_USER[BTN_USER_ROLE] }}</el-button>
           </template>
         </el-table-column>
         <el-table-column label="状态" prop="userStatus" width="200px" align="center">
@@ -138,7 +125,7 @@
               inactive-text="禁用"
               active-color="#67C23A"
               inactive-color="#F56C6C"
-              :disabled="!checkPermission(['UserManageStatus'])"
+              :disabled="!checkPermission([BTN_USER_STATUS])"
               @change="switchStatus($event, scope.row)"
             >
             </el-switch>
@@ -168,9 +155,12 @@
         <el-table-column fixed="right" label="操作" align="center" width="220px">
           <template slot-scope="scope">
             <div>
-              <el-button v-permission="['UserManageEdit']" type="primary" @click="showEdit(scope.row)">编辑</el-button>
-              <el-button v-permission="['UserManageReset']" type="danger" :disabled="scope.row.uid === 1"
-                         @click="resetPass(scope.row)">重置密码
+              <el-button v-permission="[BTN_USER_EDIT]" type="primary" @click="showEdit(scope.row)">
+                {{ BTN_MAP_USER[BTN_USER_EDIT] }}
+              </el-button>
+              <el-button v-permission="[BTN_USER_RESET]" type="danger" :disabled="scope.row.uid === 1"
+                         @click="resetPass(scope.row)">
+                {{ BTN_MAP_USER[BTN_USER_RESET] }}
               </el-button>
             </div>
           </template>
@@ -226,6 +216,15 @@
   import userRole from "./components/user-role";
   import checkPermission from "@/utils/permission";
 
+  import {
+    BTN_MAP_USER,
+    BTN_USER_ADD,
+    BTN_USER_EDIT,
+    BTN_USER_RESET,
+    BTN_USER_STATUS,
+    BTN_USER_ROLE,
+  } from "../../../api/btn";
+
   export default {
     name: "UserManage",
 
@@ -237,6 +236,12 @@
     data() {
       return {
         USER_STATUS_OPTION,
+        BTN_MAP_USER,
+        BTN_USER_ADD,
+        BTN_USER_EDIT,
+        BTN_USER_RESET,
+        BTN_USER_STATUS,
+        BTN_USER_ROLE,
         checkPermission,
 
         loading: false,
@@ -442,16 +447,7 @@
 <style scoped lang="scss">
   .app-container {
     .form-item-width {
-      width: 300px
-    }
-
-    .page-position {
-      text-align: right;
-      margin: 10px 0;
-    }
-
-    .span-color {
-      color: #1482f0
+      width: 240px
     }
   }
 </style>

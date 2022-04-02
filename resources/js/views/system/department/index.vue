@@ -1,21 +1,6 @@
 <template>
   <div class="app-container">
     <el-card>
-
-      <!--新增按钮-->
-      <div slot="header" class="clearfix">
-        <el-button
-          v-permission="['DepartmentManageAdd']"
-          type="primary"
-          class="el-icon-plus"
-          style="float: right; margin-right: 20px;"
-          @click="showDialog=true"
-        >
-          新增
-        </el-button>
-      </div>
-
-      <!--表单-->
       <div>
         <el-table
           ref="departmentTree"
@@ -38,9 +23,20 @@
           <el-table-column prop="parentId" width="150" align="center" label="上级部门ID"/>
           <el-table-column prop="cnt" width="150" align="center" label="部门人数"/>
           <el-table-column fixed="right" label="操作" width="200">
+            <template slot="header" slot-scope="scope">
+              <span>操作 </span>
+              <el-button
+                v-permission="[BTN_DEPT_ADD]"
+                type="primary"
+                class="el-icon-plus"
+                @click="showDialog=true"
+              >
+                {{BTN_MAP_DEPT[BTN_DEPT_ADD]}}
+              </el-button>
+            </template>
             <template slot-scope="scope">
-              <el-button v-permission="['DepartmentManageEdit']" type="primary" @click="showEdit(scope.row)">编辑</el-button>
-              <el-button v-if="scope.row.id > 1" v-permission="['DepartmentManageDel']" type="danger" @click="remove(scope.row.id)">删除</el-button>
+              <el-button v-permission="[BTN_DEPT_EDIT]" type="primary" @click="showEdit(scope.row)">{{ BTN_MAP_DEPT[BTN_DEPT_EDIT] }}</el-button>
+              <el-button v-if="scope.row.id > 1" v-permission="[BTN_DEPT_DEL]" type="danger" @click="remove(scope.row.id)">{{ BTN_MAP_DEPT[BTN_DEPT_DEL] }}</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -85,12 +81,23 @@
 
 <script>
   import {getList, save, remove} from '@/api/system/department';
+  import {
+    BTN_MAP_DEPT,
+    BTN_DEPT_ADD,
+    BTN_DEPT_EDIT,
+    BTN_DEPT_DEL,
+  } from "@/api/btn";
 
   export default {
     name: "DepartmentManage",
 
     data() {
       return {
+        BTN_MAP_DEPT,
+        BTN_DEPT_ADD,
+        BTN_DEPT_EDIT,
+        BTN_DEPT_DEL,
+
         loading: false,
         isExpansion: true,
 
