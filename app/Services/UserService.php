@@ -115,7 +115,7 @@ class UserService extends BaseService
         $mobile && $query->where('mobile', 'like', "%{$mobile}%");
         $deptIds && $query->whereIn('uhd.dept_id', $deptIds);
         $userStatus !== '' && $query->where('user_status', '=', $userStatus);
-    
+        
         $prop = 'uid';
         $order = 'desc';
         if (isset($sort['prop'])) {
@@ -211,24 +211,48 @@ class UserService extends BaseService
         DB::beginTransaction();
         try {
             if ($uid > 0) {
-                $exists = User::where('uid', '=', $uid)->first();
-                if (!$exists) {
+                $exist = User::where('uid', '=', $uid)->first();
+                if (!$exist) {
                     throw new CommonException(ErrorCode::NO_USER_FOUND);
                 }
-                $exists->setAttribute('avatar', $avatar);
-                $exists->setAttribute('account', $mobile);
-                $exists->setAttribute('username', $username);
-                $exists->setAttribute('mobile', $mobile);
-                $exists->setAttribute('email', $email);
-                $exists->save();
+                $data = [];
+                $avatar !== $exist->avatar && $data['avatar'] = $avatar;
+                $mobile !== $exist->account && $data['account'] = $mobile;
+                $username !== $exist->username && $data['username'] = $username;
+                $mobile !== $exist->mobile && $data['mobile'] = $mobile;
+                $email !== $exist->email && $data['email'] = $email;
+                if ($data) {
+                    $data['updated_at'] = date('Y-m-d H:i:s');
+                    foreach ($data as $key => $val) {
+                        $exist->setAttribute($key, $val);
+                        $this->cacheUserField($uid, $key, $val);
+                    }
+                    $exist->save();
+                    ActionLogService::getInstance()->insert(
+                        ActionLogService::RESOURCE_USER,
+                        $uid,
+                        $this->uid,
+                        '编辑',
+                        $data
+                    );
+                }
             } else {
-                $uid = User::insertGetId([
+                $data = [
                     'avatar' => $avatar,
                     'username' => $username,
+                    'account' => $mobile,
                     'mobile' => $mobile,
                     'email' => $email,
                     'created_at' => date('Y-m-d H:i:s'),
-                ]);
+                ];
+                $uid = User::insertGetId($data);
+                ActionLogService::getInstance()->insert(
+                    ActionLogService::RESOURCE_USER,
+                    $uid,
+                    $this->uid,
+                    '新增',
+                    $data
+                );
             }
             $ret = $this->saveUserHasDepartment($uid, $deptIds);
             DB::commit();
@@ -252,6 +276,7 @@ class UserService extends BaseService
                 ->whereIn('dept_id', $delIds)
                 ->delete();
         } else {
+            $delIds = [];
             $addIds = $deptIds;
         }
         $insertData = [];
@@ -262,7 +287,19 @@ class UserService extends BaseService
                 'created_at' => date('Y-m-d H:i:s'),
             ];
         }
-        UserHasDepartment::insert($insertData);
+        $insertData && UserHasDepartment::insert($insertData);
+        if ($delIds || $addIds) {
+            $data['delIds'] = $delIds;
+            $data['addIds'] = $addIds;
+            ActionLogService::getInstance()->insert(
+                ActionLogService::RESOURCE_USER,
+                $uid,
+                $this->uid,
+                '修改部门',
+                $data
+            );
+        }
+        
         return true;
     }
     
@@ -278,9 +315,19 @@ class UserService extends BaseService
         }
         
         if ($exists->user_status !== $userStatus) {
-            $exists->user_status = $userStatus;
+            $data['user_status'] = $userStatus;
+            $data['updated_at'] = date('Y-m-d H:i:s');
+            foreach ($data as $key => $val) {
+                $exists->setAttribute($key, $val);
+            }
             $exists->save();
-            //record log
+            ActionLogService::getInstance()->insert(
+                ActionLogService::RESOURCE_USER,
+                $uid,
+                $this->uid,
+                '切换状态',
+                $data
+            );
         }
         return true;
         
@@ -294,9 +341,21 @@ class UserService extends BaseService
         }
         $password = getRandStr(8, ['number', 'lower']);
         $plain = md5(env('SALT', '') . $password);
-        $exists->setAttribute('password', $plain);
-        $exists->save();
-        //record log
+        if ($plain !== $exists->password) {
+            $data['password'] = $plain;
+            $data['updated_at'] = date('Y-m-d H:i:s');
+            foreach ($data as $key => $val) {
+                $exists->setAttribute($key, $val);
+            }
+            $exists->save();
+            ActionLogService::getInstance()->insert(
+                ActionLogService::RESOURCE_USER,
+                $uid,
+                $this->uid,
+                '重置密码',
+                $data
+            );
+        }
         return [
             'password' => $password,
         ];
@@ -304,29 +363,49 @@ class UserService extends BaseService
     
     public function saveUserHasRole(int $uid, array $roleIds): bool
     {
-        $exists = UserHasRole::whereUid($uid)
-            ->get()
-            ->toArray();
-        if ($exists) {
-            $existIds = array_column($exists, 'role_id');
-            $addIds = array_diff($roleIds, $existIds);
-            $delIds = array_diff($existIds, $roleIds);
-            UserHasRole::whereUid($uid)
-                ->whereIn('role_id', $delIds)
-                ->delete();
-        } else {
-            $addIds = $roleIds;
+        DB::beginTransaction();
+        try {
+            $exists = UserHasRole::whereUid($uid)
+                ->get()
+                ->toArray();
+            $data = [];
+            if ($exists) {
+                $existIds = array_column($exists, 'role_id');
+                $addIds = array_diff($roleIds, $existIds);
+                $delIds = array_diff($existIds, $roleIds);
+                UserHasRole::whereUid($uid)
+                    ->whereIn('role_id', $delIds)
+                    ->delete();
+            } else {
+                $delIds = [];
+                $addIds = $roleIds;
+            }
+            $insertData = [];
+            foreach ($addIds as $roleId) {
+                $insertData[] = [
+                    'role_id' => $roleId,
+                    'uid' => $uid,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ];
+            }
+            $insertData && UserHasRole::insert($insertData);
+            if ($delIds || $addIds) {
+                $data['delIds'] = $delIds;
+                $data['addIds'] = $addIds;
+                ActionLogService::getInstance()->insert(
+                    ActionLogService::RESOURCE_USER,
+                    $uid,
+                    $this->uid,
+                    '修改角色',
+                    $data
+                );
+            }
+            
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
         }
-        $insertData = [];
-        foreach ($addIds as $roleId) {
-            $insertData[] = [
-                'role_id' => $roleId,
-                'uid' => $uid,
-                'created_at' => date('Y-m-d H:i:s'),
-            ];
-        }
-        UserHasRole::insert($insertData);
-        return true;
-        
     }
 }

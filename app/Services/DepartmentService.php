@@ -67,32 +67,79 @@ class DepartmentService extends BaseService
     public function save(string $name, int $parentId, int $id = 0): bool
     {
         $ret = false;
-        if ($id > 0) {
-            $exist = Department::whereId($id)->first();
-            if ($exist) {
-                $exist->setAttribute('parent_id', $parentId);
-                $exist->setAttribute('name', $name);
-                $ret = $exist->save();
+        DB::beginTransaction();
+        try {
+            if ($id > 0) {
+                $exist = Department::whereId($id)->first();
+                if ($exist) {
+                    $data = [];
+                    $parentId !== $exist->parent_id && $data['parent_id'] = $parentId;
+                    $name !== $exist->name && $data['name'] = $name;
+                    
+                    if ($data) {
+                        $data['updated_at'] = date('Y-m-d H:i:s');
+                        foreach ($data as $key => $val) {
+                            $exist->setAttribute($key, $val);
+                        }
+                        $ret = $exist->save();
+                        ActionLogService::getInstance()->insert(
+                            ActionLogService::RESOURCE_DEPARTMENT,
+                            $id,
+                            $this->uid,
+                            '编辑',
+                            $data
+                        );
+                    }
+                }
+            } else {
+                $data = [
+                    'parent_id' => $parentId,
+                    'name' => $name,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ];
+                $id = Department::insertGetId($data);
+                ActionLogService::getInstance()->insert(
+                    ActionLogService::RESOURCE_DEPARTMENT,
+                    $id,
+                    $this->uid,
+                    '新增',
+                    $data
+                );
+                
+                $ret = $id > 0;
             }
-        } else {
-            $ret = Department::insertGetId([
-                'parent_id' => $parentId,
-                'name' => $name,
-                'created_at' => date('Y-m-d H:i:s'),
-            ]);
+            DB::commit();
+            return $ret;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
         }
-        return $ret;
+        
     }
     
     public function remove(int $id): bool
     {
         $ret = false;
-        //check
-        $exist = Department::whereId($id)->first();
-        if ($exist) {
-            $ret = $exist->delete();
+        DB::beginTransaction();
+        try {
+            $exist = Department::whereId($id)->first();
+            if ($exist) {
+                $ret = $exist->delete();
+                ActionLogService::getInstance()->insert(
+                    ActionLogService::RESOURCE_DEPARTMENT,
+                    $id,
+                    $this->uid,
+                    '删除',
+                    []
+                );
+            }
+            DB::commit();
+            return $ret;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
         }
-        return $ret;
+        
     }
     
     protected function getUserCount(): array

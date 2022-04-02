@@ -63,7 +63,7 @@
           </el-form-item>
           <el-form-item label=" ">
             <el-button type="primary" @click="queryList">查询</el-button>
-            <el-button type="primary" icon="el-icon-plus" @click="showDialog=true">新增</el-button>
+            <el-button v-permission="['UserManageAdd']" type="primary" icon="el-icon-plus" @click="showDialog=true">新增</el-button>
           </el-form-item>
         </el-row>
       </el-form>
@@ -127,7 +127,7 @@
                 <el-tag type="">更多……</el-tag>
               </div>
             </el-popover>
-            <el-button type="primary" size="mini" @click="showEditRole(scope.row)">修改角色</el-button>
+            <el-button v-permission="['UserManageEditRole']" type="primary" size="mini" @click="showEditRole(scope.row)">修改角色</el-button>
           </template>
         </el-table-column>
         <el-table-column label="状态" prop="userStatus" width="200px" align="center">
@@ -138,6 +138,7 @@
               inactive-text="禁用"
               active-color="#67C23A"
               inactive-color="#F56C6C"
+              :disabled="!checkPermission(['UserManageStatus'])"
               @change="switchStatus($event, scope.row)"
             >
             </el-switch>
@@ -167,8 +168,8 @@
         <el-table-column fixed="right" label="操作" align="center" width="220px">
           <template slot-scope="scope">
             <div>
-              <el-button type="primary" @click="showEdit(scope.row)">编辑</el-button>
-              <el-button v-permission="['UserManageEdit']" type="danger" :disabled="scope.row.uid === 1"
+              <el-button v-permission="['UserManageEdit']" type="primary" @click="showEdit(scope.row)">编辑</el-button>
+              <el-button v-permission="['UserManageReset']" type="danger" :disabled="scope.row.uid === 1"
                          @click="resetPass(scope.row)">重置密码
               </el-button>
             </div>
@@ -223,6 +224,7 @@
 
   import userForm from "./components/user-form";
   import userRole from "./components/user-role";
+  import checkPermission from "@/utils/permission";
 
   export default {
     name: "UserManage",
@@ -235,6 +237,7 @@
     data() {
       return {
         USER_STATUS_OPTION,
+        checkPermission,
 
         loading: false,
         options: {

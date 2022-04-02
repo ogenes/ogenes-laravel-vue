@@ -5,6 +5,7 @@
       <!--新增按钮-->
       <div slot="header" class="clearfix">
         <el-button
+          v-permission="['DepartmentManageAdd']"
           type="primary"
           class="el-icon-plus"
           style="float: right; margin-right: 20px;"
@@ -38,8 +39,8 @@
           <el-table-column prop="cnt" width="150" align="center" label="部门人数"/>
           <el-table-column fixed="right" label="操作" width="200">
             <template slot-scope="scope">
-              <el-button type="primary" @click="showEdit(scope.row)">编辑</el-button>
-              <el-button v-if="scope.row.id > 1" type="danger" @click="remove(scope.row.id)">删除</el-button>
+              <el-button v-permission="['DepartmentManageEdit']" type="primary" @click="showEdit(scope.row)">编辑</el-button>
+              <el-button v-if="scope.row.id > 1" v-permission="['DepartmentManageDel']" type="danger" @click="remove(scope.row.id)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
