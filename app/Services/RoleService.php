@@ -335,4 +335,25 @@ class RoleService extends BaseService
         }
         $menuTree = array_values($menuTree);
     }
+    
+    public function getUserHasMenus(int $uid, int $systemId): array
+    {
+        $menuTb = (new Menu())->getTable();
+        $userHasRoleTb = (new UserHasRole())->getTable();
+        $roleHasMenuTb = (new RoleHasMenu())->getTable();
+        $data = DB::table("{$userHasRoleTb} as uhr")
+            ->join("{$roleHasMenuTb} as rhm", 'rhm.role_id', '=', 'uhr.role_id')
+            ->join("{$menuTb} as m", 'm.id', '=', 'rhm.menu_id')
+            ->where('m.system_id', '=', $systemId)
+            ->where('uhr.uid', '=', $uid)
+            ->get([
+                DB::raw('DISTINCT m.id as menuId'),
+                'm.menu_name as menuName',
+                'm.title as menuTitle',
+                'm.type as menuType'
+            ])
+            ->toArray();
+        return $data ? json_decode(json_encode($data, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR) : [];
+
+    }
 }

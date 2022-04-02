@@ -31,6 +31,7 @@ Vue.use(ElementUI, {
 });
 
 import VueResource from 'vue-resource'
+
 Vue.use(VueResource);
 
 import Editor from 'bin-ace-editor';
@@ -38,20 +39,15 @@ import 'brace/ext/language_tools';
 import 'brace/mode/json';
 import 'brace/snippets/json';
 import 'brace/theme/chrome';
+
 Vue.component(Editor.name, Editor);
 
-Vue.directive('noMoreClick', {
-  inserted(el, binding) {
-    el.addEventListener('click', e => {
-      el.classList.add('is-disabled');
-      el.disabled = true;
-      setTimeout(() => {
-        el.disabled = false;
-        el.classList.remove('is-disabled');
-      }, 2000)
-    })
-  }
-});
+// directive
+import noMoreClick from '@/directive/no-more-click';
+import permission from '@/directive/permission';
+
+Vue.use(noMoreClick);
+Vue.use(permission);
 
 Vue.component('index-component', () => import('./components/IndexComponent.vue'));
 

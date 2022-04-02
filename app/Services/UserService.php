@@ -24,7 +24,8 @@ class UserService extends BaseService
     public function getCurrentUser(): array
     {
         $userInfo = $this->getInfoById($this->uid);
-        $userInfo['roles'] = ['admin'];
+        $menus = RoleService::getInstance()->getUserHasMenus($this->uid, 1);
+        $userInfo['roles'] = array_column($menus, 'menuName');
         unset($userInfo['code'], $userInfo['last_login_ip']);
         return $userInfo;
     }
@@ -81,7 +82,16 @@ class UserService extends BaseService
         return json_decode($cache, true, 512, JSON_THROW_ON_ERROR);
     }
     
-    public function getList(string $username, string $userStatus, string $mobile, array $deptIds, int $page, int $pageSize): array
+    public function getList(
+        string $username,
+        string $account,
+        string $userStatus,
+        string $mobile,
+        array $deptIds,
+        array $sort = [],
+        int $page = 1,
+        int $pageSize = 20
+    ): array
     {
         $ret = [
             'cnt' => 0,
@@ -101,11 +111,21 @@ class UserService extends BaseService
                 DB::raw('GROUP_CONCAT(DISTINCT uhr.role_id) as role_ids'),
             ]);
         $username && $query->where('username', 'like', "%{$username}%");
+        $account && $query->where('account', 'like', "%{$account}%");
         $mobile && $query->where('mobile', 'like', "%{$mobile}%");
         $deptIds && $query->whereIn('uhd.dept_id', $deptIds);
         $userStatus !== '' && $query->where('user_status', '=', $userStatus);
+    
+        $prop = 'uid';
+        $order = 'desc';
+        if (isset($sort['prop'])) {
+            $prop = Str::snake($sort['prop']);
+        }
+        if (isset($sort['order']) && $sort['order'] === 'ascending') {
+            $order = 'asc';
+        }
         
-        $query->groupBy(['u.uid'])->orderBy('u.uid', 'desc');
+        $query->groupBy(['u.uid'])->orderBy($prop, $order);
         $resp = $query->paginate($pageSize, ['*'], 'page', $page)->toArray();
         if (empty($resp)) {
             return $ret;
@@ -131,7 +151,7 @@ class UserService extends BaseService
                 $item['departments'][] = $tmpDepartment['fullName'] ?? '';
             }
             $roleIds = $item['role_ids'];
-            $item['role_id_arr'] = array_filter(explode(',',$roleIds));
+            $item['role_id_arr'] = array_filter(explode(',', $roleIds));
             sort($item['role_id_arr']);
             $item['roles'] = [];
             foreach ($item['role_id_arr'] as $roleId) {

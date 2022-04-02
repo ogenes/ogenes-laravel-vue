@@ -12,11 +12,15 @@
         <el-row>
           <el-form-item label="用户名:">
             <el-input v-model="queryParams.username" @keyup.enter.native="queryList" class="form-item-width"
-                      placeholder="支持模糊搜索"/>
+                      placeholder="支持模糊搜索" clearable/>
+          </el-form-item>
+          <el-form-item label="账户:">
+            <el-input v-model="queryParams.account" @keyup.enter.native="queryList" class="form-item-width"
+                      placeholder="支持模糊搜索" clearable/>
           </el-form-item>
           <el-form-item label="手机号:">
             <el-input v-model="queryParams.mobile" @keyup.enter.native="queryList" class="form-item-width"
-                      placeholder="支持模糊搜索"/>
+                      placeholder="支持模糊搜索" clearable/>
           </el-form-item>
           <el-form-item label="状态:">
             <el-select v-model="queryParams.userStatus" clearable class="form-item-width">
@@ -24,7 +28,7 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item label="部门：" prop="deptIds">
+          <el-form-item label="部门:" prop="deptIds">
             <el-cascader
               v-model="queryParams.deptIds"
               :options="departments"
@@ -37,7 +41,7 @@
               class="form-item-width"
             />
           </el-form-item>
-          <el-form-item label="角色：" prop="roleIds">
+          <el-form-item label="角色:" prop="roleIds">
             <el-cascader
               v-model="queryParams.roleIds"
               :options="options.roleTree"
@@ -84,10 +88,12 @@
       <el-table
         :data="result.list"
         border
+        :default-sort = "queryParams.sort"
+        @sort-change="sortChange"
         height="600px"
       >
-        <el-table-column fixed label="用户ID" prop="uid" width="80px" align="center"/>
-        <el-table-column fixed label="用户名" prop="avatar" width="120px" align="center">
+        <el-table-column fixed sortable="custom" label="用户ID" prop="uid" width="100px" align="center"/>
+        <el-table-column fixed sortable="custom" label="用户名" prop="avatar" width="120px" align="center">
           <template slot-scope="scope">
             <el-popover
               v-if="scope.row.avatar"
@@ -102,9 +108,9 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column fixed label="用户账号" prop="account" width="120px" align="center"/>
-        <el-table-column label="手机号" prop="mobile" width="120px" align="center"/>
-        <el-table-column label="邮箱" prop="email" width="200px" align="left"/>
+        <el-table-column fixed sortable="custom" label="用户账号" prop="account" width="120px" align="center"/>
+        <el-table-column sortable="custom" label="手机号" prop="mobile" width="120px" align="center"/>
+        <el-table-column sortable="custom" label="邮箱" prop="email" width="200px" align="left"/>
         <el-table-column label="角色" prop="email" width="300px" align="left">
           <template slot-scope="scope">
             <div v-for="(item, key) in scope.row.roles" :key="key" v-if="key < 3">
@@ -155,14 +161,16 @@
             </el-popover>
           </template>
         </el-table-column>
-        <el-table-column label="最近一次登录时间" prop="lastLoginAt" width="160px" align="center"/>
-        <el-table-column label="最近一次登录地" prop="lastLoginIp" width="150px" align="center"/>
-        <el-table-column label="最近一次修改时间" prop="updatedAt" width="160px" align="center"/>
+        <el-table-column sortable="custom" label="最近一次登录时间" prop="lastLoginAt" width="160px" align="center"/>
+        <el-table-column sortable="custom" label="最近一次登录地" prop="lastLoginIp" width="150px" align="center"/>
+        <el-table-column sortable="custom" label="最近一次修改时间" prop="updatedAt" width="160px" align="center"/>
         <el-table-column fixed="right" label="操作" align="center" width="220px">
           <template slot-scope="scope">
             <div>
               <el-button type="primary" @click="showEdit(scope.row)">编辑</el-button>
-              <el-button type="danger" :disabled="scope.row.uid === 1" @click="resetPass(scope.row)">重置密码</el-button>
+              <el-button v-permission="['UserManageEdit']" type="danger" :disabled="scope.row.uid === 1"
+                         @click="resetPass(scope.row)">重置密码
+              </el-button>
             </div>
           </template>
         </el-table-column>
@@ -247,10 +255,15 @@
           page: 1,
           pageSize: 20,
           username: '',
+          account: '',
           mobile: '',
           userStatus: '',
           roleIds: [],
-          deptIds: []
+          deptIds: [],
+          sort: {
+            prop: 'uid',
+            order: 'descending',
+          }
         },
         pageSizes: [10, 20, 50, 100, 200],
         result: {
@@ -322,6 +335,14 @@
       handleListCurrentChange: function (currentPage) {
         this.queryParams.page = currentPage;
         this.getList()
+      },
+
+      sortChange(col) {
+        this.queryParams.sort = {
+          prop: col.prop,
+          order: col.order
+        };
+        this.queryList();
       },
 
       showEdit(row) {

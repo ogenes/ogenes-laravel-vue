@@ -13,7 +13,8 @@ use function App\Helpers\getParams;
 class UserController extends Controller
 {
     
-    public function login(LoginRequest $request) {
+    public function login(LoginRequest $request)
+    {
         $account = $request->input('account');
         $password = $request->input('password');
         $ret = AuthService::getInstance()->login($account, $password);
@@ -50,16 +51,20 @@ class UserController extends Controller
         $params = getParams($request);
         $username = $params['username'] ?? '';
         $mobile = $params['mobile'] ?? '';
+        $account = $params['account'] ?? '';
         $deptIds = $params['deptIds'] ?? [];
         $page = $params['page'] ?? 1;
         $pageSize = $params['pageSize'] ?? 100;
         $userStatus = $params['userStatus'] ?? '';
+        $sort = $params['sort'] ?? [];
         
         $ret = UserService::getInstance()->getList(
             $username,
+            $account,
             $userStatus,
             $mobile,
             $deptIds,
+            $sort,
             $page,
             $pageSize
         );

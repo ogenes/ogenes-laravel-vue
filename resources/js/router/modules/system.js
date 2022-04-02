@@ -30,6 +30,7 @@ const systemRouter = {
       path: 'permission',
       component: () => import('@/views/system/permission/index'),
       name: 'PermissionManage',
+      alwaysShow: true,
       meta: {
         title: '权限管理',
         icon: 'permission',

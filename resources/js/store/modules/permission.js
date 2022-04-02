@@ -23,20 +23,20 @@ export function filterAsyncRoutes(routes, roles) {
   const res = []
 
   routes.forEach(route => {
-    const tmp = { ...route }
+    const tmp = { ...route };
+    const map = store.getters.menuMap[tmp?.name || ''] || {};
+    if (Object.keys(map).length > 0) {
+      tmp.meta = {
+        ...tmp.meta,
+        title: map.title,
+        icon: map.icon,
+        roles: map.roles,
+      };
+    }
+    if (tmp.children) {
+      tmp.children = filterAsyncRoutes(tmp.children, roles)
+    }
     if (hasPermission(roles, tmp)) {
-      const map = store.getters.menuMap[tmp?.name || ''] || {};
-      if (Object.keys(map).length > 0) {
-        tmp.meta = {
-          ...tmp.meta,
-          title: map.title,
-          icon: map.icon,
-          roles: map.roles,
-        };
-      }
-      if (tmp.children) {
-        tmp.children = filterAsyncRoutes(tmp.children, roles)
-      }
       res.push(tmp)
     }
   });
