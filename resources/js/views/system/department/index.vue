@@ -2,13 +2,21 @@
   <div class="app-container">
     <el-card>
       <div>
+        <el-input
+          placeholder="输入部门进行搜索"
+          v-model="filterText"
+          clearable
+          style="width: 100%;"
+        >
+        </el-input>
         <el-table
           ref="departmentTree"
-          :data="list"
+          :data="treeData"
           row-key="id"
           :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
           default-expand-all
           :row-class-name="departmentRowClassName"
+          :cell-class-name="departmentColClassName"
         >
           <el-table-column fixed prop="name" width="400" label="部门">
             <template slot="header" slot-scope="scope">
@@ -35,8 +43,12 @@
               </el-button>
             </template>
             <template slot-scope="scope">
-              <el-button v-permission="[BTN_DEPT_EDIT]" type="primary" @click="showEdit(scope.row)">{{ BTN_MAP_DEPT[BTN_DEPT_EDIT] }}</el-button>
-              <el-button v-if="scope.row.id > 1" v-permission="[BTN_DEPT_DEL]" type="danger" @click="remove(scope.row.id)">{{ BTN_MAP_DEPT[BTN_DEPT_DEL] }}</el-button>
+              <el-button v-permission="[BTN_DEPT_EDIT]" type="primary" @click="showEdit(scope.row)">{{
+                BTN_MAP_DEPT[BTN_DEPT_EDIT] }}
+              </el-button>
+              <el-button v-if="scope.row.id > 1" v-permission="[BTN_DEPT_DEL]" type="danger"
+                         @click="remove(scope.row.id)">{{ BTN_MAP_DEPT[BTN_DEPT_DEL] }}
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -87,6 +99,7 @@
     BTN_DEPT_EDIT,
     BTN_DEPT_DEL,
   } from "@/api/btn";
+  import {deepClone} from "../../../utils";
 
   export default {
     name: "DepartmentManage",
@@ -101,6 +114,7 @@
         loading: false,
         isExpansion: true,
 
+        filterText: '',
         showDialog: false,
         dialogTitle: '添加部门',
         departmentParams: {
@@ -127,7 +141,6 @@
 
     computed: {
       selectOptions() {
-
         function dealDisabled(id, data, disabled) {
           if (data?.id === id) {
             disabled = true;
@@ -146,6 +159,13 @@
         const selectedId = this.departmentParams?.id || 0;
         dealDisabled(selectedId, this.list[0], false);
         return this.list;
+      },
+      treeData() {
+        if (this.filterText) {
+          const treeData = deepClone(this.list);
+          return this.handleSearch(treeData, this.filterText)
+        }
+        return this.list;
       }
     },
 
@@ -160,6 +180,29 @@
         this.list = ret?.data || [];
         this.loading = false;
       },
+      handleSearch(treeData, searchValue) {
+        if (!treeData || treeData.length === 0) {
+          return [];
+        }
+        const array = [];
+        for (let item of treeData) {
+          let match = false;
+          for (let pro in item) {
+            if (typeof (item[pro]) == 'string') {
+              match |= item[pro].includes(searchValue);
+              if (match) break;
+            }
+          }
+          if (this.handleSearch(item.children, searchValue).length > 0 || match) {
+            array.push({
+              ...item,
+              children: this.handleSearch(item.children, searchValue),
+            });
+          }
+        }
+        return array;
+      },
+
       async remove(id) {
         this.$confirm('此操作将永久删除该部门, 是否继续?', '提示', {
           confirmButtonText: '确定',
@@ -225,9 +268,18 @@
       },
 
       departmentRowClassName({row, rowIndex}) {
+        if (this.filterText && row.name.indexOf(this.filterText) !== -1) {
+          return 'search-node';
+        }
         return 'row' + row.level;
       },
-      // 切换数据表格树形展开
+      departmentColClassName({row, column}) {
+        if (column.property === 'name') {
+          return 'department-name';
+        }
+        return '';
+      },
+
       toggleRowExpansion() {
         this.isExpansion = !this.isExpansion;
         this.toggleRowExpansionAll(this.list, this.isExpansion);
@@ -245,29 +297,9 @@
 </script>
 
 <style>
-  /*.el-table .row1 {
-    background: #26c2ff;
-  }*/
-
-  /*.el-table .row2 {
-    background: #7ec24e;
+  .el-table .search-node .department-name {
+    color: #F56C6C !important;
   }
-
-  .el-table .row3 {
-    background: #E6A23C;
-  }
-
-  .el-table .row4 {
-    background: #999512;
-  }
-
-  .el-table .row5 {
-    background: #8e9982;
-  }
-
-  .el-table .row6 {
-    background: #909399;
-  }*/
 
 </style>
 <style scoped>

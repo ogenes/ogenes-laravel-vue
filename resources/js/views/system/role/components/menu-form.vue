@@ -90,9 +90,7 @@
       }
     },
 
-    async created() {
-      console.log(this.menuTree, 'this.menuTree');
-    },
+    async created() {},
 
     methods: {
       filterNode(value, data) {
