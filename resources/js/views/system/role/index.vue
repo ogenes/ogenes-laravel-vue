@@ -49,7 +49,9 @@
           </el-form-item>
           <el-form-item label=" ">
             <el-button type="primary" @click="queryList">查询</el-button>
-            <el-button type="primary" icon="el-icon-plus" @click="showDialog=true">新增</el-button>
+            <el-button v-permission="[BTN_ROLE_ADD]" type="primary" icon="el-icon-plus" @click="showDialog=true">
+              {{ BTN_MAP_ROLE[BTN_ROLE_ADD] }}
+            </el-button>
           </el-form-item>
         </el-row>
       </el-form>
@@ -104,7 +106,9 @@
                 </el-tree>
               </div>
               <div style="float:left;">
-                <el-button type="text" @click="showRoleHasMenu(scope.row, item.menuIds)">编辑</el-button>
+                <el-button v-permission="[BTN_ROLE_MENU]" type="text" @click="showRoleHasMenu(scope.row, item.menuIds)">
+                  {{ BTN_MAP_ROLE[BTN_ROLE_MENU] }}
+                </el-button>
               </div>
             </div>
           </template>
@@ -123,7 +127,7 @@
 <!--              <el-button type="text" @click="showRoleHasData(scope.row)">编辑</el-button>-->
 <!--            </div>-->
 <!--          </template>-->
-        </el-table-column>
+<!--        </el-table-column>-->
         <el-table-column prop="createdAt" width="160" align="center" label="创建时间"/>
         <el-table-column prop="updatedAt" width="160" align="center" label="更新时间"/>
         <el-table-column fixed="right" label="状态" prop="roleStatus" width="200px" align="center">
@@ -145,6 +149,7 @@
               inactive-text="禁用"
               active-color="#67C23A"
               inactive-color="#F56C6C"
+              :disabled="!checkPermission([BTN_ROLE_STATUS])"
               @change="switchStatus($event, scope.row)"
             >
             </el-switch>
@@ -152,7 +157,9 @@
         </el-table-column>
         <el-table-column fixed="right" label="操作" width="200" align="center">
           <template slot-scope="scope">
-            <el-button type="primary" @click="showEdit(scope.row)">编辑</el-button>
+            <el-button v-permission="[BTN_ROLE_EDIT]" type="primary" @click="showEdit(scope.row)">
+              {{ BTN_MAP_ROLE[BTN_ROLE_EDIT] }}
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -200,7 +207,15 @@
     switchStatus,
     ROLE_STATUS_OPTION
   } from '@/api/system/role';
+  import {
+    BTN_MAP_ROLE,
+    BTN_ROLE_ADD,
+    BTN_ROLE_EDIT,
+    BTN_ROLE_MENU,
+    BTN_ROLE_STATUS
+  } from "@/api/btn";
   import {deepClone} from "@/utils";
+  import checkPermission from "@/utils/permission";
 
   import roleForm from "./components/role-form";
   import menuForm from "./components/menu-form";
@@ -217,6 +232,12 @@
     data() {
       return {
         ROLE_STATUS_OPTION,
+        BTN_MAP_ROLE,
+        BTN_ROLE_ADD,
+        BTN_ROLE_EDIT,
+        BTN_ROLE_MENU,
+        BTN_ROLE_STATUS,
+        checkPermission,
 
         loading: false,
         isExpansion: true,

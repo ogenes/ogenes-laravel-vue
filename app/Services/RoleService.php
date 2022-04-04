@@ -161,18 +161,41 @@ class RoleService extends BaseService
         if ($id > 0) {
             $exist = Role::whereId($id)->first();
             if ($exist) {
-                $exist->setAttribute('parent_id', $parentId);
-                $exist->setAttribute('role_name', $name);
-                $exist->setAttribute('desc', $desc);
-                $ret = $exist->save();
+                $data = [];
+                $parentId !== $exist->parent_id && $data['parent_id'] = $parentId;
+                $name !== $exist->role_name && $data['role_name'] = $name;
+                $desc !== $exist->desc && $data['desc'] = $desc;
+                if ($data) {
+                    $data['updated_at'] = date('Y-m-d H:i:s');
+                    foreach ($data as $key => $val) {
+                        $exist->setAttribute($key, $val);
+                    }
+                    $ret = $exist->save();
+                    ActionLogService::getInstance()->insert(
+                        ActionLogService::RESOURCE_ROLE,
+                        $id,
+                        $this->uid,
+                        '编辑',
+                        $data
+                    );
+                }
             }
         } else {
-            $ret = Role::insertGetId([
+            $data = [
                 'parent_id' => $parentId,
                 'role_name' => $name,
                 'desc' => $desc,
                 'created_at' => date('Y-m-d H:i:s'),
-            ]);
+            ];
+            $id = Role::insertGetId($data);
+            $ret = $id > 0;
+            ActionLogService::getInstance()->insert(
+                ActionLogService::RESOURCE_ROLE,
+                $id,
+                $this->uid,
+                '新增',
+                $data
+            );
         }
         return $ret;
     }
@@ -195,6 +218,7 @@ class RoleService extends BaseService
                 ->whereIn('menu_id', $delIds)
                 ->delete();
         } else {
+            $delIds = [];
             $addIds = $menuIds;
         }
         $insertData = [];
@@ -205,7 +229,18 @@ class RoleService extends BaseService
                 'created_at' => date('Y-m-d H:i:s'),
             ];
         }
-        RoleHasMenu::insert($insertData);
+        $insertData && RoleHasMenu::insert($insertData);
+        if ($delIds || $addIds) {
+            $data['delIds'] = $delIds;
+            $data['addIds'] = $addIds;
+            ActionLogService::getInstance()->insert(
+                ActionLogService::RESOURCE_ROLE,
+                $roleId,
+                $this->uid,
+                '编辑菜单权限',
+                $data
+            );
+        }
         return true;
     }
     
@@ -249,9 +284,19 @@ class RoleService extends BaseService
         }
         
         if ($exists->role_status !== $roleStatus) {
-            $exists->role_status = $roleStatus;
+            $data['role_status'] = $roleStatus;
+            $data['updated_at'] = date('Y-m-d H:i:s');
+            foreach ($data as $key => $val) {
+                $exists->setAttribute($key, $val);
+            }
             $exists->save();
-            //record log
+            ActionLogService::getInstance()->insert(
+                ActionLogService::RESOURCE_ROLE,
+                $roleId,
+                $this->uid,
+                '切换状态',
+                $data
+            );
         }
         return true;
     }
