@@ -169,14 +169,14 @@ class MenuService extends BaseService
         }
         $exist = Menu::whereId($id)->first();
         if ($exist) {
-            $ret = $exist->delete();
             ActionLogService::getInstance()->insert(
                 ActionLogService::RESOURCE_MENU,
                 $id,
                 $this->uid,
                 '删除',
-                []
+                $exist->toArray(),
             );
+            $ret = $exist->delete();
         }
         return $ret;
     }

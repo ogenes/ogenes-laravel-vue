@@ -34,10 +34,11 @@
       <el-table-column fixed="right" label="操作" min-width="200" align="center">
         <template slot="header">
           <el-button
+            v-permission="[BTN_DICT_DATA_ADD]"
             type="primary"
             @click="result.unshift(deepClone(defaultRow))"
           >
-            新增
+            {{ BTN_MAP_DICT[BTN_DICT_DATA_ADD] }}
           </el-button>
         </template>
         <template slot-scope="scope">
@@ -46,8 +47,13 @@
                   <el-button type="info" @click="cancel(scope.row, scope.$index)">取消</el-button>
             </span>
           <span v-else>
-            <el-button type="primary" @click="$set(result, scope.$index, {...scope.row, showEdit: true})">编辑</el-button>
-            <el-button type="danger" @click="remove(scope.row.id)">删除</el-button>
+            <el-button v-permission="[BTN_DICT_DATA_EDIT]" type="primary"
+                       @click="$set(result, scope.$index, {...scope.row, showEdit: true})">
+              {{ BTN_MAP_DICT[BTN_DICT_DATA_EDIT] }}
+            </el-button>
+            <el-button v-permission="[BTN_DICT_DATA_DEL]" type="danger" @click="remove(scope.row.id)">
+              {{ BTN_MAP_DICT[BTN_DICT_DATA_DEL] }}
+            </el-button>
           </span>
         </template>
       </el-table-column>
@@ -61,6 +67,12 @@
     saveData,
     removeData
   } from '@/api/system/dict';
+  import {
+    BTN_MAP_DICT,
+    BTN_DICT_DATA_ADD,
+    BTN_DICT_DATA_EDIT,
+    BTN_DICT_DATA_DEL,
+  } from "../../../../api/btn";
   import {deepClone} from "@/utils";
 
   export default {
@@ -81,7 +93,10 @@
 
     data() {
       return {
-
+        BTN_MAP_DICT,
+        BTN_DICT_DATA_ADD,
+        BTN_DICT_DATA_EDIT,
+        BTN_DICT_DATA_DEL,
         deepClone,
 
         loading: false,

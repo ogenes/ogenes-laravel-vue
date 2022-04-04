@@ -30,12 +30,13 @@
           <el-form-item label=" ">
             <el-button type="primary" @click="queryList">查询</el-button>
             <el-button
+              v-permission="[BTN_DICT_ADD]"
               type="primary"
               class="el-icon-plus"
               style="float: right; margin-right: 20px;"
               @click="result.list.unshift(deepClone(defaultRow))"
             >
-              新增
+              {{ BTN_MAP_DICT[BTN_DICT_ADD] }}
             </el-button>
           </el-form-item>
         </el-row>
@@ -54,7 +55,7 @@
       </div>
       <el-table
         :data="result.list"
-        :default-sort = "queryParams.sort"
+        :default-sort="queryParams.sort"
         @sort-change="sortChange"
         border
         height="600px"
@@ -87,9 +88,13 @@
                   <el-button type="info" @click="cancel(scope.row, scope.$index)">取消</el-button>
             </span>
             <span v-else>
-              <el-button type="primary"
-                         @click="$set(result.list, scope.$index, {...scope.row, showEdit: true})">编辑</el-button>
-              <el-button type="danger" @click="remove(scope.row.id)">删除</el-button>
+              <el-button v-permission="[BTN_DICT_EDIT]" type="primary"
+                         @click="$set(result.list, scope.$index, {...scope.row, showEdit: true})">
+                {{ BTN_MAP_DICT[BTN_DICT_EDIT] }}
+              </el-button>
+              <el-button v-permission="[BTN_DICT_DEL]" type="danger" @click="remove(scope.row.id)">
+                {{ BTN_MAP_DICT[BTN_DICT_DEL] }}
+              </el-button>
             </span>
           </template>
         </el-table-column>
@@ -114,6 +119,12 @@
     save,
     remove
   } from '@/api/system/dict';
+  import {
+    BTN_MAP_DICT,
+    BTN_DICT_ADD,
+    BTN_DICT_EDIT,
+    BTN_DICT_DEL,
+  } from "../../../api/btn";
   import {deepClone} from "@/utils";
   import dictData from "./components/data";
 
@@ -127,7 +138,10 @@
 
     data() {
       return {
-
+        BTN_MAP_DICT,
+        BTN_DICT_ADD,
+        BTN_DICT_EDIT,
+        BTN_DICT_DEL,
         deepClone,
 
         loading: false,

@@ -124,14 +124,14 @@ class DepartmentService extends BaseService
         try {
             $exist = Department::whereId($id)->first();
             if ($exist) {
-                $ret = $exist->delete();
                 ActionLogService::getInstance()->insert(
                     ActionLogService::RESOURCE_DEPARTMENT,
                     $id,
                     $this->uid,
                     '删除',
-                    []
+                    $exist->toArray()
                 );
+                $ret = $exist->delete();
             }
             DB::commit();
             return $ret;
