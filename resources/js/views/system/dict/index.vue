@@ -204,7 +204,6 @@
             this.result.list.forEach(item => {
               item.showEdit = false;
             });
-            console.log(this.result.list, 'this.result.list');
           }
           this.loading = false
         }).catch((e) => {
