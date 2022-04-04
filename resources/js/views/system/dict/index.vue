@@ -73,7 +73,7 @@
             <el-link v-else type="primary" @click="showData(scope.row)"> {{ scope.row.symbol }}</el-link>
           </template>
         </el-table-column>
-        <el-table-column prop="remark" min-width="200" align="left" label="备2注">
+        <el-table-column prop="remark" min-width="200" align="left" label="备注">
           <template slot-scope="scope">
             <el-input v-if="scope.row.showEdit" v-model="scope.row.remark" type="textarea" autosize/>
             <span v-else> {{ scope.row.remark }} </span>
