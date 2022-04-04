@@ -61,27 +61,27 @@
         height="600px"
       >
         <el-table-column type="" prop="id" sortable="custom" width="100" align="center" label="字典ID"/>
-        <el-table-column prop="dictName" sortable="custom" width="150" align="center" label="字典名称">
+        <el-table-column prop="dictName" sortable="custom" width="300" align="center" label="字典名称">
           <template slot-scope="scope">
             <el-input v-if="scope.row.showEdit" v-model="scope.row.dictName"/>
             <span v-else> {{ scope.row.dictName }} </span>
           </template>
         </el-table-column>
-        <el-table-column prop="symbol" sortable="custom" min-width="100" align="center" label="字典标识">
+        <el-table-column prop="symbol" sortable="custom" width="300" align="center" label="字典标识">
           <template slot-scope="scope">
             <el-input v-if="scope.row.showEdit" v-model="scope.row.symbol"/>
             <el-link v-else type="primary" @click="showData(scope.row)"> {{ scope.row.symbol }}</el-link>
           </template>
         </el-table-column>
-        <el-table-column prop="remark" min-width="200" align="left" label="备注">
+        <el-table-column prop="remark" width="300" align="left" label="备注">
           <template slot-scope="scope">
             <el-input v-if="scope.row.showEdit" v-model="scope.row.remark" type="textarea" autosize/>
             <span v-else> {{ scope.row.remark }} </span>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" sortable="custom" min-width="160" align="center" label="创建时间"/>
-        <el-table-column prop="updatedAt" sortable="custom" min-width="160" align="center" label="更新时间"/>
-        <el-table-column fixed="right" label="操作" min-width="200" align="center">
+        <el-table-column prop="createdAt" sortable="custom" width="160" align="center" label="创建时间"/>
+        <el-table-column prop="updatedAt" sortable="custom" width="160" align="center" label="更新时间"/>
+        <el-table-column fixed="right" label="操作" width="200" align="center">
           <template slot-scope="scope">
             <span v-if="scope.row.showEdit">
                   <el-button type="success" @click="save(scope.row, scope.$index)">保存</el-button>

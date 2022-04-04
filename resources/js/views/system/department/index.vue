@@ -22,7 +22,7 @@
           <el-table-column prop="parent" width="500" label="上级部门"/>
           <el-table-column prop="parentId" width="150" align="center" label="上级部门ID"/>
           <el-table-column prop="cnt" width="150" align="center" label="部门人数"/>
-          <el-table-column fixed="right" label="操作" width="200">
+          <el-table-column fixed="right" width="200" label="操作">
             <template slot="header" slot-scope="scope">
               <span>操作 </span>
               <el-button
@@ -245,9 +245,9 @@
 </script>
 
 <style>
-  .el-table .row1 {
+  /*.el-table .row1 {
     background: #26c2ff;
-  }
+  }*/
 
   /*.el-table .row2 {
     background: #7ec24e;

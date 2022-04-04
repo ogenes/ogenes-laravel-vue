@@ -5,33 +5,33 @@
       border
     >
       <el-table-column type="" prop="id" width="100" align="center" label="数据ID"/>
-      <el-table-column prop="label" width="150" align="center" label="数据标签">
+      <el-table-column prop="label" width="300" align="center" label="数据标签">
         <template slot-scope="scope">
           <el-input v-if="scope.row.showEdit" v-model="scope.row.label"/>
           <span v-else> {{ scope.row.label }} </span>
         </template>
       </el-table-column>
-      <el-table-column prop="value" min-width="100" align="center" label="数据值">
+      <el-table-column prop="value" width="300" align="center" label="数据值">
         <template slot-scope="scope">
           <el-input v-if="scope.row.showEdit" v-model="scope.row.value"/>
           <span v-else> {{ scope.row.value }} </span>
         </template>
       </el-table-column>
-      <el-table-column prop="sort" min-width="100" align="center" label="排序">
+      <el-table-column prop="sort" width="100" align="center" label="排序">
         <template slot-scope="scope">
           <el-input v-if="scope.row.showEdit" v-model="scope.row.sort"/>
           <span v-else> {{ scope.row.sort }} </span>
         </template>
       </el-table-column>
-      <el-table-column prop="remark" min-width="200" align="left" label="备注">
+      <el-table-column prop="remark" width="300" align="left" label="备注">
         <template slot-scope="scope">
           <el-input v-if="scope.row.showEdit" v-model="scope.row.remark" type="textarea" autosize/>
           <span v-else> {{ scope.row.remark }} </span>
         </template>
       </el-table-column>
-      <el-table-column prop="createdAt" min-width="160" align="center" label="创建时间"/>
-      <el-table-column prop="updatedAt" min-width="160" align="center" label="更新时间"/>
-      <el-table-column fixed="right" label="操作" min-width="200" align="center">
+      <el-table-column prop="createdAt" width="160" align="center" label="创建时间"/>
+      <el-table-column prop="updatedAt" width="160" align="center" label="更新时间"/>
+      <el-table-column fixed="right" label="操作" width="200" align="center">
         <template slot="header">
           <el-button
             v-permission="[BTN_DICT_DATA_ADD]"
