@@ -2,9 +2,16 @@
   <div class="app-container">
     <!--表单-->
     <el-card>
+      <el-input
+        placeholder="输入菜单|Name|权限标识进行搜索"
+        v-model="filterText"
+        clearable
+        style="width: 100%;"
+      >
+      </el-input>
       <el-table
         ref="menuTree"
-        :data="list"
+        :data="treeData"
         row-key="id"
         :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
         default-expand-all
@@ -177,6 +184,7 @@
     BTN_MENU_EDIT,
     BTN_MENU_DEL,
   } from '@/api/btn'
+  import {deepClone} from "../../../../utils";
 
   export default {
     name: "MenuManage",
@@ -208,6 +216,7 @@
         loading: false,
         isExpansion: true,
 
+        filterText: '',
         showDialog: false,
         dialogTitle: '添加菜单',
         menuParams: {
@@ -240,7 +249,6 @@
 
     computed: {
       selectOptions() {
-
         function dealDisabled(id, data, disabled) {
           if (data?.id === id) {
             disabled = true;
@@ -259,6 +267,13 @@
         const selectedId = this.menuParams?.id || 0;
         dealDisabled(selectedId, this.list[0], false);
         return this.list;
+      },
+      treeData() {
+        if (this.filterText) {
+          const treeData = deepClone(this.list);
+          return this.handleSearch(treeData, this.filterText)
+        }
+        return this.list;
       }
     },
 
@@ -272,6 +287,28 @@
         const ret = await getList({systemId: this.systemId});
         this.list = ret?.data || [];
         this.loading = false;
+      },
+      handleSearch(treeData, searchValue) {
+        if (!treeData || treeData.length === 0) {
+          return [];
+        }
+        const array = [];
+        for (let item of treeData) {
+          let match = false;
+          for (let pro in item) {
+            if (typeof (item[pro]) == 'string') {
+              match |= item[pro].toLowerCase().includes(searchValue.toLowerCase());
+              if (match) break;
+            }
+          }
+          if (this.handleSearch(item.children, searchValue).length > 0 || match) {
+            array.push({
+              ...item,
+              children: this.handleSearch(item.children, searchValue),
+            });
+          }
+        }
+        return array;
       },
 
       async remove(id) {
@@ -302,7 +339,6 @@
       },
 
       async save() {
-        console.log(this.menuParams);
         this.$refs.menuParams.validate(valid => {
           if (valid) {
             this.loading = true;
@@ -350,7 +386,14 @@
       },
 
       menuRowClassName({row, rowIndex}) {
-        return 'row' + row.level;
+        if (this.filterText) {
+          if (row.title.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1
+          || row.menuName.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1
+          || row.roles.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1) {
+            return 'search-row';
+          }
+        }
+        return '';
       },
       // 切换数据表格树形展开
       toggleRowExpansion() {
@@ -370,29 +413,9 @@
 </script>
 
 <style>
-  .el-table .row1 {
-    background: #26c2ff;
+  .el-table .search-row {
+    color: #F56C6C !important;
   }
-
-  /*.el-table .row2 {
-    background: #7ec24e;
-  }
-
-  .el-table .row3 {
-    background: #E6A23C;
-  }
-
-  .el-table .row4 {
-    background: #999512;
-  }
-
-  .el-table .row5 {
-    background: #8e9982;
-  }
-
-  .el-table .row6 {
-    background: #909399;
-  }*/
 
 </style>
 <style scoped>

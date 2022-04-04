@@ -269,13 +269,13 @@
 
       departmentRowClassName({row, rowIndex}) {
         if (this.filterText && row.name.indexOf(this.filterText) !== -1) {
-          return 'search-node';
+          return 'search-row';
         }
-        return 'row' + row.level;
+        return '';
       },
       departmentColClassName({row, column}) {
         if (column.property === 'name') {
-          return 'department-name';
+          return 'search-col';
         }
         return '';
       },
@@ -297,7 +297,7 @@
 </script>
 
 <style>
-  .el-table .search-node .department-name {
+  .el-table .search-row .search-col {
     color: #F56C6C !important;
   }
 
