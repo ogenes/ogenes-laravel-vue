@@ -27,6 +27,7 @@ class RoleService extends BaseService
         string $roleStatus,
         array $menuIds,
         array $parentIds,
+        array $sort = [],
         int $page,
         int $pageSize
     ): array
@@ -52,8 +53,16 @@ class RoleService extends BaseService
         $roleStatus !== '' && $query->where('r.role_status', '=', $roleStatus);
         $parentIds && $query->whereIn('r.parent_id', $parentIds);
         $menuIds && $query->whereIn('rhm.menu_id', $menuIds);
-        
-        $query->groupBy(['r.id'])->orderBy('r.id', 'asc');
+    
+        $prop = 'id';
+        $order = 'asc';
+        if (isset($sort['prop'])) {
+            $prop = Str::snake($sort['prop']);
+        }
+        if (isset($sort['order']) && $sort['order'] === 'descending') {
+            $order = 'desc';
+        }
+        $query->groupBy(['r.id'])->orderBy($prop, $order);
         $resp = $query->paginate($pageSize, ['*'], 'page', $page)->toArray();
         if (empty($resp)) {
             return $ret;

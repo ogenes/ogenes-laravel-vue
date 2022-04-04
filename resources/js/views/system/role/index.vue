@@ -1,10 +1,7 @@
 <template>
   <div class="app-container">
     <el-card>
-      <div slot="header">
-        <span>查询条件</span>
-      </div>
-      <el-form :inline="true">
+      <el-form :inline="true" label-position="left">
         <el-row>
           <el-form-item label="角色名:">
             <el-input v-model="queryParams.roleName" clearable @keyup.enter.native="queryList" class="form-item-width"
@@ -47,7 +44,7 @@
               class="form-item-width"
             />
           </el-form-item>
-          <el-form-item label=" ">
+          <el-form-item>
             <el-button type="primary" @click="queryList">查询</el-button>
             <el-button v-permission="[BTN_ROLE_ADD]" type="primary" icon="el-icon-plus" @click="showDialog=true">
               {{ BTN_MAP_ROLE[BTN_ROLE_ADD] }}
@@ -55,11 +52,6 @@
           </el-form-item>
         </el-row>
       </el-form>
-    </el-card>
-    <el-card>
-      <div slot="header">
-        <span>查询结果</span>
-      </div>
       <div class="page-position">
         <el-pagination
           background
@@ -75,11 +67,13 @@
       <el-table
         :data="result.list"
         border
+        :default-sort = "queryParams.sort"
+        @sort-change="sortChange"
         height="600px"
       >
-        <el-table-column type="" prop="id" width="100" align="center" label="角色ID"/>
-        <el-table-column prop="roleName" width="150" align="left" label="角色名"/>
-        <el-table-column prop="parentId" width="100" align="center" label="上级ID"/>
+        <el-table-column type="" prop="id" sortable="custom" width="100" align="center" label="角色ID"/>
+        <el-table-column prop="roleName" sortable="custom" width="150" align="left" label="角色名"/>
+        <el-table-column prop="parentId" sortable="custom" width="100" align="center" label="上级ID"/>
         <el-table-column prop="parent" width="200" align="left" label="上级角色"/>
         <el-table-column prop="parent" width="400" align="left" label="菜单权限">
           <template slot="header" slot-scope="scope">
@@ -128,8 +122,8 @@
 <!--            </div>-->
 <!--          </template>-->
 <!--        </el-table-column>-->
-        <el-table-column prop="createdAt" width="160" align="center" label="创建时间"/>
-        <el-table-column prop="updatedAt" width="160" align="center" label="更新时间"/>
+        <el-table-column prop="createdAt" sortable="custom" width="160" align="center" label="创建时间"/>
+        <el-table-column prop="updatedAt" sortable="custom" width="160" align="center" label="更新时间"/>
         <el-table-column fixed="right" label="状态" prop="roleStatus" width="200px" align="center">
           <template slot="header">
             <span>状态</span>
@@ -254,6 +248,10 @@
           roleStatus: '',
           parentIds: [],
           menuIds: [],
+          sort: {
+            prop: 'id',
+            order: 'ascending',
+          },
           page: 1,
           pageSize: 20,
         },
@@ -387,6 +385,13 @@
         this.queryParams.page = currentPage;
         this.getList();
       },
+      sortChange(col) {
+        this.queryParams.sort = {
+          prop: col.prop,
+          order: col.order
+        };
+        this.queryList();
+      },
 
       showEdit(row) {
         this.roleParams = {
@@ -462,12 +467,7 @@
 <style scoped lang="scss">
   .app-container {
     .form-item-width {
-      width: 300px
-    }
-
-    .page-position {
-      text-align: right;
-      margin: 10px 0;
+      width: 240px
     }
   }
 </style>

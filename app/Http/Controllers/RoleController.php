@@ -65,6 +65,7 @@ class RoleController extends Controller
         $roleStatus = $params['roleStatus'] ?? '';
         $parentIds = $params['parentIds'] ?? [];
         $menuIds = $params['menuIds'] ?? [];
+        $sort = $params['sort'] ?? [];
         $page = $params['page'] ?? 1;
         $pageSize = $params['pageSize'] ?? 30;
         $ret = RoleService::getInstance()->getList(
@@ -72,6 +73,7 @@ class RoleController extends Controller
             $roleStatus,
             $menuIds,
             $parentIds,
+            $sort,
             $page,
             $pageSize
         );
