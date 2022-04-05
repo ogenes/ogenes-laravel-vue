@@ -8,9 +8,10 @@
 namespace App\Http\Controllers;
 
 
-use App\Http\Requests\Department\AddRequest;
+use App\Http\Requests\Department\SaveRequest;
 use App\Services\DepartmentService;
 use Illuminate\Http\Request;
+use function App\Helpers\getParams;
 
 class DepartmentController extends Controller
 {
@@ -22,11 +23,22 @@ class DepartmentController extends Controller
             'data' => $ret,
         ]);
     }
+    public function user(Request $request) {
+        $params = getParams($request);
+        $deptId = $params['id'] ?? 0;
+        $ret = DepartmentService::getInstance()->getDepartmentHasUser($deptId);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
     
-    public function save(AddRequest $request) {
-        $id = $request->input('id');
-        $name = $request->input('name');
-        $parentId = $request->input('parentId');
+    public function save(SaveRequest $request) {
+        $params = getParams($request);
+        $id = $params['id'] ?? 0;
+        $name = $params['name'] ?? '';
+        $parentId = $params['parentId'] ?? 0;
         $ret = DepartmentService::getInstance()->save($name, $parentId, $id);
         return response()->json([
             'code' => 0,
@@ -36,7 +48,8 @@ class DepartmentController extends Controller
     }
     
     public function remove(Request $request) {
-        $id = $request->input('id');
+        $params = getParams($request);
+        $id = $params['id'] ?? 0;
         $ret = DepartmentService::getInstance()->remove($id);
         return response()->json([
             'code' => 0,

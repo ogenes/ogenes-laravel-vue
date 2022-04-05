@@ -56,6 +56,7 @@ Route::middleware(['language'])->group(function () {
         });
         Route::prefix('department')->group(function () {
             Route::any('list', [DepartmentController::class, 'list'])->name('department.list');
+            Route::any('user', [DepartmentController::class, 'user'])->name('department.user');
             Route::any('save', [DepartmentController::class, 'save'])->name('department.save');
             Route::any('remove', [DepartmentController::class, 'remove'])->name('department.remove');
         });

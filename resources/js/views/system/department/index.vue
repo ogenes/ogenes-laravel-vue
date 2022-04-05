@@ -21,7 +21,9 @@
           <el-table-column fixed prop="name" width="400" label="部门">
             <template slot="header" slot-scope="scope">
               <span>部门 </span>
-              <el-button type="text" @click="toggleRowExpansion">
+              <el-button type="text" style="margin-left: 20px;"
+                         :icon="isExpansion ? 'el-icon-folder-remove' : 'el-icon-folder-add'"
+                         @click="toggleRowExpansion">
                 全部{{ isExpansion ? "收缩" : "展开" }}
               </el-button>
             </template>
@@ -29,25 +31,31 @@
           <el-table-column prop="id" width="150" align="center" label="部门ID"/>
           <el-table-column prop="parent" width="500" label="上级部门"/>
           <el-table-column prop="parentId" width="150" align="center" label="上级部门ID"/>
-          <el-table-column prop="cnt" width="150" align="center" label="部门人数"/>
+          <el-table-column prop="cnt" width="150" align="center" label="部门人数">
+            <template slot-scope="scope">
+              <el-button type="text" @click="showUsers(scope.row)">{{ scope.row.cnt }}</el-button>
+            </template>
+          </el-table-column>
           <el-table-column fixed="right" width="200" label="操作">
             <template slot="header" slot-scope="scope">
               <span>操作 </span>
               <el-button
                 v-permission="[BTN_DEPT_ADD]"
-                type="primary"
+                type="text"
                 class="el-icon-plus"
+                style="margin-left: 20px;"
                 @click="showDialog=true"
               >
                 {{BTN_MAP_DEPT[BTN_DEPT_ADD]}}
               </el-button>
             </template>
             <template slot-scope="scope">
-              <el-button v-permission="[BTN_DEPT_EDIT]" type="primary" @click="showEdit(scope.row)">{{
+              <el-button v-permission="[BTN_DEPT_EDIT]" type="text" icon="el-icon-edit" @click="showEdit(scope.row)">{{
                 BTN_MAP_DEPT[BTN_DEPT_EDIT] }}
               </el-button>
-              <el-button v-if="scope.row.id > 1" v-permission="[BTN_DEPT_DEL]" type="danger"
-                         @click="remove(scope.row.id)">{{ BTN_MAP_DEPT[BTN_DEPT_DEL] }}
+              <el-button v-if="scope.row.id > 1" v-permission="[BTN_DEPT_DEL]" type="text" icon="el-icon-delete"
+                         style="color:#F56C6C;" @click="remove(scope.row.id)">
+                {{ BTN_MAP_DEPT[BTN_DEPT_DEL] }}
               </el-button>
             </template>
           </el-table-column>
@@ -56,6 +64,12 @@
 
     </el-card>
 
+    <el-dialog :visible.sync="showHasUsers" :destroy-on-close="true" :show-close="false">
+      <el-button v-for="(item, key) in hasUsers" :key="key">
+        <span style="color: #409EFF">{{item.username}}</span>
+        <span style="color: #909399">({{item.account}})</span>
+      </el-button>
+    </el-dialog>
     <!--编辑弹窗-->
     <el-dialog
       :title="dialogTitle"
@@ -92,14 +106,14 @@
 </template>
 
 <script>
-  import {getList, save, remove} from '@/api/system/department';
+  import {getList, getDepartmentHasUser, save, remove} from '@/api/system/department';
   import {
     BTN_MAP_DEPT,
     BTN_DEPT_ADD,
     BTN_DEPT_EDIT,
     BTN_DEPT_DEL,
   } from "@/api/btn";
-  import {deepClone} from "../../../utils";
+  import {deepClone} from "@/utils";
 
   export default {
     name: "DepartmentManage",
@@ -113,6 +127,8 @@
 
         loading: false,
         isExpansion: true,
+        showHasUsers: false,
+        hasUsers: [],
 
         filterText: '',
         showDialog: false,
@@ -180,6 +196,13 @@
         this.list = ret?.data || [];
         this.loading = false;
       },
+      async showUsers(row) {
+        const ret = await getDepartmentHasUser({id: row.id});
+        this.hasUsers = ret?.data || [];
+        console.log(this.hasUsers, 'this.hasUsers');
+        this.showHasUsers = true;
+      },
+
       handleSearch(treeData, searchValue) {
         if (!treeData || treeData.length === 0) {
           return [];

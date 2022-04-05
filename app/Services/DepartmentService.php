@@ -9,6 +9,7 @@ namespace App\Services;
 
 
 use App\Models\Department;
+use App\Models\User;
 use App\Models\UserHasDepartment;
 use Illuminate\Support\Facades\DB;
 
@@ -152,6 +153,23 @@ class DepartmentService extends BaseService
             ->get()
             ->toArray();
         return $data ? array_column($data, 'cnt', 'dept_id') : [];
+    }
+    
+    public function getDepartmentHasUser(int $deptId): array
+    {
+        $userTb = (new User())->getTable();
+        $userHasDepartmentTb = (new UserHasDepartment())->getTable();
+        return DB::table("{$userHasDepartmentTb} as uhd")
+            ->leftJoin("{$userTb} as u", 'u.uid', '=', 'uhd.uid')
+            ->select([
+                'u.uid',
+                'u.account',
+                'u.username',
+            ])
+            ->where('u.user_status', '=', 1)
+            ->where('uhd.dept_id', '=', $deptId)
+            ->get()
+            ->toArray();
     }
     
     public function getDepartmentMap(): array

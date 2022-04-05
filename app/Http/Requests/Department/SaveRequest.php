@@ -6,8 +6,9 @@ use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use function App\Helpers\getParams;
 
-class AddRequest extends FormRequest
+class SaveRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -30,6 +31,15 @@ class AddRequest extends FormRequest
             'parentId' => 'required',
             'name' => 'required',
         ];
+    }
+    
+    /**
+     * @return array|void
+     */
+    public function validationData()
+    {
+        $request = $this->all();
+        return getParams($request);
     }
     
     /**

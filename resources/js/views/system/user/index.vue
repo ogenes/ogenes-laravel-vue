@@ -1,44 +1,48 @@
 <template>
   <div class="app-container">
     <el-card>
-      <el-form :inline="true" label-width="60px" label-position="left">
-        <el-row>
-          <el-form-item label="用户名:">
-            <el-input v-model="queryParams.username" @keyup.enter.native="queryList" class="form-item-width"
-                      placeholder="支持模糊搜索" clearable/>
-          </el-form-item>
-          <el-form-item label="账户:">
-            <el-input v-model="queryParams.account" @keyup.enter.native="queryList" class="form-item-width"
-                      placeholder="支持模糊搜索" clearable/>
-          </el-form-item>
-          <el-form-item label="手机号:">
-            <el-input v-model="queryParams.mobile" @keyup.enter.native="queryList" class="form-item-width"
-                      placeholder="支持模糊搜索" clearable/>
-          </el-form-item>
-          <el-form-item label="状态:">
-            <el-select v-model="queryParams.userStatus" placeholder="请选择" clearable class="form-item-width">
-              <el-option v-for="(v, k) in USER_STATUS_OPTION" :key="k" :value="v.value" :label="v.label"/>
-            </el-select>
-          </el-form-item>
+      <div style="float: right">
+        <el-popover trigger="click" placement="top-start">
+          <el-form :inline="true" label-width="60px" label-position="left">
+            <el-row>
+              <el-form-item label="用户名:">
+                <el-input v-model="queryParams.username" @keyup.enter.native="queryList" class="form-item-width"
+                          placeholder="支持模糊搜索" clearable/>
+              </el-form-item>
+              <el-form-item label="账户:">
+                <el-input v-model="queryParams.account" @keyup.enter.native="queryList" class="form-item-width"
+                          placeholder="支持模糊搜索" clearable/>
+              </el-form-item>
+              <el-form-item label="手机号:">
+                <el-input v-model="queryParams.mobile" @keyup.enter.native="queryList" class="form-item-width"
+                          placeholder="支持模糊搜索" clearable/>
+              </el-form-item>
+            </el-row>
+            <el-row>
+              <el-form-item label="状态:">
+                <el-select v-model="queryParams.userStatus" placeholder="请选择" clearable class="form-item-width">
+                  <el-option v-for="(v, k) in USER_STATUS_OPTION" :key="k" :value="v.value" :label="v.label"/>
+                </el-select>
+              </el-form-item>
 
-          <el-form-item label="部门:" prop="deptIds">
-            <el-cascader
-              v-model="queryParams.deptIds"
-              :options="departments"
-              :props="defaultProps"
-              :show-all-levels="false"
-              :collapse-tags="true"
-              placeholder="请选择"
-              filterable
-              clearable
-              class="form-item-width"
-            />
-          </el-form-item>
-          <el-form-item label="角色:" prop="roleIds">
-            <el-cascader
-              v-model="queryParams.roleIds"
-              :options="options.roleTree"
-              :props="{
+              <el-form-item label="部门:" prop="deptIds">
+                <el-cascader
+                  v-model="queryParams.deptIds"
+                  :options="departments"
+                  :props="defaultProps"
+                  :show-all-levels="false"
+                  :collapse-tags="true"
+                  placeholder="请选择"
+                  filterable
+                  clearable
+                  class="form-item-width"
+                />
+              </el-form-item>
+              <el-form-item label="角色:" prop="roleIds">
+                <el-cascader
+                  v-model="queryParams.roleIds"
+                  :options="options.roleTree"
+                  :props="{
                 expandTrigger: 'hover',
                 label: 'roleName',
                 value: 'id',
@@ -46,20 +50,33 @@
                 multiple: true,
                 checkStrictly: true
               }"
-              :show-all-levels="false"
-              :collapse-tags="true"
-              placeholder="请选择"
-              filterable
-              clearable
-              class="form-item-width"
-            />
-          </el-form-item>
-          <el-form-item label=" ">
-            <el-button type="primary" @click="queryList">查询</el-button>
-            <el-button v-permission="[BTN_USER_ADD]" type="primary" icon="el-icon-plus" @click="showDialog=true">{{ BTN_MAP_USER[BTN_USER_ADD]}}</el-button>
-          </el-form-item>
-        </el-row>
-      </el-form>
+                  :show-all-levels="false"
+                  :collapse-tags="true"
+                  placeholder="请选择"
+                  filterable
+                  clearable
+                  class="form-item-width"
+                />
+              </el-form-item>
+            </el-row>
+            <el-row>
+              <el-form-item label=" ">
+                <el-button type="primary" @click="queryList">查询</el-button>
+                <el-button type="info" @click="clearFilter">清空</el-button>
+              </el-form-item>
+            </el-row>
+          </el-form>
+
+          <el-button slot="reference" type="text" :style="hasFilter ? 'color: #67C23A' : 'color: #909399'"
+                     icon="el-icon-search">
+            筛选
+          </el-button>
+        </el-popover>
+
+        <el-button v-permission="[BTN_USER_ADD]" type="text" icon="el-icon-plus" @click="showDialog=true">{{
+          BTN_MAP_USER[BTN_USER_ADD]}}
+        </el-button>
+      </div>
       <div class="page-position">
         <el-pagination
           background
@@ -74,8 +91,9 @@
       </div>
       <el-table
         :data="result.list"
+        v-loading.fullscreen.lock="loading"
         border
-        :default-sort = "queryParams.sort"
+        :default-sort="queryParams.sort"
         @sort-change="sortChange"
         height="600px"
       >
@@ -100,21 +118,27 @@
         <el-table-column sortable="custom" label="邮箱" prop="email" width="200px" align="left"/>
         <el-table-column label="角色" prop="email" width="300px" align="left">
           <template slot-scope="scope">
-            <div v-for="(item, key) in scope.row.roles" :key="key" v-if="key < 3">
-              <el-tag type="info">{{ item }}</el-tag>
-            </div>
+            <el-tag v-for="(item, key) in scope.row.roles" :key="key" v-if="key < 3" type="info"
+                    style="margin-right: 10px;">
+              {{ item }}
+            </el-tag>
             <el-popover
               v-if="scope.row.roles.length > 3"
               placement="top-end"
               trigger="hover">
               <div v-for="(item, key) in scope.row.roles" :key="key">
-                <el-tag type="info">{{ item }}</el-tag>
+                <el-tag type="info">
+                  {{ item }}
+                </el-tag>
               </div>
-              <div slot="reference">
-                <el-tag type="">更多……</el-tag>
-              </div>
+              <el-tag slot="reference" type="">
+                …
+              </el-tag>
             </el-popover>
-            <el-button v-permission="[BTN_USER_ROLE]" type="primary" size="mini" @click="showEditRole(scope.row)">{{ BTN_MAP_USER[BTN_USER_ROLE] }}</el-button>
+            <el-button v-permission="[BTN_USER_ROLE]" type="text" icon="el-icon-edit" size="mini"
+                       @click="showEditRole(scope.row)">{{
+              BTN_MAP_USER[BTN_USER_ROLE] }}
+            </el-button>
           </template>
         </el-table-column>
         <el-table-column label="状态" prop="userStatus" width="200px" align="center">
@@ -133,19 +157,16 @@
         </el-table-column>
         <el-table-column label="部门" prop="departments" width="500px" align="left">
           <template slot-scope="scope">
-            <div v-for="(item, key) in scope.row.departments" :key="key" v-if="key < 3">
-              <el-tag type="success">{{ item }}</el-tag>
-            </div>
+            <el-tag type="success" v-for="(item, key) in scope.row.departments" :key="key" v-if="key < 1">{{ item }}
+            </el-tag>
             <el-popover
-              v-if="scope.row.departments.length > 3"
+              v-if="scope.row.departments.length > 1"
               placement="top-end"
               trigger="hover">
               <div v-for="(item, key) in scope.row.departments" :key="key">
                 <el-tag type="success">{{ item }}</el-tag>
               </div>
-              <div slot="reference">
-                <el-tag type="">更多……</el-tag>
-              </div>
+              <el-tag slot="reference" type="">…</el-tag>
             </el-popover>
           </template>
         </el-table-column>
@@ -155,10 +176,11 @@
         <el-table-column fixed="right" label="操作" align="center" width="220px">
           <template slot-scope="scope">
             <div>
-              <el-button v-permission="[BTN_USER_EDIT]" type="primary" @click="showEdit(scope.row)">
+              <el-button v-permission="[BTN_USER_EDIT]" type="text" icon="el-icon-edit" @click="showEdit(scope.row)">
                 {{ BTN_MAP_USER[BTN_USER_EDIT] }}
               </el-button>
-              <el-button v-permission="[BTN_USER_RESET]" type="danger" :disabled="scope.row.uid === 1"
+              <el-button v-permission="[BTN_USER_RESET]" type="text" icon="el-icon-refresh"
+                         style="color:#F56C6C;" :disabled="scope.row.uid === 1"
                          @click="resetPass(scope.row)">
                 {{ BTN_MAP_USER[BTN_USER_RESET] }}
               </el-button>
@@ -245,6 +267,7 @@
         checkPermission,
 
         loading: false,
+        showSearch: true,
         options: {
           roleTree: []
         },
@@ -298,7 +321,33 @@
       }
     },
 
-    computed: {},
+    computed: {
+      hasFilter() {
+        console.log(this.queryParams.username
+          , this.queryParams.account
+          , this.queryParams.mobile
+          , [0, 1].includes(this.queryParams.userStatus)
+          , this.queryParams.account
+          , this.queryParams.roleIds.length > 0
+          , this.queryParams.deptIds.length > 0, '333');
+        console.log(!!(this.queryParams.username
+          || this.queryParams.account
+          || this.queryParams.mobile
+          || [0, 1].includes(this.queryParams.userStatus)
+          || this.queryParams.account
+          || this.queryParams.roleIds.length > 0
+          || this.queryParams.deptIds.length > 0), '444');
+
+        return !!(this.queryParams.username
+          || this.queryParams.account
+          || this.queryParams.mobile
+          || [0, 1].includes(this.queryParams.userStatus)
+          || this.queryParams.account
+          || this.queryParams.roleIds.length > 0
+          || this.queryParams.deptIds.length > 0);
+
+      },
+    },
 
     async created() {
       const ret = await getDepartmentList();
@@ -349,6 +398,24 @@
         this.queryParams.sort = {
           prop: col.prop,
           order: col.order
+        };
+        this.queryList();
+      },
+
+      clearFilter() {
+        this.queryParams = {
+          page: 1,
+          pageSize: 20,
+          username: '',
+          account: '',
+          mobile: '',
+          userStatus: '',
+          roleIds: [],
+          deptIds: [],
+          sort: {
+            prop: 'uid',
+            order: 'descending',
+          }
         };
         this.queryList();
       },

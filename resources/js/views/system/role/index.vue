@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-card>
-      <el-form :inline="true" label-position="left">
+      <el-form v-if="showSearch" :inline="true" label-position="left">
         <el-row>
           <el-form-item label="角色名:">
             <el-input v-model="queryParams.roleName" clearable @keyup.enter.native="queryList" class="form-item-width"
@@ -46,12 +46,16 @@
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="queryList">查询</el-button>
-            <el-button v-permission="[BTN_ROLE_ADD]" type="primary" icon="el-icon-plus" @click="showDialog=true">
-              {{ BTN_MAP_ROLE[BTN_ROLE_ADD] }}
-            </el-button>
           </el-form-item>
         </el-row>
       </el-form>
+      <div style="float: right">
+        <el-button type="text" :style="showSearch ? 'color: #409EFF' : 'color: #909399'" icon="el-icon-search" @click="showSearch = !showSearch">筛选</el-button>
+        <el-button v-permission="[BTN_ROLE_ADD]" type="text" icon="el-icon-plus" @click="showDialog=true">
+          {{ BTN_MAP_ROLE[BTN_ROLE_ADD] }}
+        </el-button>
+<!--        <el-button type="text" icon="el-icon-download">导出</el-button>-->
+      </div>
       <div class="page-position">
         <el-pagination
           background
@@ -67,7 +71,7 @@
       <el-table
         :data="result.list"
         border
-        :default-sort = "queryParams.sort"
+        :default-sort="queryParams.sort"
         @sort-change="sortChange"
         height="600px"
       >
@@ -100,28 +104,29 @@
                 </el-tree>
               </div>
               <div style="float:left;">
-                <el-button v-permission="[BTN_ROLE_MENU]" type="text" @click="showRoleHasMenu(scope.row, item.menuIds)">
+                <el-button v-permission="[BTN_ROLE_MENU]" type="text" icon="el-icon-edit"
+                           @click="showRoleHasMenu(scope.row, item.menuIds)">
                   {{ BTN_MAP_ROLE[BTN_ROLE_MENU] }}
                 </el-button>
               </div>
             </div>
           </template>
         </el-table-column>
-<!--        <el-table-column prop="parent" width="400" align="left" label="数据权限">-->
-<!--          <template slot="header" slot-scope="scope">-->
-<!--            <el-select v-model="dataSystemId" size="mini" style="width: 200px">-->
-<!--              <el-option v-for="(v, k) in options.system" :key="k" :value="k" :label="v"/>-->
-<!--            </el-select>-->
-<!--            <span>数据权限</span>-->
-<!--          </template>-->
-<!--          <template slot-scope="scope">-->
-<!--            <div style="float: left;">-->
-<!--            </div>-->
-<!--            <div style="float: left;">-->
-<!--              <el-button type="text" @click="showRoleHasData(scope.row)">编辑</el-button>-->
-<!--            </div>-->
-<!--          </template>-->
-<!--        </el-table-column>-->
+        <!--        <el-table-column prop="parent" width="400" align="left" label="数据权限">-->
+        <!--          <template slot="header" slot-scope="scope">-->
+        <!--            <el-select v-model="dataSystemId" size="mini" style="width: 200px">-->
+        <!--              <el-option v-for="(v, k) in options.system" :key="k" :value="k" :label="v"/>-->
+        <!--            </el-select>-->
+        <!--            <span>数据权限</span>-->
+        <!--          </template>-->
+        <!--          <template slot-scope="scope">-->
+        <!--            <div style="float: left;">-->
+        <!--            </div>-->
+        <!--            <div style="float: left;">-->
+        <!--              <el-button type="text" @click="showRoleHasData(scope.row)">编辑</el-button>-->
+        <!--            </div>-->
+        <!--          </template>-->
+        <!--        </el-table-column>-->
         <el-table-column prop="createdAt" sortable="custom" width="160" align="center" label="创建时间"/>
         <el-table-column prop="updatedAt" sortable="custom" width="160" align="center" label="更新时间"/>
         <el-table-column fixed="right" label="状态" prop="roleStatus" width="200px" align="center">
@@ -151,7 +156,7 @@
         </el-table-column>
         <el-table-column fixed="right" label="操作" width="200" align="center">
           <template slot-scope="scope">
-            <el-button v-permission="[BTN_ROLE_EDIT]" type="primary" @click="showEdit(scope.row)">
+            <el-button v-permission="[BTN_ROLE_EDIT]" type="text" icon="el-icon-edit" @click="showEdit(scope.row)">
               {{ BTN_MAP_ROLE[BTN_ROLE_EDIT] }}
             </el-button>
           </template>
@@ -234,6 +239,7 @@
         checkPermission,
 
         loading: false,
+        showSearch: true,
         isExpansion: true,
         options: {
           system: [],

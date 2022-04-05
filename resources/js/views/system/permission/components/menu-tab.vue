@@ -21,7 +21,9 @@
         <el-table-column fixed prop="title" width="200" align="left" label="菜单">
           <template slot="header" slot-scope="scope">
             <span>菜单 </span>
-            <el-button type="text" @click="toggleRowExpansion">
+            <el-button type="text" style="margin-left: 20px;"
+                       :icon="isExpansion ? 'el-icon-folder-remove' : 'el-icon-folder-add'"
+                       @click="toggleRowExpansion">
               全部{{ isExpansion ? "收缩" : "展开" }}
             </el-button>
           </template>
@@ -50,18 +52,20 @@
             <span>操作 </span>
             <el-button
               v-permission="[BTN_MENU_ADD]"
-              type="primary"
+              type="text"
               class="el-icon-plus"
+              style="margin-left: 20px;"
               @click="showDialog=true"
             >
               {{ BTN_MAP_MENU[BTN_MENU_ADD] }}
             </el-button>
           </template>
           <template slot-scope="scope">
-            <el-button v-permission="[BTN_MENU_EDIT]" type="primary" @click="showEdit(scope.row)">
+            <el-button v-permission="[BTN_MENU_EDIT]" type="text" icon="el-icon-edit" @click="showEdit(scope.row)">
               {{ BTN_MAP_MENU[BTN_MENU_EDIT] }}
             </el-button>
-            <el-button v-permission="[BTN_MENU_DEL]" :disabled="scope.row.children !== undefined" type="danger" @click="remove(scope.row.id)">
+            <el-button v-permission="[BTN_MENU_DEL]" :disabled="scope.row.children !== undefined" type="text"
+                       icon="el-icon-delete" style="color:#F56C6C;" @click="remove(scope.row.id)">
               {{ BTN_MAP_MENU[BTN_MENU_DEL] }}
             </el-button>
           </template>
@@ -388,8 +392,8 @@
       menuRowClassName({row, rowIndex}) {
         if (this.filterText) {
           if (row.title.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1
-          || row.menuName.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1
-          || row.roles.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1) {
+            || row.menuName.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1
+            || row.roles.toLowerCase().indexOf(this.filterText.toLowerCase()) !== -1) {
             return 'search-row';
           }
         }

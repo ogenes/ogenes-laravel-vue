@@ -28,8 +28,8 @@ class RoleService extends BaseService
         array $menuIds,
         array $parentIds,
         array $sort = [],
-        int $page,
-        int $pageSize
+        int $page = 1,
+        int $pageSize = 20
     ): array
     {
         $ret = [
@@ -53,7 +53,7 @@ class RoleService extends BaseService
         $roleStatus !== '' && $query->where('r.role_status', '=', $roleStatus);
         $parentIds && $query->whereIn('r.parent_id', $parentIds);
         $menuIds && $query->whereIn('rhm.menu_id', $menuIds);
-    
+        
         $prop = 'id';
         $order = 'asc';
         if (isset($sort['prop'])) {
@@ -408,6 +408,6 @@ class RoleService extends BaseService
             ])
             ->toArray();
         return $data ? json_decode(json_encode($data, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR) : [];
-
+        
     }
 }
