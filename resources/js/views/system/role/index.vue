@@ -1,22 +1,25 @@
 <template>
   <div class="app-container">
     <el-card>
-      <el-form v-if="showSearch" :inline="true" label-position="left">
-        <el-row>
-          <el-form-item label="角色名:">
-            <el-input v-model="queryParams.roleName" clearable @keyup.enter.native="queryList" class="form-item-width"
-                      placeholder="支持模糊搜索"/>
-          </el-form-item>
-          <el-form-item label="状态:">
-            <el-select v-model="queryParams.roleStatus" placeholder="请选择！" clearable class="form-item-width">
-              <el-option v-for="(v, k) in ROLE_STATUS_OPTION" :key="k" :value="v.value" :label="v.label"/>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="菜单权限：" prop="menuId">
-            <el-cascader
-              v-model="queryParams.menuIds"
-              :options="menuOptions"
-              :props="{
+      <div style="float: right">
+        <el-popover trigger="click" placement="bottom-start">
+          <el-form :inline="true" label-width="100px" label-position="right">
+            <el-row>
+              <el-form-item label="角色名:">
+                <el-input v-model="queryParams.roleName" clearable @keyup.enter.native="queryList"
+                          class="form-item-width"
+                          placeholder="支持模糊搜索"/>
+              </el-form-item>
+              <el-form-item label="状态:">
+                <el-select v-model="queryParams.roleStatus" placeholder="请选择！" clearable class="form-item-width">
+                  <el-option v-for="(v, k) in ROLE_STATUS_OPTION" :key="k" :value="v.value" :label="v.label"/>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="菜单权限：" prop="menuId">
+                <el-cascader
+                  v-model="queryParams.menuIds"
+                  :options="menuOptions"
+                  :props="{
                 expandTrigger: 'hover',
                 label: 'title',
                 value: 'id',
@@ -24,37 +27,43 @@
                 emitPath: false,
                 multiple: true
               }"
-              placeholder="请选择"
-              filterable
-              clearable
-              :collapse-tags="true"
-              class="form-item-width"
-            />
-          </el-form-item>
-          <el-form-item label="上级角色:" prop="parentId">
-            <el-cascader
-              v-model="queryParams.parentIds"
-              :options="selectOptions"
-              :filterable="true"
-              :collapse-tags="true"
-              :props="{...defaultProps, multiple: true}"
-              placeholder="请选择！"
-              filterable
-              clearable
-              class="form-item-width"
-            />
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="queryList">查询</el-button>
-          </el-form-item>
-        </el-row>
-      </el-form>
-      <div style="float: right">
-        <el-button type="text" :style="showSearch ? 'color: #409EFF' : 'color: #909399'" icon="el-icon-search" @click="showSearch = !showSearch">筛选</el-button>
+                  placeholder="请选择"
+                  filterable
+                  clearable
+                  :collapse-tags="true"
+                  class="form-item-width"
+                />
+              </el-form-item>
+            </el-row>
+            <el-row>
+              <el-form-item label="上级角色:" prop="parentId">
+                <el-cascader
+                  v-model="queryParams.parentIds"
+                  :options="selectOptions"
+                  :filterable="true"
+                  :collapse-tags="true"
+                  :props="{...defaultProps, multiple: true}"
+                  placeholder="请选择！"
+                  filterable
+                  clearable
+                  class="form-item-width"
+                />
+              </el-form-item>
+              <el-form-item label=" ">
+                <el-button type="primary" @click="queryList">查询</el-button>
+                <el-button type="info" @click="clearFilter">清空</el-button>
+              </el-form-item>
+            </el-row>
+          </el-form>
+          <el-button slot="reference" type="text" :style="hasFilter ? 'color: #67C23A' : 'color: #909399'"
+                     icon="el-icon-search">
+            筛选
+          </el-button>
+        </el-popover>
         <el-button v-permission="[BTN_ROLE_ADD]" type="text" icon="el-icon-plus" @click="showDialog=true">
           {{ BTN_MAP_ROLE[BTN_ROLE_ADD] }}
         </el-button>
-<!--        <el-button type="text" icon="el-icon-download">导出</el-button>-->
+        <!--        <el-button type="text" icon="el-icon-download">导出</el-button>-->
       </div>
       <div class="page-position">
         <el-pagination
@@ -70,6 +79,7 @@
       </div>
       <el-table
         :data="result.list"
+        v-loading.fullscreen.lock="loading"
         border
         :default-sort="queryParams.sort"
         @sort-change="sortChange"
@@ -104,7 +114,7 @@
                 </el-tree>
               </div>
               <div style="float:left;">
-                <el-button v-permission="[BTN_ROLE_MENU]" type="text" icon="el-icon-edit"
+                <el-button v-permission="[BTN_ROLE_MENU]" type="text" size="mini" icon="el-icon-edit"
                            @click="showRoleHasMenu(scope.row, item.menuIds)">
                   {{ BTN_MAP_ROLE[BTN_ROLE_MENU] }}
                 </el-button>
@@ -324,6 +334,14 @@
         });
         return tmpData;
       },
+      hasFilter() {
+        return !!(this.queryParams.roleName
+          || [0, 1].includes(this.queryParams.roleStatus)
+          || this.queryParams.account
+          || this.queryParams.parentIds.length > 0
+          || this.queryParams.menuIds.length > 0);
+
+      },
     },
 
     async created() {
@@ -395,6 +413,22 @@
         this.queryParams.sort = {
           prop: col.prop,
           order: col.order
+        };
+        this.queryList();
+      },
+
+      clearFilter() {
+        this.queryParams = {
+          roleName: '',
+          roleStatus: '',
+          parentIds: [],
+          menuIds: [],
+          sort: {
+            prop: 'id',
+            order: 'ascending',
+          },
+          page: 1,
+          pageSize: 20,
         };
         this.queryList();
       },
@@ -473,7 +507,7 @@
 <style scoped lang="scss">
   .app-container {
     .form-item-width {
-      width: 240px
+      width: 300px
     }
   }
 </style>

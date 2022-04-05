@@ -35,7 +35,9 @@
         <template slot="header">
           <el-button
             v-permission="[BTN_DICT_DATA_ADD]"
-            type="primary"
+            type="text"
+            class="el-icon-plus"
+            style="float: right; margin-right: 20px;"
             @click="result.unshift(deepClone(defaultRow))"
           >
             {{ BTN_MAP_DICT[BTN_DICT_DATA_ADD] }}
@@ -47,11 +49,12 @@
                   <el-button type="info" @click="cancel(scope.row, scope.$index)">取消</el-button>
             </span>
           <span v-else>
-            <el-button v-permission="[BTN_DICT_DATA_EDIT]" type="primary"
+            <el-button v-permission="[BTN_DICT_DATA_EDIT]" type="text" icon="el-icon-edit"
                        @click="$set(result, scope.$index, {...scope.row, showEdit: true})">
               {{ BTN_MAP_DICT[BTN_DICT_DATA_EDIT] }}
             </el-button>
-            <el-button v-permission="[BTN_DICT_DATA_DEL]" type="danger" @click="remove(scope.row.id)">
+            <el-button v-permission="[BTN_DICT_DATA_DEL]" type="text" icon="el-icon-delete" style="color:#F56C6C;"
+                       @click="remove(scope.row.id)">
               {{ BTN_MAP_DICT[BTN_DICT_DATA_DEL] }}
             </el-button>
           </span>

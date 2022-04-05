@@ -2,7 +2,7 @@
   <div class="app-container">
     <el-card>
       <div style="float: right">
-        <el-popover trigger="click" placement="top-start">
+        <el-popover trigger="click" placement="bottom-start">
           <el-form :inline="true" label-width="60px" label-position="left">
             <el-row>
               <el-form-item label="用户名:">
@@ -323,21 +323,6 @@
 
     computed: {
       hasFilter() {
-        console.log(this.queryParams.username
-          , this.queryParams.account
-          , this.queryParams.mobile
-          , [0, 1].includes(this.queryParams.userStatus)
-          , this.queryParams.account
-          , this.queryParams.roleIds.length > 0
-          , this.queryParams.deptIds.length > 0, '333');
-        console.log(!!(this.queryParams.username
-          || this.queryParams.account
-          || this.queryParams.mobile
-          || [0, 1].includes(this.queryParams.userStatus)
-          || this.queryParams.account
-          || this.queryParams.roleIds.length > 0
-          || this.queryParams.deptIds.length > 0), '444');
-
         return !!(this.queryParams.username
           || this.queryParams.account
           || this.queryParams.mobile
