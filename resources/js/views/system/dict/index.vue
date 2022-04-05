@@ -47,7 +47,6 @@
           v-permission="[BTN_DICT_ADD]"
           type="text"
           class="el-icon-plus"
-          style="float: right; margin-right: 20px;"
           @click="result.list.unshift(deepClone(defaultRow))"
         >
           {{ BTN_MAP_DICT[BTN_DICT_ADD] }}
