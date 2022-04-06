@@ -78,7 +78,7 @@ class UserController extends Controller
     public function save(SaveRequest $request)
     {
         $params = getParams($request);
-        $uid = $params['id'] ?? '';
+        $uid = $params['id'] ?? 0;
         $avatar = $params['avatar'] ?? '';
         $username = $params['username'] ?? '';
         $mobile = $params['mobile'] ?? '';

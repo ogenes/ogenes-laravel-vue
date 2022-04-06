@@ -10,27 +10,10 @@ use Illuminate\Http\Request;
 
 class PermissionMiddleware
 {
+    /**
+     * 存在接口允许多个菜单权限访问时在此添加配置
+     */
     public const MENUS_MAP = [
-        'UserManageSave' => [
-            'UserManageAdd',
-            'UserManageEdit'
-        ],
-        'PermissionMenuManageSave' => [
-            'PermissionMenuManageAdd',
-            'PermissionMenuManageEdit'
-        ],
-        'RoleManageSave' => [
-            'RoleManageAdd',
-            'RoleManageEdit'
-        ],
-        'DictManageSave' => [
-            'DictManageAdd',
-            'DictManageEdit'
-        ],
-        'DictManageSaveData' => [
-            'DictManageAddData',
-            'DictManageEditData'
-        ],
     ];
     
     /**

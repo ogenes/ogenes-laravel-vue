@@ -37,9 +37,17 @@ export function getList(data) {
   })
 }
 
-export function save(data) {
+export function add(data) {
   return request({
-    url: '/api/user/save',
+    url: '/api/user/add',
+    method: 'post',
+    data: {data},
+  })
+}
+
+export function edit(data) {
+  return request({
+    url: '/api/user/edit',
     method: 'post',
     data: {data},
   })

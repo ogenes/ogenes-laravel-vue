@@ -32,7 +32,7 @@
 </template>
 
 <script>
-  import {save} from '@/api/system/role';
+  import {add, edit} from '@/api/system/role';
 
   export default {
     name: "RoleForm",
@@ -79,7 +79,8 @@
         this.$refs.roleParams.validate(valid => {
           if (valid) {
             this.loading = true;
-            save(this.roleParams).then((res) => {
+            const func = this.roleParams.id > 0 ? edit : add;
+            func(this.roleParams).then((res) => {
               if (res.code > 0) {
                 this.$message.error(res.msg)
               } else {

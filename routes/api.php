@@ -53,7 +53,8 @@ Route::middleware(['language'])->group(function () {
                 Route::any('departmentList', [DepartmentController::class, 'list'])->name('UserManage');
                 Route::any('roleTree', [UserController::class, 'roleTree'])->name('UserManage');
                 Route::any('list', [UserController::class, 'list'])->name('UserManage');
-                Route::any('save', [UserController::class, 'save'])->name('UserManageSave');
+                Route::any('add', [UserController::class, 'save'])->name('UserManageAdd');
+                Route::any('edit', [UserController::class, 'save'])->name('UserManageEdit');
                 Route::any('switchStatus', [UserController::class, 'switchStatus'])->name('UserManageStatus');
                 Route::any('resetPassByUid', [UserController::class, 'resetPassByUid'])->name('UserManageReset');
                 Route::any('saveUserHasRole', [UserController::class, 'saveUserHasRole'])->name('UserManageEditRole');
@@ -61,7 +62,8 @@ Route::middleware(['language'])->group(function () {
             Route::prefix('menu')->group(function () {
                 Route::any('options', [MenuController::class, 'options'])->name('PermissionMenuManage');
                 Route::any('list', [MenuController::class, 'list'])->name('PermissionMenuManage');
-                Route::any('save', [MenuController::class, 'save'])->name('PermissionMenuManageSave');
+                Route::any('add', [MenuController::class, 'save'])->name('PermissionMenuManageAdd');
+                Route::any('edit', [MenuController::class, 'save'])->name('PermissionMenuManageEdit');
                 Route::any('remove', [MenuController::class, 'remove'])->name('PermissionMenuManageDel');
             });
             Route::prefix('data-permission')->group(function () {
@@ -77,7 +79,8 @@ Route::middleware(['language'])->group(function () {
                 Route::any('dataTree', [RoleController::class, 'dataTree'])->name('RoleManage');
                 Route::any('roleTree', [RoleController::class, 'roleTree'])->name('RoleManage');
                 Route::any('list', [RoleController::class, 'list'])->name('RoleManage');
-                Route::any('save', [RoleController::class, 'save'])->name('RoleManageSave');
+                Route::any('add', [RoleController::class, 'save'])->name('RoleManageAdd');
+                Route::any('edit', [RoleController::class, 'save'])->name('RoleManageEdit');
                 Route::any('saveRoleHasData', [RoleController::class, 'saveRoleHasData'])->name('role.saveRoleHasData');
                 Route::any('saveRoleHasMenu', [RoleController::class, 'saveRoleHasMenu'])->name('RoleManageMenu');
                 Route::any('switchStatus', [RoleController::class, 'switchStatus'])->name('RoleManageStatus');
@@ -85,9 +88,11 @@ Route::middleware(['language'])->group(function () {
     
             Route::prefix('dict')->group(function () {
                 Route::any('list', [DictController::class, 'list'])->name('DictManage');
-                Route::any('save', [DictController::class, 'save'])->name('DictManageSave');
+                Route::any('add', [DictController::class, 'save'])->name('DictManageAdd');
+                Route::any('edit', [DictController::class, 'save'])->name('DictManageEdit');
                 Route::any('dataList', [DictController::class, 'dataList'])->name('DictManageData');
-                Route::any('saveData', [DictController::class, 'saveData'])->name('DictManageSaveData');
+                Route::any('addData', [DictController::class, 'saveData'])->name('DictManageAddData');
+                Route::any('editData', [DictController::class, 'saveData'])->name('DictManageEditData');
                 Route::any('remove', [DictController::class, 'remove'])->name('DictManageDel');
                 Route::any('removeData', [DictController::class, 'removeData'])->name('DictManageDelData');
                 Route::any('switchDataStatus', [DictController::class, 'switchDataStatus'])->name('dict.switchDataStatus');

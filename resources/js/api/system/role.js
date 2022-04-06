@@ -40,9 +40,17 @@ export function getList(data) {
   })
 }
 
-export function save(data) {
+export function add(data) {
   return request({
-    url: '/api/role/save',
+    url: '/api/role/add',
+    method: 'post',
+    data: {data},
+  })
+}
+
+export function edit(data) {
+  return request({
+    url: '/api/role/edit',
     method: 'post',
     data: {data},
   })

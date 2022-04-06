@@ -177,7 +177,8 @@
 <script>
   import {
     getList,
-    save,
+    add,
+    edit,
     remove,
   } from '@/api/system/menu';
   import svgIcons from '@/utils/svg-icons'
@@ -347,7 +348,8 @@
           if (valid) {
             this.loading = true;
             this.menuParams.systemId = this.systemId;
-            save(this.menuParams).then((res) => {
+            const func = this.menuParams.id > 0 ? edit : add;
+            func(this.menuParams).then((res) => {
               if (res.code > 0) {
                 this.$message.error(res.msg)
               } else {

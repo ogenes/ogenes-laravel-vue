@@ -23,9 +23,17 @@ export function getOptions() {
   })
 }
 
-export function save(data) {
+export function add(data) {
   return request({
-    url: '/api/menu/save',
+    url: '/api/menu/add',
+    method: 'post',
+    data: {data},
+  })
+}
+
+export function edit(data) {
+  return request({
+    url: '/api/menu/edit',
     method: 'post',
     data: {data},
   })

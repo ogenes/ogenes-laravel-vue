@@ -130,7 +130,8 @@
 <script>
   import {
     getList,
-    save,
+    add,
+    edit,
     remove
   } from '@/api/system/dict';
   import {
@@ -275,7 +276,8 @@
       },
       async save(row, index) {
         this.loading = true;
-        save(row).then((res) => {
+        const func = row.id > 0 ? edit : add;
+        func(row).then((res) => {
           if (res.code > 0) {
             this.$message.error(res.msg)
           } else {

@@ -58,7 +58,7 @@
 </template>
 
 <script>
-  import {save} from '@/api/user';
+  import {add, edit} from '@/api/user';
   import {compressAccurately} from 'image-conversion';
   import {fileUpload} from '@/api/common'
 
@@ -108,7 +108,8 @@
         this.$refs.userParams.validate(valid => {
           if (valid) {
             this.loading = true;
-            save(this.userParams).then((res) => {
+            const func = this.userParams.id > 0 ? edit : add;
+            func(this.userParams).then((res) => {
               if (res.code > 0) {
                 this.$message.error(res.msg)
               } else {

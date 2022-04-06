@@ -16,17 +16,33 @@ export function getDataList(data) {
   })
 }
 
-export function save(data) {
+export function add(data) {
   return request({
-    url: '/api/dict/save',
+    url: '/api/dict/add',
     method: 'post',
     data: {data},
   })
 }
 
-export function saveData(data) {
+export function edit(data) {
   return request({
-    url: '/api/dict/saveData',
+    url: '/api/dict/edit',
+    method: 'post',
+    data: {data},
+  })
+}
+
+export function addData(data) {
+  return request({
+    url: '/api/dict/addData',
+    method: 'post',
+    data: {data},
+  })
+}
+
+export function editData(data) {
+  return request({
+    url: '/api/dict/editData',
     method: 'post',
     data: {data},
   })
