@@ -75,6 +75,15 @@ const systemRouter = {
         icon: 'dict',
       },
     },
+    {
+      path: 'actionLog',
+      component: () => import('@/views/system/action-log'),
+      name: 'ActionLogManage',
+      meta: {
+        title: '日志管理',
+        icon: 'log',
+      },
+    },
   ]
 };
 

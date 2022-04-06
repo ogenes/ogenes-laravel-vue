@@ -348,6 +348,7 @@ class UserService extends BaseService
                 $exists->setAttribute($key, $val);
             }
             $exists->save();
+            $data['password'] = '***……';
             ActionLogService::getInstance()->insert(
                 ActionLogService::RESOURCE_USER,
                 $uid,
@@ -407,5 +408,13 @@ class UserService extends BaseService
             DB::rollBack();
             throw $e;
         }
+    }
+    
+    public function getAllUsers():array {
+        return User::get([
+            'username',
+            'user_status',
+            'uid'
+        ])->toArray();
     }
 }

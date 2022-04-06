@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActionLogController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DictController;
 use App\Http\Controllers\FileController;
@@ -95,6 +96,10 @@ Route::middleware(['language'])->group(function () {
                 Route::any('editData', [DictController::class, 'saveData'])->name('DictManageEditData');
                 Route::any('remove', [DictController::class, 'remove'])->name('DictManageDel');
                 Route::any('removeData', [DictController::class, 'removeData'])->name('DictManageDelData');
+            });
+            Route::prefix('actionLog')->group(function () {
+                Route::any('options', [ActionLogController::class, 'options'])->name('ActionLogManage');
+                Route::any('list', [ActionLogController::class, 'list'])->name('ActionLogManage');
             });
         });
     });

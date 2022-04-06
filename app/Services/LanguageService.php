@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Cookie;
 
 class LanguageService extends BaseService
 {
-    protected const LANG_KEY = 'CYNIC:LANG:';
+    protected const LANG_KEY = 'OG:LANG:';
     
     public function getLang(): string
     {
@@ -37,17 +37,7 @@ class LanguageService extends BaseService
     
     protected function getLangKey(): string
     {
-        if ($this->uid > 0) {
-            $key = self::LANG_KEY . 'USER:' . $this->uid;
-        } else {
-            $uniqReq = Cookie::get('UNIQ-REQ');
-            if ($uniqReq) {
-                $key = self::LANG_KEY . 'REQ:' . $uniqReq;
-            } else {
-                $key = '';
-            }
-        }
-        return $key;
+        return $this->uid > 0 ? self::LANG_KEY . 'USER:' . $this->uid : '';
     }
     
 }
