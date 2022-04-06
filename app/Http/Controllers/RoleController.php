@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\DictService;
 use App\Services\Permission\MenuService;
 use App\Services\RoleService;
 use Illuminate\Http\Request;
@@ -11,7 +12,7 @@ class RoleController extends Controller
 {
     public function options(Request $request)
     {
-        $ret['system'] = MenuService::SYSTEM;
+        $ret['system'] = DictService::getInstance()->getSystemMap();
         return response()->json([
             'code' => 0,
             'msg' => 'success',
@@ -21,7 +22,7 @@ class RoleController extends Controller
     
     public function menuTree(Request $request)
     {
-        $system = MenuService::SYSTEM;
+        $system = DictService::getInstance()->getSystemMap();
         $ret = [];
         foreach ($system as $systemId => $systemName) {
             $tmp['systemId'] = $systemId;

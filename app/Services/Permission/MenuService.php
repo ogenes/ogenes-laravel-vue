@@ -17,12 +17,6 @@ use function App\Helpers\formatDateTime;
  */
 class MenuService extends BaseService
 {
-    public const SYSTEM = [
-        1 => '权限管理系统',
-        2 => '商品系统',
-        3 => 'ERP系统',
-    ];
-    
     public const
         MENU_TYPE_DIR = 1,
         MENU_TYPE_PAGE = 2,

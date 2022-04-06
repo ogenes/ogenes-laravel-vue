@@ -314,4 +314,11 @@ class DictService extends BaseService
         }
         return $ret;
     }
+    
+    public function getSystemMap():array {
+        $symbol = 'system';
+        $data = $this->getDictDataBySymbol($symbol);
+        
+        return $data ? array_column($data, 'label', 'value') : [];
+    }
 }

@@ -51,7 +51,7 @@ Route::middleware(['language'])->group(function () {
     
             Route::prefix('user')->group(function () {
                 Route::any('departmentList', [DepartmentController::class, 'list'])->name('UserManage');
-                Route::any('roleTree', [UserController::class, 'roleTree'])->name('UserManage');
+                Route::any('roleTree', [RoleController::class, 'roleTree'])->name('UserManage');
                 Route::any('list', [UserController::class, 'list'])->name('UserManage');
                 Route::any('add', [UserController::class, 'save'])->name('UserManageAdd');
                 Route::any('edit', [UserController::class, 'save'])->name('UserManageEdit');

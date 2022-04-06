@@ -76,7 +76,8 @@ class RoleService extends BaseService
         $roleMap = $this->getRoleMap($roleIds);
         $roleHasMenuMap = $this->getRoleHasMenuMap($roleIds);
         $menuTreeMap = [];
-        foreach (MenuService::SYSTEM as $systemId => $val) {
+        $systems = DictService::getInstance()->getSystemMap();
+        foreach ($systems as $systemId => $val) {
             $menuTreeMap[$systemId] = MenuService::getInstance()->getList($systemId);
         }
         foreach ($resp['data'] as $item) {
@@ -85,7 +86,7 @@ class RoleService extends BaseService
             $item['updated_at'] = formatDateTime($item['updated_at']);
             $item['parent'] = $roleMap[$item['id']]['parent'] ?: '/';
             $menuMap = $roleHasMenuMap[$item['id']] ?? [];
-            foreach (MenuService::SYSTEM as $systemId => $systemName) {
+            foreach ($systems as $systemId => $systemName) {
                 $systemInfo['systemId'] = $systemId;
                 $systemInfo['systemName'] = $systemName;
                 $map = $menuMap[$systemId] ?? [];
