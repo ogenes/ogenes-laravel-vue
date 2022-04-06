@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActionLogController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DictController;
 use App\Http\Controllers\FileController;
@@ -24,20 +25,25 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['language'])->group(function () {
     Route::prefix('user')->group(function () {
-        Route::any('login', [UserController::class, 'login'])->name('user.login');
+        Route::any('login', [AuthController::class, 'login']);
     });
     
     Route::middleware(['api.auth'])->group(function () {
         
         Route::prefix('user')->group(function () {
-            Route::any('logout', [UserController::class, 'logout'])->name('user.logout');
-            Route::any('info', [UserController::class, 'info'])->name('user.info');
+            Route::any('logout', [AuthController::class, 'logout']);
+            Route::any('info', [AuthController::class, 'info']);
+            Route::any('roleTree', [AuthController::class, 'roleTree']);
+            Route::any('menuTree', [AuthController::class, 'menuTree']);
+            Route::any('updateBasicInfo', [AuthController::class, 'updateBasicInfo']);
+            Route::any('updateAvatar', [AuthController::class, 'updateAvatar']);
+            Route::any('updatePass', [AuthController::class, 'updatePass']);
         });
         Route::prefix('file')->group(function () {
-            Route::any('upload', [FileController::class, 'upload'])->name('file.upload');
+            Route::any('upload', [FileController::class, 'upload']);
         });
         Route::prefix('menu')->group(function () {
-            Route::any('menuMap', [MenuController::class, 'menuMap'])->name('menu.menuMap');
+            Route::any('menuMap', [MenuController::class, 'menuMap']);
         });
         
         Route::middleware(['api.permission'])->group(function () {

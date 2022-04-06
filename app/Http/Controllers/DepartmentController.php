@@ -10,6 +10,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Department\SaveRequest;
 use App\Services\DepartmentService;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use function App\Helpers\getParams;
 
@@ -26,7 +27,7 @@ class DepartmentController extends Controller
     public function user(Request $request) {
         $params = getParams($request);
         $deptId = $params['id'] ?? 0;
-        $ret = DepartmentService::getInstance()->getDepartmentHasUser($deptId);
+        $ret = UserService::getInstance()->getDepartmentHasUser($deptId);
         return response()->json([
             'code' => 0,
             'msg' => 'success',

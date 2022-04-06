@@ -10,7 +10,6 @@ namespace App\Services;
 
 use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
-use App\Models\RoleHasData;
 use App\Models\User;
 use App\Models\UserHasDepartment;
 use App\Models\UserHasRole;
@@ -21,15 +20,6 @@ use function App\Helpers\getRandStr;
 
 class UserService extends BaseService
 {
-    public function getCurrentUser(): array
-    {
-        $userInfo = $this->getInfoById($this->uid);
-        $menus = RoleService::getInstance()->getUserHasMenus($this->uid, 1);
-        $userInfo['roles'] = array_column($menus, 'menuName');
-        unset($userInfo['code'], $userInfo['last_login_ip']);
-        return $userInfo;
-    }
-    
     public function getInfoById(int $uid): array
     {
         if ($uid <= 0) {
@@ -56,7 +46,7 @@ class UserService extends BaseService
         return $data ?: [];
     }
     
-    public const USER_KEY_PREFIX = 'CYNIC:USER:';
+    public const USER_KEY_PREFIX = 'OG:USER:';
     
     public function cacheUserInfo(array $users): bool
     {
@@ -80,6 +70,14 @@ class UserService extends BaseService
             return [];
         }
         return json_decode($cache, true, 512, JSON_THROW_ON_ERROR);
+    }
+    
+    protected function cacheUserField(int $uid, string $field, string $value): void
+    {
+        $userInfo = $this->getInfoFromCache($uid);
+        !$userInfo && $userInfo['id'] = $uid;
+        $userInfo[$field] = $value;
+        $this->cacheUserInfo($userInfo);
     }
     
     public function getList(
@@ -166,23 +164,6 @@ class UserService extends BaseService
         }
         return $ret;
         
-    }
-    
-    protected function cacheUserField(int $uid, string $field, string $value): void
-    {
-        $userInfo = $this->getInfoFromCache($uid);
-        !$userInfo && $userInfo['id'] = $uid;
-        $userInfo[$field] = $value;
-        $this->cacheUserInfo($userInfo);
-    }
-    
-    public function updateLoginInfo(int $uid, string $loginAt, string $loginIp): void
-    {
-        User::whereUid($uid)->update([
-            'last_login_at' => $loginAt,
-            'last_login_ip' => $loginIp,
-            'updated_at' => DB::raw('`updated_at`')
-        ]);
     }
     
     
@@ -303,6 +284,54 @@ class UserService extends BaseService
         return true;
     }
     
+    public function saveUserHasRole(int $uid, array $roleIds): bool
+    {
+        DB::beginTransaction();
+        try {
+            $exists = UserHasRole::whereUid($uid)
+                ->get()
+                ->toArray();
+            $data = [];
+            if ($exists) {
+                $existIds = array_column($exists, 'role_id');
+                $addIds = array_diff($roleIds, $existIds);
+                $delIds = array_diff($existIds, $roleIds);
+                UserHasRole::whereUid($uid)
+                    ->whereIn('role_id', $delIds)
+                    ->delete();
+            } else {
+                $delIds = [];
+                $addIds = $roleIds;
+            }
+            $insertData = [];
+            foreach ($addIds as $roleId) {
+                $insertData[] = [
+                    'role_id' => $roleId,
+                    'uid' => $uid,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ];
+            }
+            $insertData && UserHasRole::insert($insertData);
+            if ($delIds || $addIds) {
+                $data['delIds'] = $delIds;
+                $data['addIds'] = $addIds;
+                ActionLogService::getInstance()->insert(
+                    ActionLogService::RESOURCE_USER,
+                    $uid,
+                    $this->uid,
+                    '修改角色',
+                    $data
+                );
+            }
+            
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+    
     public function switchStatus(int $uid, int $userStatus): bool
     {
         $exists = User::whereUid($uid)->first();
@@ -362,59 +391,29 @@ class UserService extends BaseService
         ];
     }
     
-    public function saveUserHasRole(int $uid, array $roleIds): bool
+    public function getAllUsers(): array
     {
-        DB::beginTransaction();
-        try {
-            $exists = UserHasRole::whereUid($uid)
-                ->get()
-                ->toArray();
-            $data = [];
-            if ($exists) {
-                $existIds = array_column($exists, 'role_id');
-                $addIds = array_diff($roleIds, $existIds);
-                $delIds = array_diff($existIds, $roleIds);
-                UserHasRole::whereUid($uid)
-                    ->whereIn('role_id', $delIds)
-                    ->delete();
-            } else {
-                $delIds = [];
-                $addIds = $roleIds;
-            }
-            $insertData = [];
-            foreach ($addIds as $roleId) {
-                $insertData[] = [
-                    'role_id' => $roleId,
-                    'uid' => $uid,
-                    'created_at' => date('Y-m-d H:i:s'),
-                ];
-            }
-            $insertData && UserHasRole::insert($insertData);
-            if ($delIds || $addIds) {
-                $data['delIds'] = $delIds;
-                $data['addIds'] = $addIds;
-                ActionLogService::getInstance()->insert(
-                    ActionLogService::RESOURCE_USER,
-                    $uid,
-                    $this->uid,
-                    '修改角色',
-                    $data
-                );
-            }
-            
-            DB::commit();
-            return true;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw $e;
-        }
-    }
-    
-    public function getAllUsers():array {
         return User::get([
             'username',
             'user_status',
             'uid'
         ])->toArray();
+    }
+    
+    public function getDepartmentHasUser(int $deptId): array
+    {
+        $userTb = (new User())->getTable();
+        $userHasDepartmentTb = (new UserHasDepartment())->getTable();
+        return DB::table("{$userHasDepartmentTb} as uhd")
+            ->leftJoin("{$userTb} as u", 'u.uid', '=', 'uhd.uid')
+            ->select([
+                'u.uid',
+                'u.account',
+                'u.username',
+            ])
+            ->where('u.user_status', '=', 1)
+            ->where('uhd.dept_id', '=', $deptId)
+            ->get()
+            ->toArray();
     }
 }

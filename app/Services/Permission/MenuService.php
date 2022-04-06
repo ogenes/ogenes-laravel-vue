@@ -6,8 +6,11 @@ namespace App\Services\Permission;
 use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
 use App\Models\Menu;
+use App\Models\RoleHasMenu;
+use App\Models\UserHasRole;
 use App\Services\ActionLogService;
 use App\Services\BaseService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use function App\Helpers\formatDateTime;
 
@@ -220,5 +223,50 @@ class MenuService extends BaseService
             array_unshift($parents, ...$tmpParents);
         }
         return $parents;
+    }
+    
+    public function getUserHasMenus(int $uid, int $systemId): array
+    {
+        $menuTb = (new Menu())->getTable();
+        $userHasRoleTb = (new UserHasRole())->getTable();
+        $roleHasMenuTb = (new RoleHasMenu())->getTable();
+        $data = DB::table("{$userHasRoleTb} as uhr")
+            ->join("{$roleHasMenuTb} as rhm", 'rhm.role_id', '=', 'uhr.role_id')
+            ->join("{$menuTb} as m", 'm.id', '=', 'rhm.menu_id')
+            ->where('m.system_id', '=', $systemId)
+            ->where('uhr.uid', '=', $uid)
+            ->get([
+                DB::raw('DISTINCT m.id as menuId'),
+                'm.menu_name as menuName',
+                'm.title as menuTitle',
+                'm.type as menuType'
+            ])
+            ->toArray();
+        return $data ? json_decode(json_encode($data, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR) : [];
+    }
+    
+    public function getRoleHasMenuMap(array $roleIds): array
+    {
+        $menuTb = (new Menu())->getTable();
+        $roleHasMenuTb = (new RoleHasMenu())->getTable();
+        $exists = DB::table("{$roleHasMenuTb} as rhm")
+            ->join("{$menuTb} as m", 'm.id', '=', 'rhm.menu_id')
+            ->whereIn('rhm.role_id', $roleIds)
+            ->select([
+                'rhm.role_id',
+                'rhm.menu_id',
+                'm.system_id',
+                'm.parent_id',
+                'm.menu_name',
+                'm.title',
+            ])
+            ->get()
+            ->toArray();
+        $ret = [];
+        foreach ($exists as $item) {
+            $item = json_decode(json_encode($item, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
+            $ret[$item['role_id']][$item['system_id']][] = $item;
+        }
+        return $ret;
     }
 }

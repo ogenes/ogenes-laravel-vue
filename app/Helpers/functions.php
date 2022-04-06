@@ -69,3 +69,16 @@ function getParams($request): array
     }
     return is_array($request['data']) ? $request['data'] : json_decode($request['data'], true, 512, JSON_THROW_ON_ERROR);
 }
+
+function filterTree(array &$treeData, array $ids):void {
+    foreach ($treeData as $key => $item) {
+        
+        if (!in_array($item['id'], $ids, false)) {
+            unset($treeData[$key]);
+        }
+        if (isset($treeData[$key]['children']) && $treeData[$key]['children']) {
+            filterTree($treeData[$key]['children'], $ids);
+        }
+    }
+    $treeData = array_values($treeData);
+}

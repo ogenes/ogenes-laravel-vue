@@ -4,7 +4,7 @@ namespace App\Http\Middleware\Api;
 
 use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
-use App\Services\RoleService;
+use App\Services\Permission\MenuService;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -30,7 +30,7 @@ class PermissionMiddleware
         if (is_object($route) && method_exists($route, 'getName')) {
             $routeName = $route->getName();
             $codes = self::MENUS_MAP[$routeName] ?? [$routeName];
-            $service = RoleService::getInstance();
+            $service = MenuService::getInstance();
             $id = $service->uid;
             $menus = $service->getUserHasMenus($id, 1);
             

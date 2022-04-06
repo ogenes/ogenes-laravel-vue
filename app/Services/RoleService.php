@@ -18,6 +18,7 @@ use App\Models\UserHasRole;
 use App\Services\Permission\MenuService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use function App\Helpers\filterTree;
 use function App\Helpers\formatDateTime;
 
 class RoleService extends BaseService
@@ -74,7 +75,7 @@ class RoleService extends BaseService
         
         $roleIds = array_column($resp['data'], 'id');
         $roleMap = $this->getRoleMap($roleIds);
-        $roleHasMenuMap = $this->getRoleHasMenuMap($roleIds);
+        $roleHasMenuMap = MenuService::getInstance()->getRoleHasMenuMap($roleIds);
         $menuTreeMap = [];
         $systems = DictService::getInstance()->getSystemMap();
         foreach ($systems as $systemId => $val) {
@@ -92,7 +93,7 @@ class RoleService extends BaseService
                 $map = $menuMap[$systemId] ?? [];
                 $systemInfo['menuIds'] = array_column($map, 'menu_id');
                 $menuTree = $menuTreeMap[$systemId] ?? [];
-                $this->filterMenu($menuTree, $systemInfo['menuIds']);
+                filterTree($menuTree, $systemInfo['menuIds']);
                 $systemInfo['menuTree'] = $menuTree;
                 $item['system'][$systemId] = $systemInfo;
             }
@@ -352,63 +353,17 @@ class RoleService extends BaseService
         return $parents;
     }
     
-    public function getRoleHasMenuMap(array $roleIds): array
-    {
-        $menuTb = (new Menu())->getTable();
-        $roleHasMenuTb = (new RoleHasMenu())->getTable();
-        $exists = DB::table("{$roleHasMenuTb} as rhm")
-            ->join("{$menuTb} as m", 'm.id', '=', 'rhm.menu_id')
-            ->whereIn('rhm.role_id', $roleIds)
-            ->select([
-                'rhm.role_id',
-                'rhm.menu_id',
-                'm.system_id',
-                'm.parent_id',
-                'm.menu_name',
-                'm.title',
-            ])
-            ->get()
-            ->toArray();
-        $ret = [];
-        foreach ($exists as $item) {
-            $item = json_decode(json_encode($item, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
-            $ret[$item['role_id']][$item['system_id']][] = $item;
-        }
-        return $ret;
-    }
-    
-    protected function filterMenu(array &$menuTree, array $menuIds): void
-    {
-        foreach ($menuTree as $key => $item) {
-            
-            if (!in_array($item['id'], $menuIds, false)) {
-                unset($menuTree[$key]);
-            }
-            if (isset($menuTree[$key]['children']) && $menuTree[$key]['children']) {
-                $this->filterMenu($menuTree[$key]['children'], $menuIds);
-            }
-        }
-        $menuTree = array_values($menuTree);
-    }
-    
-    public function getUserHasMenus(int $uid, int $systemId): array
-    {
-        $menuTb = (new Menu())->getTable();
+    public function getUserHasRoles(int $uid):array {
+        $roleTb = (new Role())->getTable();
         $userHasRoleTb = (new UserHasRole())->getTable();
-        $roleHasMenuTb = (new RoleHasMenu())->getTable();
         $data = DB::table("{$userHasRoleTb} as uhr")
-            ->join("{$roleHasMenuTb} as rhm", 'rhm.role_id', '=', 'uhr.role_id')
-            ->join("{$menuTb} as m", 'm.id', '=', 'rhm.menu_id')
-            ->where('m.system_id', '=', $systemId)
+            ->join("{$roleTb} as r", 'r.id', '=', 'uhr.role_id')
             ->where('uhr.uid', '=', $uid)
             ->get([
-                DB::raw('DISTINCT m.id as menuId'),
-                'm.menu_name as menuName',
-                'm.title as menuTitle',
-                'm.type as menuType'
+                DB::raw('DISTINCT r.id as roleId'),
+                'r.role_name as roleName',
             ])
             ->toArray();
         return $data ? json_decode(json_encode($data, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR) : [];
-        
     }
 }

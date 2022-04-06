@@ -11,8 +11,10 @@ namespace App\Services;
 use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
 use App\Models\User;
+use App\Services\Permission\MenuService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use function App\Helpers\filterTree;
 use function App\Helpers\getRealIp;
 use function App\Helpers\getUniqId;
 
@@ -59,7 +61,7 @@ class AuthService extends BaseService
             json_encode($loginInfo, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE),
             self::LOGIN_EXP
         );
-        UserService::getInstance()->updateLoginInfo($exist->uid, $loginInfo['last_login_at'], $loginInfo['last_login_ip']);
+        $this->updateLoginInfo($exist->uid, $loginInfo['last_login_at'], $loginInfo['last_login_ip']);
         if (!$ret) {
             throw new CommonException(ErrorCode::LOGIN_FAILED);
         }
@@ -112,7 +114,7 @@ class AuthService extends BaseService
             if ($diffTime > self::REFRESH_EXP) {
                 $loginInfo['last_login_at'] = date('Y-m-d H:i:s');
                 $loginInfo['last_login_ip'] = getRealIp();
-                UserService::getInstance()->updateLoginInfo($uid, $loginInfo['last_login_at'], $loginInfo['last_login_ip']);
+                $this->updateLoginInfo($uid, $loginInfo['last_login_at'], $loginInfo['last_login_ip']);
                 $this->getRedis()->set(
                     $loginKey,
                     json_encode($loginInfo, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE),
@@ -139,6 +141,55 @@ class AuthService extends BaseService
     {
         $loginKey = self::LOGIN_KEY_PREFIX . $token;
         $this->getRedis()->del($loginKey);
+        return true;
+    }
+    
+    public function updateLoginInfo(int $uid, string $loginAt, string $loginIp): void
+    {
+        User::whereUid($uid)->update([
+            'last_login_at' => $loginAt,
+            'last_login_ip' => $loginIp,
+            'updated_at' => DB::raw('`updated_at`')
+        ]);
+    }
+    
+    public function getCurrentUser(): array
+    {
+        $userInfo = UserService::getInstance()->getInfoById($this->uid);
+        $menus = MenuService::getInstance()->getUserHasMenus($this->uid, 1);
+        $userInfo['roles'] = array_column($menus, 'menuName');
+        unset($userInfo['code'], $userInfo['last_login_ip']);
+        return $userInfo;
+    }
+    
+    public function getRoleTree(): array
+    {
+        $roleTree = RoleService::getInstance()->getRoleTree();
+        $roles = RoleService::getInstance()->getUserHasRoles($this->uid);
+        $roleIds = array_column($roles, 'roleId');
+        filterTree($roleTree, $roleIds);
+        return $roleTree;
+    }
+    
+    public function getMenuTree(): array
+    {
+        $menuTree = MenuService::getInstance()->getList(1);
+        $menus = MenuService::getInstance()->getUserHasMenus($this->uid, 1);
+        $menuIds = array_column($menus, 'menuId');
+        filterTree($menuTree, $menuIds);
+        return $menuTree;
+    }
+    
+    public function updateBasicInfo(string $username, string $mobile, string $email): bool 
+    {
+        return true;
+    }
+    public function updateAvatar(string $avatar): bool
+    {
+        return true;
+    }
+    public function updatePass(string $password, string $oldPassword): bool
+    {
         return true;
     }
 }
