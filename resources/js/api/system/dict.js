@@ -48,13 +48,6 @@ export function editData(data) {
   })
 }
 
-export function switchDataStatus(data) {
-  return request({
-    url: '/api/dict/switchDataStatus',
-    method: 'post',
-    data: {data},
-  })
-}
 export function remove(data) {
   return request({
     url: '/api/dict/remove',

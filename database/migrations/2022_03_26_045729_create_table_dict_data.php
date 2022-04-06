@@ -20,7 +20,7 @@ class CreateTableDictData extends Migration
             $table->string('label', 32)->nullable(false)->default('')->comment('标签');
             $table->string('value', 32)->nullable(false)->default('')->comment('值');
             $table->string('remark', 128)->nullable(false)->default('')->comment('备注');
-            $table->tinyInteger('data_status')->nullable(false)->default(1)->comment('数据状态：0隐藏，1正常');
+            $table->tinyInteger('disable')->nullable(false)->default(0)->comment('为1不可编辑和删除');
             $table->timestamp('created_at')->default('2000-01-01 00:00:01')->comment('创建时间');
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'))->comment('更新时间');
             $table->engine = 'InnoDB';
@@ -32,17 +32,10 @@ class CreateTableDictData extends Migration
         DB::table('dict_data')->insert([
             'dict_id' => 1,
             'sort' => '1',
-            'label' => '正常',
+            'label' => '权限管理系统',
             'value' => '1',
-            'remark' => '',
-            'created_at' => date('Y-m-d H:i:s'),
-        ]);
-        DB::table('dict_data')->insert([
-            'dict_id' => 1,
-            'sort' => '2',
-            'label' => '隐藏',
-            'value' => '0',
-            'remark' => '隐藏不影响历史数据展示label，只是不可被选用',
+            'remark' => '当前系统，为系统默认配置',
+            'disable' => 1,
             'created_at' => date('Y-m-d H:i:s'),
         ]);
     }

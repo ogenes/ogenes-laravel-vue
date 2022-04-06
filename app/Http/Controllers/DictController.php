@@ -53,8 +53,7 @@ class DictController extends Controller
     {
         $params = getParams($request);
         $symbol = $params['symbol'] ?? '';
-        $dataStatus = $params['dataStatus'] ?? '';
-        $ret = DictService::getInstance()->getDictDataBySymbol($symbol, $dataStatus);
+        $ret = DictService::getInstance()->getDictDataBySymbol($symbol);
         return response()->json([
             'code' => 0,
             'msg' => 'success',
@@ -72,19 +71,6 @@ class DictController extends Controller
         $remark = $params['remark'] ?? '';
         $id = $params['id'] ?? 0;
         $ret = DictService::getInstance()->saveData($dictId, $sort, $label, $value, $remark, $id);
-        return response()->json([
-            'code' => 0,
-            'msg' => 'success',
-            'data' => $ret,
-        ]);
-    }
-    
-    public function switchDataStatus(Request $request)
-    {
-        $params = getParams($request);
-        $dataId = $params['dataId'] ?? 0;
-        $dataStatus = $params['dataStatus'] ?? 0;
-        $ret = DictService::getInstance()->switchDataStatus($dataId, $dataStatus);
         return response()->json([
             'code' => 0,
             'msg' => 'success',

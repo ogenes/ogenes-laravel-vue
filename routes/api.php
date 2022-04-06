@@ -95,7 +95,6 @@ Route::middleware(['language'])->group(function () {
                 Route::any('editData', [DictController::class, 'saveData'])->name('DictManageEditData');
                 Route::any('remove', [DictController::class, 'remove'])->name('DictManageDel');
                 Route::any('removeData', [DictController::class, 'removeData'])->name('DictManageDelData');
-                Route::any('switchDataStatus', [DictController::class, 'switchDataStatus'])->name('dict.switchDataStatus');
             });
         });
     });

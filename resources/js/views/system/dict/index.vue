@@ -100,7 +100,7 @@
                   <el-button type="success" @click="save(scope.row, scope.$index)">保存</el-button>
                   <el-button type="info" @click="cancel(scope.row, scope.$index)">取消</el-button>
             </span>
-            <span v-else>
+            <span v-else-if="!scope.row.disable">
               <el-button v-permission="[BTN_DICT_EDIT]" type="text" icon="el-icon-edit"
                          @click="$set(result.list, scope.$index, {...scope.row, showEdit: true})">
                 {{ BTN_MAP_DICT[BTN_DICT_EDIT] }}

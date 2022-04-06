@@ -33,11 +33,12 @@
       <el-table-column prop="updatedAt" width="160" align="center" label="更新时间"/>
       <el-table-column fixed="right" label="操作" width="200" align="center">
         <template slot="header">
+          操作
           <el-button
             v-permission="[BTN_DICT_DATA_ADD]"
             type="text"
             class="el-icon-plus"
-            style="float: right; margin-right: 20px;"
+            style="margin-left: 20px;"
             @click="result.unshift(deepClone(defaultRow))"
           >
             {{ BTN_MAP_DICT[BTN_DICT_DATA_ADD] }}
@@ -48,7 +49,7 @@
                   <el-button type="success" @click="save(scope.row, scope.$index)">保存</el-button>
                   <el-button type="info" @click="cancel(scope.row, scope.$index)">取消</el-button>
             </span>
-          <span v-else>
+          <span v-else-if="!scope.row.disable">
             <el-button v-permission="[BTN_DICT_DATA_EDIT]" type="text" icon="el-icon-edit"
                        @click="$set(result, scope.$index, {...scope.row, showEdit: true})">
               {{ BTN_MAP_DICT[BTN_DICT_DATA_EDIT] }}

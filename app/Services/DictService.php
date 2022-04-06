@@ -39,6 +39,7 @@ class DictService extends BaseService
             'dict_name',
             'symbol',
             'remark',
+            'disable',
             'created_at',
             'updated_at',
         ]);
@@ -228,56 +229,19 @@ class DictService extends BaseService
         return $ret;
     }
     
-    public function switchDataStatus(int $dataId, int $dictStatus): bool
-    {
-        $exists = DictData::whereId($dataId)->first();
-        if (!$exists) {
-            throw new CommonException(ErrorCode::RECORD_EXCEPTION);
-        }
-        
-        $statusMap = $this->getDictDataBySymbol('DictDataType', '1');
-        $statusMap = array_column($statusMap, 'label', 'value');
-        if (!array_key_exists($dictStatus, $statusMap)) {
-            throw new CommonException(ErrorCode::INVALID_ARGUMENT);
-        }
-        
-        if ($exists->data_status !== $dictStatus) {
-            DB::beginTransaction();
-            try {
-                $data['data_status'] = $dictStatus;
-                $data['updated_at'] = date('Y-m-d H:i:s');
-                foreach ($data as $key => $val) {
-                    $exists->setAttribute($key, $val);
-                }
-                $exists->save();
-                ActionLogService::getInstance()->insert(
-                    ActionLogService::RESOURCE_DICT,
-                    $exists->dict_id,
-                    $this->uid,
-                    '切换状态',
-                    ['id' => $dataId]
-                );
-                DB::commit();
-            } catch (\Exception $e) {
-                DB::rollBack();
-                throw $e;
-            }
-        }
-        return true;
-    }
-    
-    public function getDictDataBySymbol(string $symbol, string $dataStatus = ''): array
+    public function getDictDataBySymbol(string $symbol): array
     {
         $dictTb = (new Dict())->getTable();
         $dictDataTb = (new DictData())->getTable();
-        $query = DB::table("{$dictDataTb} as dd")
+        $data = DB::table("{$dictDataTb} as dd")
             ->leftJoin("{$dictTb} as d", 'd.id', '=', 'dd.dict_id')
             ->select([
                 'dd.*',
             ])
-            ->where('d.symbol', '=', $symbol);
-        $dataStatus !== '' && $query->where('dd.data_status', '=', $dataStatus);
-        $data = $query->orderBy('dd.sort', 'asc')->get()->toArray();
+            ->where('d.symbol', '=', $symbol)
+            ->orderBy('dd.sort', 'asc')
+            ->get()
+            ->toArray();
         $ret = [];
         foreach ($data as $item) {
             $item = json_decode(json_encode($item, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $dict_name 字典名称
  * @property string $symbol 字典符号
  * @property string $remark 备注
+ * @property int $disable 为1不可编辑和删除
  * @property \Illuminate\Support\Carbon $created_at 创建时间
  * @property \Illuminate\Support\Carbon $updated_at 更新时间
  * @method static \Illuminate\Database\Eloquent\Builder|Dict newModelQuery()
@@ -19,6 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Dict query()
  * @method static \Illuminate\Database\Eloquent\Builder|Dict whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Dict whereDictName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Dict whereDisable($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Dict whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Dict whereRemark($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Dict whereSymbol($value)
