@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\Api\AuthMiddleware;
+use App\Http\Middleware\Api\PermissionMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -55,6 +56,7 @@ class Kernel extends HttpKernel
      */
     protected $routeMiddleware = [
         'api.auth' => AuthMiddleware::class,
+        'api.permission' => PermissionMiddleware::class,
         'auth' => \App\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,

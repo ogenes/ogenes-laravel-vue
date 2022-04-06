@@ -9,6 +9,7 @@ return [
     'UNKNOW' => 'UNKNOW ERROR: Please contact your administrator!',
     'SYSTEM' => 'SYSTEM ERROR: Please contact your administrator!',
     'INVALID_ARGUMENT' => 'INVALID ARGUMENT!',
+    'INVALID_ROLES' => 'INVALID ROLES！',
     'NO_USER_FOUND' => 'NO USER FOUND!',
     'LOGIN_REQUIRED' => 'LOGIN REQUIRED!',
     'PASSWORD_ERROR' => 'PASSWORD ERROR!',

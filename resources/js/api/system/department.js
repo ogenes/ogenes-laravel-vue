@@ -15,9 +15,17 @@ export function getDepartmentHasUser(data) {
   })
 }
 
-export function save(data) {
+export function add(data) {
   return request({
-    url: '/api/department/save',
+    url: '/api/department/add',
+    method: 'post',
+    data: {data},
+  })
+}
+
+export function edit(data) {
+  return request({
+    url: '/api/department/edit',
     method: 'post',
     data: {data},
   })

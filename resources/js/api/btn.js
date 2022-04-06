@@ -1,10 +1,12 @@
 export const BTN_DEPT_ADD = 'DepartmentManageAdd';
 export const BTN_DEPT_EDIT = 'DepartmentManageEdit';
 export const BTN_DEPT_DEL = 'DepartmentManageDel';
+export const BTN_DEPT_USER = 'DepartmentManageUser';
 export const BTN_MAP_DEPT = {
   [BTN_DEPT_ADD]: '新增',
   [BTN_DEPT_EDIT]: '编辑',
   [BTN_DEPT_DEL]: '删除',
+  [BTN_DEPT_USER]: '查看用户',
 };
 
 export const BTN_USER_ADD = 'UserManageAdd';
@@ -43,6 +45,7 @@ export const BTN_MAP_ROLE = {
 export const BTN_DICT_ADD = 'DictManageAdd';
 export const BTN_DICT_EDIT = 'DictManageEdit';
 export const BTN_DICT_DEL = 'DictManageDel';
+export const BTN_DICT_DATA = 'DictManageData';
 export const BTN_DICT_DATA_ADD = 'DictManageAddData';
 export const BTN_DICT_DATA_EDIT = 'DictManageEditData';
 export const BTN_DICT_DATA_DEL = 'DictManageDelData';
@@ -50,6 +53,7 @@ export const BTN_MAP_DICT = {
   [BTN_DICT_ADD]: '新增',
   [BTN_DICT_EDIT]: '编辑',
   [BTN_DICT_DEL]: '删除',
+  [BTN_DICT_DATA]: '字典数据',
   [BTN_DICT_DATA_ADD]: '新增',
   [BTN_DICT_DATA_EDIT]: '编辑',
   [BTN_DICT_DATA_DEL]: '删除',

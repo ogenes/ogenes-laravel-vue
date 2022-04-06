@@ -9,6 +9,7 @@ return [
     'UNKNOW' => '未知错误，请联系管理员！',
     'SYSTEM' => '系统错误，请联系管理员！',
     'INVALID_ARGUMENT' => '参数异常，请检查！',
+    'INVALID_ROLES' => '没有接口权限！',
     'NO_USER_FOUND' => '用户不存在！',
     'LOGIN_REQUIRED' => '账号异常，请重新登录！',
     'PASSWORD_ERROR' => '密码错误！',

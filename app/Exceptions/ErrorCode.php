@@ -20,6 +20,7 @@ class ErrorCode
     public const UNKNOW = 1000;
     public const SYSTEM = 1001;
     public const INVALID_ARGUMENT = 1002;
+    public const INVALID_ROLES = 1003;
     public const LOGIN_REQUIRED = 1004;
     public const PASSWORD_ERROR = 1005;
     public const EMAIL_EXISTS = 1007;

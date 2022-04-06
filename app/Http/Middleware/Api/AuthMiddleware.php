@@ -16,13 +16,6 @@ use Closure;
 
 class AuthMiddleware
 {
-    
-    public const NO_AUTH_ROUTES = [
-        'file.upload',
-        'system.init',
-        'system.setLang',
-    ];
-    
     /**
      * Handle an incoming request.
      *
@@ -35,15 +28,7 @@ class AuthMiddleware
     {
         $token = $request->header('Authorization');
         if (empty($token) || !AuthService::getInstance()->checkLogin($token)) {
-            $route = $request->route();
-            if (is_object($route) && method_exists($route, 'getName')) {
-                $routerName = $route->getName();
-            } else {
-                $routerName = '';
-            }
-            if (!in_array($routerName, self::NO_AUTH_ROUTES, true)) {
-                throw new CommonException(ErrorCode::LOGIN_REQUIRED);
-            }
+            throw new CommonException(ErrorCode::LOGIN_REQUIRED);
         }
         return $next($request);
     }

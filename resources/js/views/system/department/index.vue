@@ -33,7 +33,7 @@
           <el-table-column prop="parentId" width="150" align="center" label="上级部门ID"/>
           <el-table-column prop="cnt" width="150" align="center" label="部门人数">
             <template slot-scope="scope">
-              <el-button type="text" @click="showUsers(scope.row)">{{ scope.row.cnt }}</el-button>
+              <el-button type="text" :disabled="!checkPermission([BTN_DEPT_USER])" @click="showUsers(scope.row)">{{ scope.row.cnt }}</el-button>
             </template>
           </el-table-column>
           <el-table-column fixed="right" width="200" label="操作">
@@ -106,14 +106,16 @@
 </template>
 
 <script>
-  import {getList, getDepartmentHasUser, save, remove} from '@/api/system/department';
+  import {getList, getDepartmentHasUser, add, edit, remove} from '@/api/system/department';
   import {
     BTN_MAP_DEPT,
     BTN_DEPT_ADD,
     BTN_DEPT_EDIT,
     BTN_DEPT_DEL,
+    BTN_DEPT_USER,
   } from "@/api/btn";
   import {deepClone} from "@/utils";
+  import checkPermission from "@/utils/permission";
 
   export default {
     name: "DepartmentManage",
@@ -124,6 +126,8 @@
         BTN_DEPT_ADD,
         BTN_DEPT_EDIT,
         BTN_DEPT_DEL,
+        BTN_DEPT_USER,
+        checkPermission,
 
         loading: false,
         isExpansion: true,
@@ -256,7 +260,8 @@
         this.$refs.departmentParams.validate(valid => {
           if (valid) {
             this.loading = true;
-            save(this.departmentParams).then((res) => {
+            const func = this.departmentParams.id > 0 ? edit : add;
+            func(this.departmentParams).then((res) => {
               if (res.code > 0) {
                 this.$message.error(res.msg)
               } else {
