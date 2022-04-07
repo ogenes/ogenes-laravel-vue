@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div>
     <el-card>
       <div style="float: right">
         <el-popover trigger="click" placement="bottom-start">
@@ -95,7 +95,7 @@
         border
         :default-sort="queryParams.sort"
         @sort-change="sortChange"
-        height="600px"
+        :max-height="tableHeight"
       >
         <el-table-column fixed sortable="custom" label="用户ID" prop="uid" width="100px" align="center"/>
         <el-table-column fixed sortable="custom" label="用户名" prop="avatar" width="120px" align="center">
@@ -254,7 +254,11 @@
       userForm,
       userRole,
     },
-
+    mounted() {
+      this.$nextTick(() => {
+        this.tableHeight = window.innerHeight - 165;
+      })
+    },
     data() {
       return {
         USER_STATUS_OPTION,
@@ -267,6 +271,7 @@
         checkPermission,
 
         loading: false,
+        tableHeight: 0,
         showSearch: true,
         options: {
           roleTree: []

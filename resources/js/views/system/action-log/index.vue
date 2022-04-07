@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div>
     <el-card>
       <div style="float: right">
         <el-popover trigger="click" placement="bottom-start">
@@ -70,7 +70,7 @@
         border
         :default-sort="queryParams.sort"
         @sort-change="sortChange"
-        height="700px"
+        :max-height="tableHeight"
       >
         <el-table-column type="" prop="id" sortable="custom" width="100" align="center" label="ID"/>
         <el-table-column prop="resource" sortable="custom" width="200" align="center" label="资源">
@@ -109,11 +109,18 @@
 
     components: {},
 
+    mounted() {
+      this.$nextTick(() => {
+        this.tableHeight = window.innerHeight - 165;
+      })
+    },
+
     data() {
       return {
         handleJsonFormat,
 
         loading: false,
+        tableHeight: 0,
         options: {
           users: [],
           resourceMap: [],

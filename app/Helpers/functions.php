@@ -70,7 +70,13 @@ function getParams($request): array
     return is_array($request['data']) ? $request['data'] : json_decode($request['data'], true, 512, JSON_THROW_ON_ERROR);
 }
 
-function filterTree(array &$treeData, array $ids):void {
+function transPass(string $password): string
+{
+    return md5(env('SALT', '') . $password);
+}
+
+function filterTree(array &$treeData, array $ids): void
+{
     foreach ($treeData as $key => $item) {
         
         if (!in_array($item['id'], $ids, false)) {

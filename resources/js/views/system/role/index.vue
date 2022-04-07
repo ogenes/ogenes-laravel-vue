@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div>
     <el-card>
       <div style="float: right">
         <el-popover trigger="click" placement="bottom-start">
@@ -83,7 +83,7 @@
         border
         :default-sort="queryParams.sort"
         @sort-change="sortChange"
-        height="600px"
+        :max-height="tableHeight"
       >
         <el-table-column type="" prop="id" sortable="custom" width="100" align="center" label="角色ID"/>
         <el-table-column prop="roleName" sortable="custom" width="150" align="left" label="角色名"/>
@@ -237,7 +237,11 @@
       roleForm,
       menuForm
     },
-
+    mounted() {
+      this.$nextTick(() => {
+        this.tableHeight = window.innerHeight - 165;
+      })
+    },
     data() {
       return {
         ROLE_STATUS_OPTION,
@@ -249,6 +253,7 @@
         checkPermission,
 
         loading: false,
+        tableHeight: 0,
         showSearch: true,
         isExpansion: true,
         options: {

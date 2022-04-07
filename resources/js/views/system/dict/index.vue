@@ -1,7 +1,6 @@
 <template>
-  <div class="app-container">
+  <div>
     <el-card>
-
       <div style="float: right">
         <el-popover trigger="click" placement="bottom-start">
           <el-form :inline="true" label-width="100px" label-position="right">
@@ -71,7 +70,7 @@
         :default-sort="queryParams.sort"
         @sort-change="sortChange"
         border
-        height="600px"
+        :max-height="tableHeight"
       >
         <el-table-column type="" prop="id" sortable="custom" width="100" align="center" label="字典ID"/>
         <el-table-column prop="dictName" sortable="custom" width="300" align="center" label="字典名称">
@@ -151,6 +150,11 @@
       dictData
     },
 
+    mounted() {
+      this.$nextTick(() => {
+        this.tableHeight = window.innerHeight - 165;
+      })
+    },
     data() {
       return {
         BTN_MAP_DICT,
@@ -160,6 +164,7 @@
         deepClone,
 
         loading: false,
+        tableHeight: 0,
 
         queryParams: {
           dictName: '',

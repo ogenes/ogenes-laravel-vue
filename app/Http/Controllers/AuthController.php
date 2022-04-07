@@ -86,7 +86,7 @@ class AuthController extends Controller
     
     public function updatePass(Request $request) {
         $params = getParams($request);
-        $password = $params['password'] ?? '';
+        $password = $params['newPassword'] ?? '';
         $oldPassword = $params['oldPassword'] ?? '';
         $ret = AuthService::getInstance()->updatePass($password, $oldPassword);
         return response()->json([

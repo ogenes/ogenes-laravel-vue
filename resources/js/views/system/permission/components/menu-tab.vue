@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div>
     <!--表单-->
     <el-card>
       <el-input
@@ -16,6 +16,7 @@
         :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
         default-expand-all
         :row-class-name="menuRowClassName"
+        :max-height="tableHeight"
       >
         <el-table-column type="" fixed prop="id" width="100" align="center" label="菜单ID"/>
         <el-table-column fixed prop="title" width="200" align="left" label="菜单">
@@ -208,7 +209,11 @@
         default: {}
       },
     },
-
+    mounted() {
+      this.$nextTick(() => {
+        this.tableHeight = window.innerHeight -250;
+      })
+    },
     data() {
       return {
         BTN_MAP,
@@ -219,6 +224,7 @@
         svgIcons,
 
         loading: false,
+        tableHeight: 0,
         isExpansion: true,
 
         filterText: '',

@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use function App\Helpers\filterTree;
 use function App\Helpers\getRealIp;
 use function App\Helpers\getUniqId;
+use function App\Helpers\transPass;
 
 class AuthService extends BaseService
 {
@@ -40,7 +41,7 @@ class AuthService extends BaseService
         }
         
         //2. 密码跟比对
-        $plain = md5(env('SALT', '') . $password);
+        $plain = transPass($password);
         if ($plain !== $exist->password) {
             throw new CommonException(ErrorCode::PASSWORD_ERROR);
         }
@@ -190,6 +191,29 @@ class AuthService extends BaseService
     }
     public function updatePass(string $password, string $oldPassword): bool
     {
+        $exist = User::whereUid($this->uid)->first();
+        if ($exist->password !== transPass($oldPassword)) {
+            throw new CommonException(ErrorCode::PASSWORD_ERROR);
+        }
+    
+        $newPlain = transPass($password);
+        if ($newPlain === $exist->password) {
+            return true;
+        }
+        $data['password'] = $newPlain;
+        $data['updated_at'] = date('Y-m-d H:i:s');
+        foreach ($data as $key => $val) {
+            $exist->setAttribute($key, $val);
+        }
+        $exist->save();
+        $data['password'] = '***……';
+        ActionLogService::getInstance()->insert(
+            ActionLogService::RESOURCE_USER,
+            $this->uid,
+            $this->uid,
+            '用户修改密码',
+            $data
+        );
         return true;
     }
 }

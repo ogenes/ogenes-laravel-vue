@@ -85,6 +85,14 @@ export function saveUserHasRole(data) {
   })
 }
 
+export function updatePass(data) {
+  return request({
+    url: '/api/user/updatePass',
+    method: 'post',
+    data: {data},
+  })
+}
+
 export const USER_STATUS_OPTION = [
   {
     label: '启用',
