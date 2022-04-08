@@ -163,13 +163,14 @@ class AuthService extends BaseService
         return $userInfo;
     }
     
-    public function getRoleTree(): array
+    public function getDepartmentMap(): array
     {
-        $roleTree = RoleService::getInstance()->getRoleTree();
-        $roles = RoleService::getInstance()->getUserHasRoles($this->uid);
-        $roleIds = array_column($roles, 'roleId');
-        filterTree($roleTree, $roleIds);
-        return $roleTree;
+        return DepartmentService::getInstance()->getUserHasDepartment($this->uid);
+    }
+    
+    public function getRoleMap(): array
+    {
+        return RoleService::getInstance()->getUserHasRoles($this->uid);
     }
     
     public function getMenuTree(): array
@@ -181,21 +182,37 @@ class AuthService extends BaseService
         return $menuTree;
     }
     
-    public function updateBasicInfo(string $username, string $mobile, string $email): bool 
+    public function actionList(int $page = 1, int $pageSize = 20): array
+    {
+        return ActionLogService::getInstance()->getList(
+            [],
+            [$this->uid],
+            '',
+            '',
+            [],
+            [],
+            $page,
+            $pageSize
+        );
+    }
+    
+    public function updateBasicInfo(string $username, string $mobile, string $email): bool
     {
         return true;
     }
+    
     public function updateAvatar(string $avatar): bool
     {
         return true;
     }
+    
     public function updatePass(string $password, string $oldPassword): bool
     {
         $exist = User::whereUid($this->uid)->first();
         if ($exist->password !== transPass($oldPassword)) {
             throw new CommonException(ErrorCode::PASSWORD_ERROR);
         }
-    
+        
         $newPlain = transPass($password);
         if ($newPlain === $exist->password) {
             return true;

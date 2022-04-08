@@ -185,4 +185,16 @@ class DepartmentService extends BaseService
         }
         return $parents;
     }
+    
+    public function getUserHasDepartment(int $uid):array 
+    {
+        $depts = UserHasDepartment::whereUid($uid)->select(['dept_id'])->get()->toArray();
+        if (empty($depts)) {
+            return [];
+        }
+        $departmentMap = $this->getDepartmentMap();
+        return array_map(static function ($item) use($departmentMap) {
+            return $departmentMap[$item['dept_id']] ?? [];
+        }, $depts);
+    }
 }

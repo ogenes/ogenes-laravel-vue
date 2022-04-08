@@ -91,6 +91,7 @@ class ActionLogService extends BaseService
         foreach ($resp['data'] as $item) {
             $item = json_decode(json_encode($item, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
             $item['created_at'] = formatDateTime($item['created_at']);
+            $item['resourceName'] = self::RESOURCE_MAP[$item['resource']] ?? '';
             $tmp = [];
             foreach ($item as $key => $value) {
                 $tmp[Str::camel($key)] = $value;

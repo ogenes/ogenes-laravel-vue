@@ -15,6 +15,21 @@ export function getInfo() {
   })
 }
 
+export function getActionList(data) {
+  return request({
+    url: '/api/user/getActionList',
+    method: 'get',
+    params: {data}
+  })
+}
+
+export function getHasInfo() {
+  return request({
+    url: '/api/user/hasInfo',
+    method: 'get',
+  })
+}
+
 export function logout() {
   return request({
     url: '/api/user/logout',

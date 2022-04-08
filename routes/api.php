@@ -33,8 +33,8 @@ Route::middleware(['language'])->group(function () {
         Route::prefix('user')->group(function () {
             Route::any('logout', [AuthController::class, 'logout']);
             Route::any('info', [AuthController::class, 'info']);
-            Route::any('roleTree', [AuthController::class, 'roleTree']);
-            Route::any('menuTree', [AuthController::class, 'menuTree']);
+            Route::any('hasInfo', [AuthController::class, 'hasInfo']);
+            Route::any('getActionList', [AuthController::class, 'getActionList']);
             Route::any('updateBasicInfo', [AuthController::class, 'updateBasicInfo']);
             Route::any('updateAvatar', [AuthController::class, 'updateAvatar']);
             Route::any('updatePass', [AuthController::class, 'updatePass']);
@@ -44,6 +44,10 @@ Route::middleware(['language'])->group(function () {
         });
         Route::prefix('menu')->group(function () {
             Route::any('menuMap', [MenuController::class, 'menuMap']);
+        });
+    
+        Route::prefix('actionLog')->group(function () {
+            Route::any('options', [ActionLogController::class, 'options'])->name('ActionLogManage');
         });
         
         Route::middleware(['api.permission'])->group(function () {
@@ -104,7 +108,6 @@ Route::middleware(['language'])->group(function () {
                 Route::any('removeData', [DictController::class, 'removeData'])->name('DictManageDelData');
             });
             Route::prefix('actionLog')->group(function () {
-                Route::any('options', [ActionLogController::class, 'options'])->name('ActionLogManage');
                 Route::any('list', [ActionLogController::class, 'list'])->name('ActionLogManage');
             });
         });

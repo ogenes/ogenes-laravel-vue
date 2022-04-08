@@ -105,11 +105,21 @@
                   :indent="32"
                   empty-text="无任何权限"
                   node-key="id"
-                  :default-checked-keys="item.menuIds"
                   :props="{ expandTrigger: 'hover', label: 'title', value: 'id' }"
                 >
                   <span slot-scope="{ node, data }" class="custom-tree-node">
-                    <span>{{ node.label }} <span style="font-size: 5px;color: gray;">({{ data.menuName }})</span></span>
+                    <el-button v-if="data.type === 1" type="text" size="mini" style="color: #909399;">
+                      {{ node.label }}
+                      <span style="font-size: 5px;color: gray;">({{ data.menuName }})</span>
+                    </el-button>
+                    <el-button v-else-if="data.type === 2" type="text" size="mini" style="color: #67C23A;">
+                      {{ node.label }}
+                      <span style="font-size: 5px;color: gray;">({{ data.menuName }})</span>
+                    </el-button>
+                    <el-button v-else type="text" size="mini" style="color: #E6A23C;">
+                      {{ node.label }}
+                      <span style="font-size: 5px;color: gray;">({{ data.menuName }})</span>
+                    </el-button>
                   </span>
                 </el-tree>
               </div>

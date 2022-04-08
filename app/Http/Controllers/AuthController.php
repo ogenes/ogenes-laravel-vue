@@ -42,8 +42,12 @@ class AuthController extends Controller
         ]);
     }
     
-    public function roleTree(Request $request) {
-        $ret = AuthService::getInstance()->getRoleTree();
+    public function getActionList(Request $request)
+    {
+        $params = getParams($request);
+        $page = $params['page'] ?? 1;
+        $pageSize = $params['pageSize'] ?? 20;
+        $ret = AuthService::getInstance()->actionList($page, $pageSize);
         return response()->json([
             'code' => 0,
             'msg' => 'success',
@@ -51,8 +55,11 @@ class AuthController extends Controller
         ]);
     }
     
-    public function menuTree(Request $request) {
-        $ret = AuthService::getInstance()->getMenuTree();
+    public function hasInfo(Request $request)
+    {
+        $ret['deptMap'] = AuthService::getInstance()->getDepartmentMap();
+        $ret['roleMap'] = AuthService::getInstance()->getRoleMap();
+        $ret['menuTree'] = AuthService::getInstance()->getMenuTree();
         return response()->json([
             'code' => 0,
             'msg' => 'success',
@@ -60,7 +67,8 @@ class AuthController extends Controller
         ]);
     }
     
-    public function updateBasicInfo(Request $request) {
+    public function updateBasicInfo(Request $request)
+    {
         $params = getParams($request);
         $username = $params['username'] ?? '';
         $mobile = $params['mobile'] ?? '';
@@ -73,7 +81,8 @@ class AuthController extends Controller
         ]);
     }
     
-    public function updateAvatar(Request $request) {
+    public function updateAvatar(Request $request)
+    {
         $params = getParams($request);
         $avatar = $params['avatar'] ?? '';
         $ret = AuthService::getInstance()->updateAvatar($avatar);
@@ -84,7 +93,8 @@ class AuthController extends Controller
         ]);
     }
     
-    public function updatePass(Request $request) {
+    public function updatePass(Request $request)
+    {
         $params = getParams($request);
         $password = $params['newPassword'] ?? '';
         $oldPassword = $params['oldPassword'] ?? '';

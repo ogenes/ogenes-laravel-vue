@@ -354,16 +354,13 @@ class RoleService extends BaseService
     }
     
     public function getUserHasRoles(int $uid):array {
-        $roleTb = (new Role())->getTable();
-        $userHasRoleTb = (new UserHasRole())->getTable();
-        $data = DB::table("{$userHasRoleTb} as uhr")
-            ->join("{$roleTb} as r", 'r.id', '=', 'uhr.role_id')
-            ->where('uhr.uid', '=', $uid)
-            ->get([
-                DB::raw('DISTINCT r.id as roleId'),
-                'r.role_name as roleName',
-            ])
-            ->toArray();
-        return $data ? json_decode(json_encode($data, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR) : [];
+        $roles = UserHasRole::whereUid($uid)->select(['role_id'])->get()->toArray();
+        if (empty($roles)) {
+            return [];
+        }
+        $roleMap = $this->getRoleMap();
+        return array_map(static function ($item) use($roleMap) {
+            return $roleMap[$item['role_id']] ?? [];
+        }, $roles);
     }
 }
