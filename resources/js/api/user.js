@@ -108,11 +108,43 @@ export function updatePass(data) {
   })
 }
 
+export function updateUsername(data) {
+  return request({
+    url: '/api/user/updateUsername',
+    method: 'post',
+    data: {data},
+  })
+}
+
+export function updateAccount(data) {
+  return request({
+    url: '/api/user/updateAccount',
+    method: 'post',
+    data: {data},
+  })
+}
+
+export function updateMobile(data) {
+  return request({
+    url: '/api/user/updateMobile',
+    method: 'post',
+    data: {data},
+  })
+}
+
+export function updateEmail(data) {
+  return request({
+    url: '/api/user/updateEmail',
+    method: 'post',
+    data: {data},
+  })
+}
+
 export function updateAvatar(params) {
   return request({
     url: '/api/user/updateAvatar',
     method: 'post',
-    headers: { 'Content-Type': 'Multipart/form-data' },
+    headers: {'Content-Type': 'Multipart/form-data'},
     data: params,
   })
 }

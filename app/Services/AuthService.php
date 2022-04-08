@@ -10,7 +10,6 @@ namespace App\Services;
 
 use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
-use App\Models\FileUpload;
 use App\Models\User;
 use App\Services\Permission\MenuService;
 use Illuminate\Http\UploadedFile;
@@ -198,12 +197,46 @@ class AuthService extends BaseService
         );
     }
     
-    public function updateBasicInfo(string $username, string $mobile, string $email): bool
+    protected function updateBasicInfo(array $data, string $type): bool
     {
-        return true;
+        return UserService::getInstance()->updateBasicInfo($this->uid, $data, $type);
     }
     
-    public function updateAvatar(UploadedFile $file): array 
+    public function updateAccount(string $account): bool
+    {
+        $exists = User::whereAccount($account)->where('uid', '!=', $this->uid)->first();
+        if ($exists) {
+            throw new CommonException(ErrorCode::RECORD_EXISTS);
+        }
+        $data['account'] = $account;
+        return $this->updateBasicInfo($data, '用户修改账号');
+    }
+    
+    public function updateUsername(string $username): bool
+    {
+        $data['username'] = $username;
+        return $this->updateBasicInfo($data, '用户修改用户名');
+    }
+    
+    public function updateMobile(string $mobile): bool
+    {
+        //短信验证
+        $exists = User::whereMobile($mobile)->where('uid', '!=', $this->uid)->first();
+        if ($exists) {
+            throw new CommonException(ErrorCode::RECORD_EXISTS);
+        }
+        $data['mobile'] = $mobile;
+        return $this->updateBasicInfo($data, '用户修改手机号');
+    }
+    
+    public function updateEmail(string $email): bool
+    {
+        //邮件验证
+        $data['email'] = $email;
+        return $this->updateBasicInfo($data, '用户修改邮箱');
+    }
+    
+    public function updateAvatar(UploadedFile $file): array
     {
         $exist = User::whereUid($this->uid)->first();
         $source = 'user-avatar';
@@ -211,19 +244,7 @@ class AuthService extends BaseService
         $avatar = $resp['path'] ?? '';
         if ($avatar && $exist->avatar !== $avatar) {
             $data['avatar'] = $avatar;
-            $data['updated_at'] = date('Y-m-d H:i:s');
-            foreach ($data as $key => $val) {
-                $exist->setAttribute($key, $val);
-                UserService::getInstance()->cacheUserField($this->uid, $key, $val);
-            }
-            $exist->save();
-            ActionLogService::getInstance()->insert(
-                ActionLogService::RESOURCE_USER,
-                $this->uid,
-                $this->uid,
-                '用户修改头像',
-                $data
-            );
+            $this->updateBasicInfo($data, '用户修改头像');
         }
         return $resp;
     }

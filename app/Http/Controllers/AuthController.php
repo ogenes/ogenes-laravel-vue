@@ -67,13 +67,47 @@ class AuthController extends Controller
         ]);
     }
     
-    public function updateBasicInfo(Request $request)
+    public function updateAccount(Request $request)
+    {
+        $params = getParams($request);
+        $account = $params['account'] ?? '';
+        $ret = AuthService::getInstance()->updateAccount($account);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
+    public function updateUsername(Request $request)
     {
         $params = getParams($request);
         $username = $params['username'] ?? '';
+        $ret = AuthService::getInstance()->updateUsername($username);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
+    public function updateMobile(Request $request)
+    {
+        $params = getParams($request);
         $mobile = $params['mobile'] ?? '';
+        $ret = AuthService::getInstance()->updateMobile($mobile);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
+    public function updateEmail(Request $request)
+    {
+        $params = getParams($request);
         $email = $params['email'] ?? '';
-        $ret = AuthService::getInstance()->updateBasicInfo($username, $mobile, $email);
+        $ret = AuthService::getInstance()->updateEmail($email);
         return response()->json([
             'code' => 0,
             'msg' => 'success',

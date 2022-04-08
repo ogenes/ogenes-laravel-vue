@@ -203,19 +203,7 @@ class UserService extends BaseService
                 $mobile !== $exist->mobile && $data['mobile'] = $mobile;
                 $email !== $exist->email && $data['email'] = $email;
                 if ($data) {
-                    $data['updated_at'] = date('Y-m-d H:i:s');
-                    foreach ($data as $key => $val) {
-                        $exist->setAttribute($key, $val);
-                        $this->cacheUserField($uid, $key, $val);
-                    }
-                    $exist->save();
-                    ActionLogService::getInstance()->insert(
-                        ActionLogService::RESOURCE_USER,
-                        $uid,
-                        $this->uid,
-                        '编辑',
-                        $data
-                    );
+                    $this->updateBasicInfo($uid, $data, '编辑');
                 }
             } else {
                 $data = [
@@ -415,5 +403,24 @@ class UserService extends BaseService
             ->where('uhd.dept_id', '=', $deptId)
             ->get()
             ->toArray();
+    }
+    
+    public function updateBasicInfo(int $uid, array $data, string $type): bool
+    {
+        $user = User::whereUid($uid)->first();
+        $data['updated_at'] = date('Y-m-d H:i:s');
+        foreach ($data as $key => $val) {
+            $user->setAttribute($key, $val);
+            $this->cacheUserField($uid, $key, $val);
+        }
+        $user->save();
+        ActionLogService::getInstance()->insert(
+            ActionLogService::RESOURCE_USER,
+            $uid,
+            $this->uid,
+            $type,
+            $data
+        );
+        return true;
     }
 }
