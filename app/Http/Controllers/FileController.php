@@ -17,6 +17,7 @@ class FileController extends Controller
     public function upload(Request $request)
     {
         $file = $request->file('file');
+        print_r($file);exit;
         $source = $request->input('source');
         $ret = FileService::getInstance()->upload($file, $source);
         return response()->json([

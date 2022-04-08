@@ -1,7 +1,10 @@
 <template>
   <div class="app-container" :style="`height: ` + tableHeight + `px;`">
     <el-card class="user-card">
-      头像
+      <div slot="header">
+        <span style="font-weight: bold;">头像</span>
+      </div>
+      <user-avatar/>
     </el-card>
     <el-card class="user-card">
       <div slot="header">
@@ -114,6 +117,7 @@
 
 <script>
   import {getHasInfo} from "@/api/user";
+  import userAvatar from './user-avatar';
 
   export default {
     name: "UserProfileInfo",
@@ -137,6 +141,9 @@
       avatar: {
         type: String
       },
+    },
+    components: {
+      userAvatar
     },
 
     data() {

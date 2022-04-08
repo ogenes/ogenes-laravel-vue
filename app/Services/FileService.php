@@ -50,9 +50,8 @@ class FileService extends BaseService
             return $exists->toArray();
         }
         
-        $ext = $file->getClientOriginalExtension();
+        $ext = $file->getClientOriginalExtension() ? : 'png';
         $ext = strtolower($ext);
-        
         if (!in_array($ext, self::ALLOW_TYPE, true)) {
             throw new CommonException(ErrorCode::INVALID_FILE_TYPE);
         }

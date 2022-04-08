@@ -10,8 +10,10 @@ namespace App\Services;
 
 use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
+use App\Models\FileUpload;
 use App\Models\User;
 use App\Services\Permission\MenuService;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use function App\Helpers\filterTree;
@@ -201,9 +203,29 @@ class AuthService extends BaseService
         return true;
     }
     
-    public function updateAvatar(string $avatar): bool
+    public function updateAvatar(UploadedFile $file): array 
     {
-        return true;
+        $exist = User::whereUid($this->uid)->first();
+        $source = 'user-avatar';
+        $resp = FileService::getInstance()->upload($file, $source);
+        $avatar = $resp['path'] ?? '';
+        if ($avatar && $exist->avatar !== $avatar) {
+            $data['avatar'] = $avatar;
+            $data['updated_at'] = date('Y-m-d H:i:s');
+            foreach ($data as $key => $val) {
+                $exist->setAttribute($key, $val);
+                UserService::getInstance()->cacheUserField($this->uid, $key, $val);
+            }
+            $exist->save();
+            ActionLogService::getInstance()->insert(
+                ActionLogService::RESOURCE_USER,
+                $this->uid,
+                $this->uid,
+                '用户修改头像',
+                $data
+            );
+        }
+        return $resp;
     }
     
     public function updatePass(string $password, string $oldPassword): bool

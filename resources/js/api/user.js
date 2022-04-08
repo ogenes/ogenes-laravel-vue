@@ -108,6 +108,15 @@ export function updatePass(data) {
   })
 }
 
+export function updateAvatar(params) {
+  return request({
+    url: '/api/user/updateAvatar',
+    method: 'post',
+    headers: { 'Content-Type': 'Multipart/form-data' },
+    data: params,
+  })
+}
+
 export const USER_STATUS_OPTION = [
   {
     label: '启用',

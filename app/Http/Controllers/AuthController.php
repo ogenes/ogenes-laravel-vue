@@ -83,9 +83,8 @@ class AuthController extends Controller
     
     public function updateAvatar(Request $request)
     {
-        $params = getParams($request);
-        $avatar = $params['avatar'] ?? '';
-        $ret = AuthService::getInstance()->updateAvatar($avatar);
+        $file = $request->file('file');
+        $ret = AuthService::getInstance()->updateAvatar($file);
         return response()->json([
             'code' => 0,
             'msg' => 'success',

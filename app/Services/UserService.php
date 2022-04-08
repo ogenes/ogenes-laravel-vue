@@ -72,7 +72,7 @@ class UserService extends BaseService
         return json_decode($cache, true, 512, JSON_THROW_ON_ERROR);
     }
     
-    protected function cacheUserField(int $uid, string $field, string $value): void
+    public function cacheUserField(int $uid, string $field, string $value): void
     {
         $userInfo = $this->getInfoFromCache($uid);
         !$userInfo && $userInfo['id'] = $uid;
