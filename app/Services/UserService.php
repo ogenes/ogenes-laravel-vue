@@ -180,6 +180,7 @@ class UserService extends BaseService
     public function save(
         int $uid,
         string $avatar,
+        string $account,
         string $username,
         string $mobile,
         string $email,
@@ -198,7 +199,7 @@ class UserService extends BaseService
                 }
                 $data = [];
                 $avatar !== $exist->avatar && $data['avatar'] = $avatar;
-                $mobile !== $exist->account && $data['account'] = $mobile;
+                $account !== $exist->account && $data['account'] = $account;
                 $username !== $exist->username && $data['username'] = $username;
                 $mobile !== $exist->mobile && $data['mobile'] = $mobile;
                 $email !== $exist->email && $data['email'] = $email;
@@ -209,12 +210,17 @@ class UserService extends BaseService
                 $data = [
                     'avatar' => $avatar,
                     'username' => $username,
-                    'account' => $mobile,
+                    'account' => $account,
                     'mobile' => $mobile,
                     'email' => $email,
                     'created_at' => date('Y-m-d H:i:s'),
                 ];
                 $uid = User::insertGetId($data);
+                //新增访客角色
+                UserHasRole::insertGetId([
+                    'uid' => $uid,
+                    'role_id' => 14,
+                ]);
                 ActionLogService::getInstance()->insert(
                     ActionLogService::RESOURCE_USER,
                     $uid,

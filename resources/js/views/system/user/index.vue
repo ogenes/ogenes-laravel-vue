@@ -311,6 +311,7 @@
         dialogTitle: '添加用户',
         userParams: {
           id: 0,
+          account: '',
           username: '',
           mobile: '',
           email: '',
@@ -413,6 +414,7 @@
       showEdit(row) {
         this.userParams = {
           id: row.uid,
+          account: row.account,
           username: row.username,
           mobile: row.mobile,
           email: row.email,

@@ -35,7 +35,7 @@ class PermissionMiddleware
             $menus = $service->getUserHasMenus($id, 1);
             
             $menuCodes = array_column($menus, 'menuName');
-            if (empty(array_intersect($codes, $menuCodes))) {
+            if (empty(array_intersect($codes, $menuCodes)) && !in_array('admin', $menuCodes, true)) {
                 throw new CommonException(ErrorCode::INVALID_ROLES);
             }
         }

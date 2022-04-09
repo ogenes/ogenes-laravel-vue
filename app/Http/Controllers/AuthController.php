@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\CommonException;
+use App\Exceptions\ErrorCode;
 use App\Http\Requests\User\LoginRequest;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use function App\Helpers\getParams;
 
 class AuthController extends Controller
@@ -70,7 +73,15 @@ class AuthController extends Controller
     public function updateAccount(Request $request)
     {
         $params = getParams($request);
-        $account = $params['account'] ?? '';
+        $validator = Validator::make($params, [
+            'account' => 'required|min:6|max:20',
+        ]);
+        
+        if ($validator->fails()) {
+            throw new CommonException(ErrorCode::INVALID_ARGUMENT, $validator->errors()->first());
+        }
+        
+        $account = $params['account'];
         $ret = AuthService::getInstance()->updateAccount($account);
         return response()->json([
             'code' => 0,
@@ -82,7 +93,14 @@ class AuthController extends Controller
     public function updateUsername(Request $request)
     {
         $params = getParams($request);
-        $username = $params['username'] ?? '';
+        $validator = Validator::make($params, [
+            'name' => 'required',
+        ]);
+        
+        if ($validator->fails()) {
+            throw new CommonException(ErrorCode::INVALID_ARGUMENT, $validator->errors()->first());
+        }
+        $username = $params['name'] ?? '';
         $ret = AuthService::getInstance()->updateUsername($username);
         return response()->json([
             'code' => 0,
@@ -94,6 +112,13 @@ class AuthController extends Controller
     public function updateMobile(Request $request)
     {
         $params = getParams($request);
+        $validator = Validator::make($params, [
+            'mobile' => 'required|size:11',
+        ]);
+        
+        if ($validator->fails()) {
+            throw new CommonException(ErrorCode::INVALID_ARGUMENT, $validator->errors()->first());
+        }
         $mobile = $params['mobile'] ?? '';
         $ret = AuthService::getInstance()->updateMobile($mobile);
         return response()->json([
@@ -106,6 +131,13 @@ class AuthController extends Controller
     public function updateEmail(Request $request)
     {
         $params = getParams($request);
+        $validator = Validator::make($params, [
+            'email' => 'required|email',
+        ]);
+        
+        if ($validator->fails()) {
+            throw new CommonException(ErrorCode::INVALID_ARGUMENT, $validator->errors()->first());
+        }
         $email = $params['email'] ?? '';
         $ret = AuthService::getInstance()->updateEmail($email);
         return response()->json([

@@ -70,7 +70,8 @@ const actions = {
 
         // roles must be a non-empty array
         if (!roles || roles.length <= 0) {
-          reject('getInfo: roles must be a non-null array!')
+          router.push('/401');
+          // reject('没有任何菜单权限，请联系')
         }
 
         commit('SET_ROLES', roles);

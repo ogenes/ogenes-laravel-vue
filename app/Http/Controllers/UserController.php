@@ -45,6 +45,7 @@ class UserController extends Controller
         $params = getParams($request);
         $uid = $params['id'] ?? 0;
         $avatar = $params['avatar'] ?? '';
+        $account = $params['account'] ?? '';
         $username = $params['username'] ?? '';
         $mobile = $params['mobile'] ?? '';
         $email = $params['email'] ?? '';
@@ -53,6 +54,7 @@ class UserController extends Controller
         $ret = UserService::getInstance()->save(
             $uid,
             $avatar,
+            $account,
             $username,
             $mobile,
             $email,

@@ -60,6 +60,8 @@
                 this.$message.error(res.msg)
               } else {
                 this.$message.success('操作成功');
+                this.logout();
+                //
               }
             })
           } else {
@@ -68,6 +70,10 @@
           }
         });
       },
+      async logout() {
+        await this.$store.dispatch('user/logout');
+        await this.$router.push(`/login?redirect=${this.$route.fullPath}`);
+      }
     }
   };
 </script>

@@ -27,8 +27,11 @@
           <el-avatar v-else :size="200"> 点击上传</el-avatar>
         </el-upload>
       </el-form-item>
+      <el-form-item label="账号：" prop="account">
+        <el-input v-model="userParams.account" :disabled="userParams.id > 0" type="text" style="width: 100%"/>
+      </el-form-item>
       <el-form-item label="用户名：" prop="username">
-        <el-input v-model="userParams.username" type="text" style="width: 100%"/>
+        <el-input v-model="userParams.username" :disabled="userParams.id > 0" type="text" style="width: 100%"/>
       </el-form-item>
       <el-form-item label="手机号：" prop="mobile">
         <el-input v-model="userParams.mobile" type="text" style="width: 100%"/>
@@ -74,6 +77,7 @@
         type: Object,
         default: {
           id: 0,
+          account: '',
           username: '',
           mobile: '',
           email: '',
@@ -96,7 +100,13 @@
         loading: false,
 
         userRules: {
-          username: [{required: true, message: '请输入用户名', trigger: 'change'}],
+          account: [
+            {required: true, message: "请输入账号", trigger: "change"},
+            {min: 6, max: 20, message: "长度在 6 到 20 个字符", trigger: "change"}
+          ],
+          username: [
+            {required: true, message: "请输入用户名", trigger: "change"},
+          ],
           mobile: [{required: true, message: '请输入手机号', trigger: 'change'}],
           deptIds: [{required: true, message: '请选择部门', trigger: 'change'}]
         },

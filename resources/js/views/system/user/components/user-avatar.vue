@@ -137,7 +137,7 @@
             } else {
               this.open = false;
               this.options.img = ret.data.path;
-              store.commit('SET_AVATAR', this.options.img);
+              store.commit('user/SET_AVATAR', this.options.img);
               this.$message.success("修改成功");
               this.visible = false;
             }
@@ -153,7 +153,6 @@
       closeDialog() {
         this.options.img = store.getters.avatar;
         this.visible = false;
-        location.reload();
       }
     }
   };

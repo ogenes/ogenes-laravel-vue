@@ -29,7 +29,9 @@ class SaveRequest extends FormRequest
     public function rules()
     {
         return [
-            'mobile' => 'required',
+            'account' => 'required|min:6|max:20',
+            'username' => 'required',
+            'mobile' => 'required|size:11',
         ];
     }
     
