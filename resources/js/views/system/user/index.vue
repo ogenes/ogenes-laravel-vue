@@ -199,6 +199,7 @@
       :wrapper-closable="false"
       style="padding-left: 20px"
       custom-class="overflow-auto"
+      :before-close="closeDialog"
     >
       <user-form
         :departments="departments"
