@@ -6,7 +6,6 @@
       v-el-table-infinite-scroll="nextPage"
       :height="tableHeight"
       highlight-current-row
-      style="background-color: red;"
     >
       <el-table-column type="" prop="id" label=" ">
         <template slot-scope="scope">

@@ -74,7 +74,7 @@ class AuthController extends Controller
     {
         $params = getParams($request);
         $validator = Validator::make($params, [
-            'account' => 'required|min:6|max:20',
+            'account' => 'required|min:3|max:32',
         ]);
         
         if ($validator->fails()) {

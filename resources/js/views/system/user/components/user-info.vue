@@ -33,7 +33,8 @@
             </div>
             <div v-else>
               <div class="user-item-value">
-                <el-input type="input" readonly style="width: 300px;" v-model="userInfo.account"></el-input>
+                <span>{{userInfo.account}}</span>
+<!--                <el-input type="input" readonly style="width: 300px;" v-model="userInfo.account"></el-input>-->
               </div>
               <el-button class="user-item-btn" type="text" @click="showEdit.account=true">修改</el-button>
             </div>
@@ -60,7 +61,7 @@
             </div>
             <div v-else>
               <div class="user-item-value">
-                <el-input type="input" readonly style="width: 300px;" v-model="userInfo.name"></el-input>
+                <span>{{userInfo.name}}</span>
               </div>
               <el-button class="user-item-btn" type="text" @click="showEdit.name=true">修改</el-button>
             </div>
@@ -87,7 +88,7 @@
             </div>
             <div v-else>
               <div class="user-item-value">
-                <el-input type="input" readonly style="width: 300px;" v-model="userInfo.mobile"></el-input>
+                <span>{{userInfo.mobile}}</span>
               </div>
               <el-button class="user-item-btn" type="text" @click="showEdit.mobile=true">修改</el-button>
             </div>
@@ -114,7 +115,7 @@
             </div>
             <div v-else>
               <div class="user-item-value">
-                <el-input type="input" readonly style="width: 300px;" v-model="userInfo.email"></el-input>
+                <span> {{ userInfo.email }} </span>
               </div>
               <el-button class="user-item-btn" type="text" @click="showEdit.email=true">修改</el-button>
             </div>
@@ -221,7 +222,7 @@
         rules: {
           account: [
             {required: true, message: "账户不能为空", trigger: "change"},
-            {min: 6, max: 20, message: "长度在 6 到 20 个字符", trigger: "change"}
+            {min: 3, max: 32, message: "长度在 3 到 32 个字符", trigger: "change"}
           ],
           name: [
             {required: true, message: "用户名不能为空", trigger: "change"},

@@ -1,31 +1,66 @@
 <template>
-  <div class="dashboard-container">
-    <component :is="currentRole" />
+  <div>
+    <el-col :span="18">
+      <el-card class="home-card">
+        <el-card class="home-item-card">
+          <Hello/>
+        </el-card>
+        <el-card class="home-item-card">
+          <UserStatistics/>
+        </el-card>
+      </el-card>
+    </el-col>
+    <el-col :span="6">
+      <el-card class="home-card">
+        <Calendar/>
+      </el-card>
+    </el-col>
+    <el-col :span="12">
+      <el-card class="home-card">
+        <Feedback/>
+      </el-card>
+    </el-col>
+    <el-col :span="12">
+      <el-card class="home-card">
+        <Task/>
+      </el-card>
+    </el-col>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import adminDashboard from './admin'
-import editorDashboard from './editor'
 
-export default {
-  name: 'Dashboard',
-  components: { adminDashboard, editorDashboard },
-  data() {
-    return {
-      currentRole: 'adminDashboard'
-    }
-  },
-  computed: {
-    ...mapGetters([
-      'roles'
-    ])
-  },
-  created() {
-    if (!this.roles.includes('admin')) {
-      this.currentRole = 'editorDashboard'
+  import Hello from './components/hello';
+  import Calendar from './components/calendar';
+  import Task from './components/task';
+  import Feedback from './components/feedback';
+  import UserStatistics from './components/user-statistics';
+
+  export default {
+    name: 'Dashboard',
+    components: {
+      Hello,
+      Calendar,
+      Task,
+      Feedback,
+      UserStatistics,
+    },
+    data() {
+      return {}
+    },
+    computed: {},
+    created() {
     }
   }
-}
 </script>
+
+<style scoped lang="scss">
+  .home-card {
+    margin: 10px;
+    height: 800px;
+    .home-item-card {
+      height: 360px;
+      margin: 10px;
+    }
+  }
+</style>
