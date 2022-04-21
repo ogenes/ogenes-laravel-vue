@@ -31,8 +31,10 @@ Vue.use(ElementUI, {
 });
 
 import VueResource from 'vue-resource'
+import VCalendar from 'v-calendar';
 
 Vue.use(VueResource);
+Vue.use(VCalendar);
 
 import Editor from 'bin-ace-editor';
 import 'brace/ext/language_tools';

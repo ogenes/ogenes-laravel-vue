@@ -18,6 +18,7 @@ class UserController extends Controller
         $mobile = $params['mobile'] ?? '';
         $account = $params['account'] ?? '';
         $deptIds = $params['deptIds'] ?? [];
+        $roleIds = $params['roleIds'] ?? [];
         $page = $params['page'] ?? 1;
         $pageSize = $params['pageSize'] ?? 100;
         $userStatus = $params['userStatus'] ?? '';
@@ -29,6 +30,7 @@ class UserController extends Controller
             $userStatus,
             $mobile,
             $deptIds,
+            $roleIds,
             $sort,
             $page,
             $pageSize

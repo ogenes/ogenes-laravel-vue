@@ -1,28 +1,19 @@
 <template>
   <div>
-    <el-col :span="18">
-      <el-card class="home-card">
-        <el-card class="home-item-card">
-          <Hello/>
-        </el-card>
-        <el-card class="home-item-card">
-          <UserStatistics/>
-        </el-card>
+    <el-col :span="14">
+      <el-card v-if="checkPermission(['DashboardUserGroup'])" class="home-item-card">
+        <UserGroup />
+      </el-card>
+      <el-card class="home-item-card">
+        <Hello/>
       </el-card>
     </el-col>
-    <el-col :span="6">
-      <el-card class="home-card">
+    <el-col :span="10">
+      <el-card class="home-item-card">
         <Calendar/>
       </el-card>
-    </el-col>
-    <el-col :span="12">
-      <el-card class="home-card">
-        <Feedback/>
-      </el-card>
-    </el-col>
-    <el-col :span="12">
-      <el-card class="home-card">
-        <Task/>
+      <el-card class="home-item-card">
+<!--        <Feedback/>-->
       </el-card>
     </el-col>
   </div>
@@ -34,7 +25,8 @@
   import Calendar from './components/calendar';
   import Task from './components/task';
   import Feedback from './components/feedback';
-  import UserStatistics from './components/user-statistics';
+  import UserGroup from './components/user-group';
+  import checkPermission from "@/utils/permission";
 
   export default {
     name: 'Dashboard',
@@ -43,10 +35,12 @@
       Calendar,
       Task,
       Feedback,
-      UserStatistics,
+      UserGroup,
     },
     data() {
-      return {}
+      return {
+        checkPermission
+      }
     },
     computed: {},
     created() {
@@ -55,12 +49,9 @@
 </script>
 
 <style scoped lang="scss">
-  .home-card {
+  .home-item-card {
     margin: 10px;
-    height: 800px;
-    .home-item-card {
-      height: 360px;
-      margin: 10px;
-    }
+    overflow: auto;
+    height: 100%;
   }
 </style>

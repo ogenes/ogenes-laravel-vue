@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ActionLogController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DictController;
 use App\Http\Controllers\FileController;
@@ -54,6 +55,10 @@ Route::middleware(['language'])->group(function () {
         });
         
         Route::middleware(['api.permission'])->group(function () {
+    
+            Route::prefix('dashboard')->group(function () {
+                Route::any('userGroup', [DashboardController::class, 'userGroup'])->name('DashboardUserGroup');
+            });
             
             Route::prefix('department')->group(function () {
                 Route::any('list', [DepartmentController::class, 'list'])->name('DepartmentManage');

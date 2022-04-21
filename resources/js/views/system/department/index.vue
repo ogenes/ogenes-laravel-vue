@@ -33,7 +33,9 @@
           <el-table-column prop="parentId" width="150" align="center" label="上级部门ID"/>
           <el-table-column prop="cnt" width="150" align="center" label="部门人数">
             <template slot-scope="scope">
-              <el-button type="text" :disabled="!checkPermission([BTN_DEPT_USER])" @click="showUsers(scope.row)">{{ scope.row.cnt }}</el-button>
+              <el-button type="text" :disabled="!checkPermission([BTN_DEPT_USER])" @click="showUsers(scope.row)">{{
+                scope.row.cnt }}
+              </el-button>
             </template>
           </el-table-column>
           <el-table-column fixed="right" width="200" label="操作">
@@ -78,8 +80,14 @@
       :close-on-click-modal="false"
       :before-close="closeDialog"
     >
-      <el-form ref="departmentParams" v-loading="loading" :rules="departmentRules" :model="departmentParams"
-               label-width="120px" label-position="right">
+      <el-form
+        ref="departmentParams"
+        v-loading="loading"
+        :rules="departmentRules"
+        :model="departmentParams"
+        label-width="120px"
+        label-position="top"
+      >
         <el-form-item label="上级部门：" prop="parentId">
           <el-cascader
             v-model="departmentParams.parentId"
@@ -292,6 +300,7 @@
 
       closeDialog() {
         this.showDialog = false;
+        this.dialogTitle = '添加部门';
         this.departmentParams = {};
       },
 

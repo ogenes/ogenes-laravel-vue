@@ -86,6 +86,7 @@ class UserService extends BaseService
         string $userStatus,
         string $mobile,
         array $deptIds,
+        array $roleIds,
         array $sort = [],
         int $page = 1,
         int $pageSize = 20
@@ -112,6 +113,7 @@ class UserService extends BaseService
         $account && $query->where('account', 'like', "%{$account}%");
         $mobile && $query->where('mobile', 'like', "%{$mobile}%");
         $deptIds && $query->whereIn('uhd.dept_id', $deptIds);
+        $roleIds && $query->whereIn('uhr.role_id', $roleIds);
         $userStatus !== '' && $query->where('user_status', '=', $userStatus);
         
         $prop = 'uid';

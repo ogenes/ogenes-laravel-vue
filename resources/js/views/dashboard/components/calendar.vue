@@ -1,5 +1,10 @@
 <template>
-  <el-calendar v-model="value" />
+  <v-calendar
+    show-weeknumbers
+    is-expanded
+    :attributes='attrs'
+  >
+  </v-calendar>
 </template>
 
 <script>
@@ -7,14 +12,17 @@
     name: "HomeCalendar",
     data() {
       return {
-        value: new Date()
+        attrs: [
+          {
+            key: 'today',
+            dates: new Date(),
+            highlight: {
+              color: 'blue',
+              fillMode: 'light',
+            },
+          },
+        ],
       }
-    }
+    },
   }
 </script>
-
-<style scoped>
-  .is-selected {
-    color: #1989FA;
-  }
-</style>
