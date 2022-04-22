@@ -68,13 +68,13 @@
           </el-form>
 
           <el-button slot="reference" type="text" :style="hasFilter ? 'color: #67C23A' : 'color: #909399'"
-                     icon="el-icon-search">
+                     icon="el-icon-search" id="user-filter">
             筛选
           </el-button>
         </el-popover>
 
-        <el-button v-permission="[BTN_USER_ADD]" type="text" icon="el-icon-plus" @click="showDialog=true">{{
-          BTN_MAP_USER[BTN_USER_ADD]}}
+        <el-button v-permission="[BTN_USER_ADD]" type="text" icon="el-icon-plus" @click="showDialog=true" id="user-add">
+          {{ BTN_MAP_USER[BTN_USER_ADD]}}
         </el-button>
       </div>
       <div class="page-position">
@@ -136,7 +136,7 @@
               </el-tag>
             </el-popover>
             <el-button v-permission="[BTN_USER_ROLE]" type="text" icon="el-icon-edit" size="mini"
-                       @click="showEditRole(scope.row)">{{
+                       @click="showEditRole(scope.row)" id="user-role">{{
               BTN_MAP_USER[BTN_USER_ROLE] }}
             </el-button>
           </template>
@@ -150,6 +150,7 @@
               active-color="#67C23A"
               inactive-color="#F56C6C"
               :disabled="!checkPermission([BTN_USER_STATUS])"
+              id="user-status"
               @change="switchStatus($event, scope.row)"
             >
             </el-switch>
@@ -176,12 +177,12 @@
         <el-table-column fixed="right" label="操作" align="center" width="220px">
           <template slot-scope="scope">
             <div>
-              <el-button v-permission="[BTN_USER_EDIT]" type="text" icon="el-icon-edit" @click="showEdit(scope.row)">
+              <el-button v-permission="[BTN_USER_EDIT]" type="text" icon="el-icon-edit" @click="showEdit(scope.row)" class="user-edit">
                 {{ BTN_MAP_USER[BTN_USER_EDIT] }}
               </el-button>
               <el-button v-permission="[BTN_USER_RESET]" type="text" icon="el-icon-refresh"
                          style="color:#F56C6C;" :disabled="scope.row.uid === 1"
-                         @click="resetPass(scope.row)">
+                         @click="resetPass(scope.row)" id="user-reset">
                 {{ BTN_MAP_USER[BTN_USER_RESET] }}
               </el-button>
             </div>
@@ -237,7 +238,12 @@
 
   import userForm from "./components/user-form";
   import userRole from "./components/user-role";
+  import steps from "./components/steps";
+
   import checkPermission from "@/utils/permission";
+
+  import Driver from 'driver.js'
+  import 'driver.js/dist/driver.min.css'
 
   import {
     BTN_MAP_USER,
@@ -258,7 +264,8 @@
     mounted() {
       this.$nextTick(() => {
         this.tableHeight = window.innerHeight - 165;
-      })
+      });
+      this.driver = new Driver();
     },
     data() {
       return {
@@ -277,6 +284,8 @@
         options: {
           roleTree: []
         },
+
+        driver: null,
 
         departments: [],
         defaultProps: {
@@ -348,9 +357,15 @@
       const roleTreeRet = await getRoleTree();
       this.options.roleTree = roleTreeRet?.data || [];
       await this.queryList();
+      this.guide();
     },
 
     methods: {
+      guide() {
+        this.driver.defineSteps(steps)
+        this.driver.start()
+      },
+
       async queryList() {
         this.queryParams.page = 1;
         this.getList();
