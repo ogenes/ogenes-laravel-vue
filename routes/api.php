@@ -9,6 +9,7 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\Permission\DataController;
 use App\Http\Controllers\Permission\MenuController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -52,6 +53,12 @@ Route::middleware(['language'])->group(function () {
         
         Route::prefix('actionLog')->group(function () {
             Route::any('options', [ActionLogController::class, 'options'])->name('ActionLogManage');
+        });
+    
+        Route::prefix('setting')->group(function () {
+            Route::any('getAll', [SettingController::class, 'getAll'])->name('ActionLogManage');
+            Route::any('getOne', [SettingController::class, 'getOne'])->name('getOne');
+            Route::any('save', [SettingController::class, 'save'])->name('SettingEditOne');
         });
         
         Route::middleware(['api.permission'])->group(function () {

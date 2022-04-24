@@ -357,7 +357,7 @@
       const roleTreeRet = await getRoleTree();
       this.options.roleTree = roleTreeRet?.data || [];
       await this.queryList();
-      this.guide();
+      // this.guide();
     },
 
     methods: {

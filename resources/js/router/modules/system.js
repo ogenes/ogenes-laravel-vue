@@ -84,6 +84,15 @@ const systemRouter = {
         icon: 'log',
       },
     },
+    {
+      path: 'setting',
+      component: () => import('@/views/system/setting'),
+      name: 'Setting',
+      meta: {
+        title: '系统设置',
+        icon: 'setting',
+      },
+    },
   ]
 };
 
