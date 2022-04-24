@@ -54,12 +54,6 @@ Route::middleware(['language'])->group(function () {
         Route::prefix('actionLog')->group(function () {
             Route::any('options', [ActionLogController::class, 'options'])->name('ActionLogManage');
         });
-    
-        Route::prefix('setting')->group(function () {
-            Route::any('getAll', [SettingController::class, 'getAll'])->name('ActionLogManage');
-            Route::any('getOne', [SettingController::class, 'getOne'])->name('getOne');
-            Route::any('save', [SettingController::class, 'save'])->name('SettingEditOne');
-        });
         
         Route::middleware(['api.permission'])->group(function () {
     
