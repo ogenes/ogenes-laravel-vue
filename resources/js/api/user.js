@@ -159,3 +159,5 @@ export const USER_STATUS_OPTION = [
     value: 0,
   }
 ];
+
+export const USER_EXPORT_URL = '/api/user/export';

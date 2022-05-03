@@ -9,12 +9,14 @@ export const BTN_MAP_DEPT = {
   [BTN_DEPT_USER]: '查看用户',
 };
 
+export const BTN_USER_EXPORT = 'UserManageExport';
 export const BTN_USER_ADD = 'UserManageAdd';
 export const BTN_USER_EDIT = 'UserManageEdit';
 export const BTN_USER_RESET = 'UserManageReset';
 export const BTN_USER_STATUS = 'UserManageStatus';
 export const BTN_USER_ROLE = 'UserManageEditRole';
 export const BTN_MAP_USER = {
+  [BTN_USER_EXPORT]: '导出',
   [BTN_USER_ADD]: '新增',
   [BTN_USER_EDIT]: '编辑',
   [BTN_USER_RESET]: '重置密码',

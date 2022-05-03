@@ -13,4 +13,5 @@ return [
         'mobile' => '',
     ],
     'loginUnique' => false,
+    'maxSize' => 5000,
 ];

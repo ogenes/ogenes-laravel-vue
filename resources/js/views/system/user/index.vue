@@ -2,6 +2,12 @@
   <div>
     <el-card>
       <div style="float: right">
+
+        <el-button v-permission="[BTN_USER_EXPORT]" type="text" style="color: #909399" icon="el-icon-download"
+                   v-no-more-click v-loading="exportLoading" @click="exportExcel" id="user-export">
+          {{ BTN_MAP_USER[BTN_USER_EXPORT]}}
+        </el-button>
+        &nbsp;
         <el-popover trigger="click" placement="bottom-start">
           <el-form :inline="true" label-width="60px" label-position="left">
             <el-row>
@@ -72,7 +78,7 @@
             筛选
           </el-button>
         </el-popover>
-
+        &nbsp;
         <el-button v-permission="[BTN_USER_ADD]" type="text" icon="el-icon-plus" @click="showDialog=true" id="user-add">
           {{ BTN_MAP_USER[BTN_USER_ADD]}}
         </el-button>
@@ -177,7 +183,8 @@
         <el-table-column fixed="right" label="操作" align="center" width="220px">
           <template slot-scope="scope">
             <div>
-              <el-button v-permission="[BTN_USER_EDIT]" type="text" icon="el-icon-edit" @click="showEdit(scope.row)" class="user-edit">
+              <el-button v-permission="[BTN_USER_EDIT]" type="text" icon="el-icon-edit" @click="showEdit(scope.row)"
+                         class="user-edit">
                 {{ BTN_MAP_USER[BTN_USER_EDIT] }}
               </el-button>
               <el-button v-permission="[BTN_USER_RESET]" type="text" icon="el-icon-refresh"
@@ -233,8 +240,11 @@
     getList,
     switchStatus,
     resetPassByUid,
-    USER_STATUS_OPTION
+    USER_STATUS_OPTION,
+    USER_EXPORT_URL,
   } from '@/api/user';
+
+  import {exportExcel} from "@/api/common";
 
   import userForm from "./components/user-form";
   import userRole from "./components/user-role";
@@ -247,6 +257,7 @@
 
   import {
     BTN_MAP_USER,
+    BTN_USER_EXPORT,
     BTN_USER_ADD,
     BTN_USER_EDIT,
     BTN_USER_RESET,
@@ -271,6 +282,7 @@
       return {
         USER_STATUS_OPTION,
         BTN_MAP_USER,
+        BTN_USER_EXPORT,
         BTN_USER_ADD,
         BTN_USER_EDIT,
         BTN_USER_RESET,
@@ -279,6 +291,7 @@
         checkPermission,
 
         loading: false,
+        exportLoading: false,
         tableHeight: 0,
         showSearch: true,
         options: {
@@ -425,6 +438,12 @@
           }
         };
         this.queryList();
+      },
+
+      async exportExcel() {
+        this.exportLoading = true;
+        await exportExcel(USER_EXPORT_URL, this.userParams);
+        this.exportLoading = false;
       },
 
       showEdit(row) {

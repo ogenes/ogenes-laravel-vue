@@ -8,6 +8,7 @@
 namespace App\Services;
 
 
+use AliOss;
 use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
 use App\Helpers\AliOssHelper;
@@ -63,7 +64,7 @@ class FileService extends BaseService
             $data['source'] = $source;
             $data['original_name'] = $file->getClientOriginalName();
             $data['object_id'] = $objectId;
-            $data['path'] = AliOssHelper::getInstance()->upload($tmpFile, $savePath);
+            $data['path'] = AliOss::upload($tmpFile, $savePath);
             $data['size'] = $file->getSize();
             $data['ext'] = $ext;
             $data['created_at'] = date('Y-m-d H:i:s');

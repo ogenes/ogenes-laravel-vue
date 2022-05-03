@@ -10,9 +10,12 @@ namespace App\Services;
 
 use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
+use App\Helpers\ExcelHelper;
+use app\library\helper\PHPSpreadSheetHelper;
 use App\Models\User;
 use App\Models\UserHasDepartment;
 use App\Models\UserHasRole;
+use Excel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use function App\Helpers\formatDateTime;
@@ -430,5 +433,66 @@ class UserService extends BaseService
             $data
         );
         return true;
+    }
+    
+    public function export(
+        string $username,
+        string $account,
+        string $userStatus,
+        string $mobile,
+        array $deptIds,
+        array $roleIds,
+        array $sort = []
+    ) {
+        $maxSize = config('common.maxSize') ? : 5000;
+        $data = $this->getList(
+            $username,
+            $account,
+            $userStatus,
+            $mobile,
+            $deptIds,
+            $roleIds,
+            $sort,
+            1,
+            $maxSize,
+        );
+        $filename = '用户列表' . date('YmdHis');
+        $list['Sheet1'] = array_map(static function($item) {
+            $item['userStatus'] = $item['userStatus'] ? '启用' : '禁用';
+            $item['roles'] = implode(PHP_EOL, $item['roles']);
+            $item['departments'] = implode(PHP_EOL, $item['departments']);
+            $item['avatar'] = $item['avatar'] ? <<<EOF
+<table>
+  <img   src={$item['avatar']}   height=80 width=80 />
+</table>
+EOF
+ : '';
+            return $item;
+        }, $data['list']);
+        $config['Sheet1'] = [
+            ['bindKey' => 'uid', 'columnName' => '用户ID', 'align' => 'center', 'width' => 20, 'height' => 80, 'format' => 'General'],
+            ['bindKey' => 'avatar', 'columnName' => '头像', 'align' => 'left', 'width' => 30, 'height' => 80, 'format' => 'General'],
+            ['bindKey' => 'username', 'columnName' => '用户名', 'align' => 'left', 'width' => 30, 'height' => 80, 'format' => 'General'],
+            ['bindKey' => 'account', 'columnName' => '用户账号', 'align' => 'left', 'width' => 30, 'height' => 80, 'format' => 'General'],
+            ['bindKey' => 'mobile', 'columnName' => '手机号', 'align' => 'center', 'width' => 30, 'height' => 80, 'format' => 'General'],
+            ['bindKey' => 'email', 'columnName' => '邮箱', 'align' => 'left', 'width' => 30, 'height' => 80, 'format' => 'General'],
+            ['bindKey' => 'roles', 'columnName' => '角色', 'align' => 'left', 'width' => 40, 'height' => 80, 'format' => 'General', 'setWrapText' => true],
+            ['bindKey' => 'userStatus', 'columnName' => '状态', 'align' => 'center', 'width' => 20, 'height' => 80, 'format' => 'General'],
+            ['bindKey' => 'departments', 'columnName' => '部门', 'align' => 'left', 'width' => 60, 'height' => 80, 'format' => 'General', 'setWrapText' => true],
+            ['bindKey' => 'lastLoginAt', 'columnName' => '最近一次登录时间', 'align' => 'center', 'width' => 30, 'height' => 80, 'format' => 'General'],
+            ['bindKey' => 'lastLoginIp', 'columnName' => '最近一次登录地', 'align' => 'center', 'width' => 30, 'height' => 80, 'format' => 'General'],
+            ['bindKey' => 'updatedAt', 'columnName' => '最近一次修改时间', 'align' => 'center', 'width' => 30, 'height' => 80, 'format' => 'General'],
+        ];
+        $filepath = Excel::export($filename, $config, $list);
+    
+        $pathinfo = pathinfo($filepath);
+        $ext = $pathinfo['extension'] ?: 'xlsx';
+        $objectId = sha1_file($filepath);
+        $savePath = ExcelHelper::TMP_PATH . date('Y/m/d/') . $objectId . '/' . $filename . '.' . $ext;
+        $ossPath = \AliOss::upload($filepath, $savePath);
+        @unlink($filepath);
+        return [
+            'filepath' => $ossPath
+        ];
     }
 }

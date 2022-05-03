@@ -42,6 +42,33 @@ class UserController extends Controller
         ]);
     }
     
+    public function export(Request $request)
+    {
+        $params = getParams($request);
+        $username = $params['username'] ?? '';
+        $mobile = $params['mobile'] ?? '';
+        $account = $params['account'] ?? '';
+        $deptIds = $params['deptIds'] ?? [];
+        $roleIds = $params['roleIds'] ?? [];
+        $userStatus = $params['userStatus'] ?? '';
+        $sort = $params['sort'] ?? [];
+        
+        $ret = UserService::getInstance()->export(
+            $username,
+            $account,
+            $userStatus,
+            $mobile,
+            $deptIds,
+            $roleIds,
+            $sort
+        );
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
     public function save(SaveRequest $request)
     {
         $params = getParams($request);

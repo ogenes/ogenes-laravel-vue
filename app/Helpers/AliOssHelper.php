@@ -13,18 +13,20 @@ use OSS\OssClient;
 
 class AliOssHelper
 {
-
+    
     protected $accessKeyId;
     protected $accessKeySecret;
     protected $endpoint;
     protected $bucket;
     protected $cdnDomain;
-
+    
+    protected OssClient $client;
+    
     /**
      * OssHelper constructor.
      * @throws OssException
      */
-    private function __construct()
+    public function __construct()
     {
         $this->accessKeyId = config('param.alioss.accessKeyId');
         $this->accessKeySecret = config('param.alioss.accessKeySecret');
@@ -34,42 +36,9 @@ class AliOssHelper
         if (!($this->accessKeyId && $this->accessKeySecret)) {
             throw new OssException('accessKeyId or accessKeySecret is empty');
         }
+        $this->client = new OssClient($this->accessKeyId, $this->accessKeySecret, $this->endpoint);
     }
-
-    /**
-     * @var array
-     */
-    protected static array $instance = [];
-
-    /**
-     * @return static
-     * @throws OssException
-     */
-    public static function getInstance()
-    {
-        $className = static::class;
-        if (isset(self::$instance[$className])) {
-            return self::$instance[$className];
-        }
-        self::$instance[$className] = new AliOssHelper();
-        return self::$instance[$className];
-    }
-
-    /**
-     * @return mixed
-     * @throws OssException
-     */
-    public function getOssClient()
-    {
-        $className = OssClient::class;
-        if (isset(self::$instance[$className])) {
-            return self::$instance[$className];
-        }
-        self::$instance[$className] = new OssClient($this->accessKeyId, $this->accessKeySecret, $this->endpoint);
-        return self::$instance[$className];
-
-    }
-
+    
     /**
      * @param string $filePath
      * @param string $objectId
@@ -78,10 +47,9 @@ class AliOssHelper
      */
     public function upload(string $filePath, string $objectId): string
     {
-        $ossClient = $this->getOssClient();
-        $resp = $ossClient->uploadFile($this->bucket, $objectId, $filePath);
+        $resp = $this->client->uploadFile($this->bucket, $objectId, $filePath);
         $info = $resp['info'] ?? [];
         return $info['url'] ?? '';
     }
-
+    
 }

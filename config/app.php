@@ -178,6 +178,9 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         IdeHelperServiceProvider::class,
+        \App\Providers\ExcelProvider::class,
+        \App\Providers\AliOssProvider::class,
+        \App\Providers\DownloadProvider::class,
 
     ],
 
@@ -230,6 +233,9 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
+        'Excel' => \App\Facades\ExcelFacade::class,
+        'AliOss' => \App\Facades\AliOssFacade::class,
+        'Download' => \App\Facades\DownloadFacade::class,
 
     ],
 
