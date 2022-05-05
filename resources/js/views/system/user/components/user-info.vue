@@ -75,22 +75,11 @@
               <div class="user-item-label">&nbsp;手机号</div>
               :
             </template>
-            <div v-if="showEdit.mobile">
-              <div class="user-item-value">
-                <el-input type="input" style="width: 300px;" v-model="userInfo.mobile"></el-input>
-              </div>
-              <el-button class="user-item-btn" type="text" style="color: #67C23A;"
-                         @click="updateBasicInfo('mobile')">保存
-              </el-button>
-              <el-button class="user-item-btn" type="text" style="color: #909399;"
-                         @click="cancelBasicInfo('mobile')">取消
-              </el-button>
-            </div>
-            <div v-else>
+            <div>
               <div class="user-item-value">
                 <span>{{userInfo.mobile}}</span>
               </div>
-              <el-button class="user-item-btn" type="text" @click="showEdit.mobile=true">修改</el-button>
+              <el-button class="user-item-btn" type="text" @click="showUpdateMobile=true">修改</el-button>
             </div>
           </el-form-item>
           <el-divider/>
@@ -173,6 +162,15 @@
         </el-tree>
       </div>
     </el-card>
+
+    <el-dialog
+      :visible.sync="showUpdateMobile"
+      :show-close="false"
+      :close-on-click-modal="false"
+      :destroy-on-close="true"
+      width="50%">
+      <update-mobile :close-dialog="closeDialog"/>
+    </el-dialog>
   </div>
 </template>
 
@@ -181,10 +179,10 @@
     getHasInfo,
     updateAccount,
     updateUsername,
-    updateMobile,
     updateEmail,
   } from "@/api/user";
   import userAvatar from './user-avatar';
+  import updateMobile from './update-mobile';
   import store from "@/store";
 
   export default {
@@ -196,7 +194,8 @@
       }
     },
     components: {
-      userAvatar
+      userAvatar,
+      updateMobile
     },
 
     data() {
@@ -204,9 +203,9 @@
         showEdit: {
           account: false,
           name: false,
-          mobile: false,
           email: false,
         },
+        showUpdateMobile: false,
         userHasInfo: {
           menuTree: [],
           roleMap: [],
@@ -253,9 +252,6 @@
             } else if (type === 'name') {
               func = updateUsername;
               commitPath = 'user/SET_NAME';
-            } else if (type === 'mobile') {
-              func = updateMobile;
-              commitPath = 'user/SET_MOBILE';
             } else {
               func = updateEmail;
               commitPath = 'user/SET_EMAIL';
@@ -280,6 +276,10 @@
       cancelBasicInfo(type) {
         this.showEdit[type] = false;
         this.userInfo[type] = store.getters[type];
+      },
+      closeDialog() {
+        this.showUpdateMobile = false;
+        this.userInfo.mobile = store.getters.mobile
       }
     }
   }

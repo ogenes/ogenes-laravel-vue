@@ -178,9 +178,7 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         IdeHelperServiceProvider::class,
-        \App\Providers\ExcelProvider::class,
-        \App\Providers\AliOssProvider::class,
-        \App\Providers\DownloadProvider::class,
+        \App\Providers\HelperProvider::class,
 
     ],
 
@@ -236,6 +234,7 @@ return [
         'Excel' => \App\Facades\ExcelFacade::class,
         'AliOss' => \App\Facades\AliOssFacade::class,
         'Download' => \App\Facades\DownloadFacade::class,
+        'Sms' => \App\Facades\SmsFacade::class,
 
     ],
 

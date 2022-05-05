@@ -109,7 +109,7 @@ class AuthController extends Controller
         ]);
     }
     
-    public function updateMobile(Request $request)
+    public function sendCode(Request $request)
     {
         $params = getParams($request);
         $validator = Validator::make($params, [
@@ -119,8 +119,28 @@ class AuthController extends Controller
         if ($validator->fails()) {
             throw new CommonException(ErrorCode::INVALID_ARGUMENT, $validator->errors()->first());
         }
+        $ret = \Sms::sendCode($params['mobile']);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
+    public function updateMobile(Request $request)
+    {
+        $params = getParams($request);
+        $validator = Validator::make($params, [
+            'mobile' => 'required|size:11',
+            'code' => 'required|size:4',
+        ]);
+        
+        if ($validator->fails()) {
+            throw new CommonException(ErrorCode::INVALID_ARGUMENT, $validator->errors()->first());
+        }
         $mobile = $params['mobile'] ?? '';
-        $ret = AuthService::getInstance()->updateMobile($mobile);
+        $code = $params['code'] ?? '';
+        $ret = AuthService::getInstance()->updateMobile($mobile, $code);
         return response()->json([
             'code' => 0,
             'msg' => 'success',

@@ -15,6 +15,7 @@ use App\Services\Permission\MenuService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Sms;
 use function App\Helpers\filterTree;
 use function App\Helpers\getRealIp;
 use function App\Helpers\getUniqId;
@@ -218,9 +219,12 @@ class AuthService extends BaseService
         return $this->updateBasicInfo($data, '用户修改用户名');
     }
     
-    public function updateMobile(string $mobile): bool
+    public function updateMobile(string $mobile, string $code): bool
     {
         //短信验证
+        if (!Sms::checkCode($mobile, $code)) {
+            throw new CommonException(ErrorCode::VERIFICATION_CODE_ERROR);
+        }
         $exists = User::whereMobile($mobile)->where('uid', '!=', $this->uid)->first();
         if ($exists) {
             throw new CommonException(ErrorCode::RECORD_EXISTS);

@@ -39,6 +39,7 @@ Route::middleware(['language'])->group(function () {
             Route::any('getActionList', [AuthController::class, 'getActionList']);
             Route::any('updateAccount', [AuthController::class, 'updateAccount']);
             Route::any('updateUsername', [AuthController::class, 'updateUsername']);
+            Route::any('sendCode', [AuthController::class, 'sendCode']);
             Route::any('updateMobile', [AuthController::class, 'updateMobile']);
             Route::any('updateEmail', [AuthController::class, 'updateEmail']);
             Route::any('updateAvatar', [AuthController::class, 'updateAvatar']);

@@ -28,13 +28,13 @@ class ExcelHelper extends Facade
      * @param string $filename
      * @param array $config
      * @param array $data
-     * @param array $imgUrls
      * @return string
+     * @throws CommonException
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      * @throws \Exception
      */
-    public function export(string $filename, array $config, array $data, array $imgUrls = []): string
+    public function export(string $filename, array $config, array $data): string
     {
         $imgPath = $this->catchImages($config, $data);
         if (empty($config) || !is_array($config)) {

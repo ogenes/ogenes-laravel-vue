@@ -124,6 +124,14 @@ export function updateAccount(data) {
   })
 }
 
+export function sendCode(data) {
+  return request({
+    url: '/api/user/sendCode',
+    method: 'post',
+    data: {data},
+  })
+}
+
 export function updateMobile(data) {
   return request({
     url: '/api/user/updateMobile',
