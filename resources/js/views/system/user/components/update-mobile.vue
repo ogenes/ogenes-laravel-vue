@@ -43,9 +43,6 @@
         default: null
       },
     },
-    created() {
-      this.bindForm.mobile = this.$store.getters.mobile;
-    },
 
     data() {
       return {
@@ -69,6 +66,10 @@
       sendCode() {
         if (!this.bindForm.mobile) {
           this.$message.error('请输入手机号！');
+          return;
+        }
+        if (this.bindForm.mobile === this.$store.getters.mobile) {
+          this.$message.error('请输入新手机号！');
           return;
         }
         sendCode({mobile: this.bindForm.mobile}).then((res) => {

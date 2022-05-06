@@ -4,7 +4,7 @@
              label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">请登录</h3>
       </div>
 
       <el-form-item prop="account">
@@ -46,17 +46,15 @@
         </el-form-item>
       </el-tooltip>
 
+      <div style="margin-bottom: 20px;">
+        <el-checkbox v-model="loginForm.rememberMe">
+          <span style="color: #000; font-size: 12px;"> 记住我 </span>
+        </el-checkbox>
+      </div>
+
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;"
                  @click.native.prevent="handleLogin">Login
       </el-button>
-
-      <div style="position:relative">
-        <div class="tips">
-          <span>Account : admin</span>
-          <span>Password : 123456</span>
-        </div>
-
-      </div>
     </el-form>
   </div>
 </template>
@@ -86,7 +84,8 @@
       return {
         loginForm: {
           account: 'admin',
-          password: '123456'
+          password: '123456',
+          rememberMe: false
         },
         loginRules: {
           account: [{required: true, trigger: 'blur', validator: validateAccount}],
@@ -174,6 +173,7 @@
   $bg: #283443;
   $light_gray: #fff;
   $cursor: #fff;
+  $black: #000;
 
   @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
     .login-container .el-input input {
@@ -194,7 +194,7 @@
         -webkit-appearance: none;
         border-radius: 0px;
         padding: 12px 5px 12px 15px;
-        color: $light_gray;
+        color: $black;
         height: 47px;
         caret-color: $cursor;
 
@@ -218,11 +218,13 @@
   $bg: #2d3a4b;
   $dark_gray: #889aa4;
   $light_gray: #eee;
+  $black: #000;
 
   .login-container {
     min-height: 100%;
     width: 100%;
-    background-color: $bg;
+    background: url(@/assets/images/bg1.webp) no-repeat;
+    background-size:100% 100%;
     overflow: hidden;
 
     .login-form {
@@ -234,21 +236,10 @@
       overflow: hidden;
     }
 
-    .tips {
-      font-size: 14px;
-      color: #fff;
-      margin-bottom: 10px;
-
-      span {
-        &:first-of-type {
-          margin-right: 16px;
-        }
-      }
-    }
 
     .svg-container {
       padding: 6px 5px 6px 15px;
-      color: $dark_gray;
+      color: $black;
       vertical-align: middle;
       width: 30px;
       display: inline-block;
@@ -259,7 +250,7 @@
 
       .title {
         font-size: 26px;
-        color: $light_gray;
+        color: $black;
         margin: 0px auto 40px auto;
         text-align: center;
         font-weight: bold;
@@ -271,21 +262,9 @@
       right: 10px;
       top: 7px;
       font-size: 16px;
-      color: $dark_gray;
+      color: $black;
       cursor: pointer;
       user-select: none;
-    }
-
-    .thirdparty-button {
-      position: absolute;
-      right: 0;
-      bottom: 6px;
-    }
-
-    @media only screen and (max-width: 470px) {
-      .thirdparty-button {
-        display: none;
-      }
     }
   }
 </style>
