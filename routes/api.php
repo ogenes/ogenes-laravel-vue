@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DictController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\Permission\DataController;
 use App\Http\Controllers\Permission\MenuController;
 use App\Http\Controllers\RoleController;
@@ -120,6 +121,12 @@ Route::middleware(['language'])->group(function () {
             });
             Route::prefix('actionLog')->group(function () {
                 Route::any('list', [ActionLogController::class, 'list'])->name('ActionLogManage');
+            });
+            Route::prefix('message')->group(function () {
+                Route::any('list', [MessageController::class, 'list'])->name('MessageManage');
+                Route::any('add', [MessageController::class, 'add'])->name('MessageManageAdd');
+                Route::any('edit', [MessageController::class, 'edit'])->name('MessageManageEdit');
+                Route::any('switchHidden', [MessageController::class, 'switchHidden'])->name('MessageManageHidden');
             });
         });
     });

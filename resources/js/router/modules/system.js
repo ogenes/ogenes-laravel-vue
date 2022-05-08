@@ -85,6 +85,37 @@ const systemRouter = {
       },
     },
     {
+      path: 'message',
+      component: () => import('@/views/system/message/index'),
+      redirect: '/system/message/list',
+      name: 'MessageManage',
+      meta: {
+        title: '消息通知',
+        icon: 'notify'
+      },
+      children: [
+        {
+          path: 'create',
+          component: () => import('@/views/system/message/create'),
+          name: 'CreateMessage',
+          meta: { title: '新增消息', icon: 'edit' }
+        },
+        {
+          path: 'edit/:id(\\d+)',
+          component: () => import('@/views/system/message/edit'),
+          name: 'EditMessage',
+          meta: { title: '编辑消息', noCache: true, activeMenu: '/system/message/list' },
+          hidden: true
+        },
+        {
+          path: 'list',
+          component: () => import('@/views/system/message/list'),
+          name: 'MessageList',
+          meta: { title: '消息列表', icon: 'list' }
+        }
+      ]
+    },
+    {
       path: 'setting',
       component: () => import('@/views/system/setting'),
       name: 'Setting',
