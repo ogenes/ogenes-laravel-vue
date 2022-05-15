@@ -85,7 +85,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="type" sortable="custom" width="200" align="center" label="操作类型"/>
-        <el-table-column prop="remark" width="400" align="left" label="操作备注">
+        <el-table-column prop="remark" align="left" label="操作备注">
           <template slot-scope="scope">
             <el-popover trigger="hover">
               <pre>{{ handleJsonFormat(scope.row.remark) }}</pre>

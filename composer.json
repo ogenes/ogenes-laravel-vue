@@ -9,6 +9,7 @@
   "license": "MIT",
   "require": {
     "php": "^7.4",
+    "ext-curl": "*",
     "ext-json": "*",
     "alibabacloud/sdk": "^1.8",
     "aliyuncs/oss-sdk-php": "^2.4",
@@ -19,7 +20,7 @@
     "laravel/framework": "^8.0",
     "laravel/tinker": "^2.0",
     "laravel/ui": "^3.3",
-    "ext-curl": "*"
+    "phpoffice/phpspreadsheet": "^1.23"
   },
   "require-dev": {
     "barryvdh/laravel-ide-helper": "^2.10",

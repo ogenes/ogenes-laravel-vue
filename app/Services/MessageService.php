@@ -8,45 +8,121 @@
 namespace App\Services;
 
 
-use App\Services\BaseService;
+use App\Models\Message;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use function App\Helpers\formatDateTime;
 
 class MessageService extends BaseService
 {
-    public function getList(string $keyword): array
+    public function getList(string $keyword, int $page = 1, int $pageSize = 30): array
     {
-        $json = <<<EOF
-{"code":20000,"data":{"total":100,"items":[{"id":1,"timestamp":1280995900540,"author":"Sharon","reviewer":"Ruth","title":"Dairn Unj Kkdhsmohg Uoh Bhrfr Ngoqfta","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":59.49,"importance":2,"type":"EU","status":"published","display_time":"1998-02-03 06:22:24","comment_disabled":true,"pageviews":778,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]},{"id":2,"timestamp":802618882812,"author":"Edward","reviewer":"Daniel","title":"Ogroaqxll Sswqdejvi Vjdovksk Rim Olrh Hdnqxmfm Ugcr","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":43.56,"importance":2,"type":"US","status":"published","display_time":"2004-07-22 22:20:06","comment_disabled":true,"pageviews":4134,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]},{"id":3,"timestamp":1048959002839,"author":"Sarah","reviewer":"George","title":"Ejolc Vuotjfmjlo Pqxgoyntv Jxujepepln Jcvywr Pnihfbc","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":73.47,"importance":2,"type":"JP","status":"draft","display_time":"2018-04-12 16:50:43","comment_disabled":true,"pageviews":844,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]},{"id":4,"timestamp":208300203906,"author":"Nancy","reviewer":"Jennifer","title":"Tiubzrj Liwkyllts Chtkp Xxnd Sydkwt Ocunpp Xhzezrr Razzmw Sftva Pthcy","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":26.21,"importance":3,"type":"US","status":"draft","display_time":"1980-04-06 23:15:36","comment_disabled":true,"pageviews":488,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]},{"id":5,"timestamp":1282897044780,"author":"Gary","reviewer":"Shirley","title":"Dumducsz Eyog Puc Hprytuvqu Lonwfxboe","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":60.44,"importance":2,"type":"JP","status":"published","display_time":"2013-01-20 03:30:08","comment_disabled":true,"pageviews":2477,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]},{"id":6,"timestamp":1169751133636,"author":"Michael","reviewer":"Barbara","title":"Kjwsqxemu Xpwdisgm Rurfku Cgmh Lrzj Znnmxcwhg Axfj Hvosn Bjvvyg Fvbidmy","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":92.41,"importance":3,"type":"US","status":"draft","display_time":"1975-06-22 02:28:49","comment_disabled":true,"pageviews":1787,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]},{"id":7,"timestamp":1562189322245,"author":"Robert","reviewer":"Betty","title":"Rtdorllzne Gskamh Fiieuq Nxpsn Gmzcmw Sbbap","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":31.34,"importance":1,"type":"JP","status":"draft","display_time":"1982-02-07 04:10:00","comment_disabled":true,"pageviews":2729,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]},{"id":8,"timestamp":1253289085251,"author":"Jason","reviewer":"Shirley","title":"Stwggiwoi Weipokdua Mrcf Gowc Siwglpp Iyuwbjcl Wiilliyyk Xdbrr","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":67.91,"importance":3,"type":"EU","status":"draft","display_time":"1970-09-01 14:21:09","comment_disabled":true,"pageviews":4712,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]},{"id":9,"timestamp":772193664407,"author":"Steven","reviewer":"Sharon","title":"Xvgqfc Uzknmrfs Wpbtz Hubhbpmvkk Njfdtca Inhvqaaga Kvnvcwq Twge","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":12.22,"importance":2,"type":"JP","status":"published","display_time":"2000-08-19 20:38:34","comment_disabled":true,"pageviews":1675,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]},{"id":10,"timestamp":1115736125294,"author":"Susan","reviewer":"Ronald","title":"Muigdh Rtpesduc Wbcdlvuv Hjkdsnn Ukirlg Nradh Ytzrw Nkqstx Rlsnbugg","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":13.48,"importance":2,"type":"US","status":"draft","display_time":"1987-05-23 13:20:19","comment_disabled":true,"pageviews":1577,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]},{"id":11,"timestamp":817784678364,"author":"Jason","reviewer":"Nancy","title":"Enrll Roztxlznl Ywahm Sshj Pfnkfo Box","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":92.13,"importance":3,"type":"CN","status":"published","display_time":"1991-05-07 11:42:25","comment_disabled":true,"pageviews":2888,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]},{"id":12,"timestamp":1215806196731,"author":"Sharon","reviewer":"Mark","title":"Vokieo Zfcpuq Wxkxecr Njymix Bbuxuhq Cogmr Fctp Uvuxq","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":19.86,"importance":3,"type":"US","status":"published","display_time":"1992-08-04 23:07:16","comment_disabled":true,"pageviews":4940,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]},{"id":13,"timestamp":392284190549,"author":"Jessica","reviewer":"Nancy","title":"Hpntpsynd Ijxwgrjog Tyfxj Vxa Nzqw Quprxj","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":42.35,"importance":2,"type":"CN","status":"published","display_time":"1976-12-10 13:25:13","comment_disabled":true,"pageviews":2278,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]},{"id":14,"timestamp":178344763110,"author":"Sandra","reviewer":"Susan","title":"Ulfh Lbwft Tfa Qikbpshbod Wgbis Ijwwviv","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":37.37,"importance":2,"type":"JP","status":"draft","display_time":"1984-01-31 13:48:21","comment_disabled":true,"pageviews":3029,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]},{"id":15,"timestamp":462663693379,"author":"Scott","reviewer":"Cynthia","title":"Vshluqm Venr Fbomh Lfgsrvlr Gvxypt Wqikacvl Elgqa","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":14.78,"importance":2,"type":"EU","status":"draft","display_time":"1971-07-27 02:13:14","comment_disabled":true,"pageviews":632,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]},{"id":16,"timestamp":370172133844,"author":"Patricia","reviewer":"Barbara","title":"Fuopunae Yqkchv Wuxdig Jdlgvkzc Vgdpotfmz Tatyrwuus Dvorxcrpio Ibnhwpbro Mzpxqprws Mfgxcwrda","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":48.76,"importance":2,"type":"EU","status":"published","display_time":"1972-02-21 15:56:00","comment_disabled":true,"pageviews":2957,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]},{"id":17,"timestamp":1365999943351,"author":"Jessica","reviewer":"Mark","title":"Gbbutiqyn Xur Ibtx Lbxbk Pddywem Keolmx Hhw Lejdrocrjy Vypz Gtyl","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":28.42,"importance":3,"type":"JP","status":"draft","display_time":"1995-04-04 09:56:42","comment_disabled":true,"pageviews":3354,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]},{"id":18,"timestamp":555102185688,"author":"Eric","reviewer":"Dorothy","title":"Fjdqd Xzoaohuut Jtqjktictm Mpcieuolvp Ozuhlvuf Uui","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":5.64,"importance":2,"type":"JP","status":"draft","display_time":"2013-07-03 20:21:41","comment_disabled":true,"pageviews":578,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]},{"id":19,"timestamp":464635197376,"author":"Jennifer","reviewer":"Amy","title":"Jhcbm Onhin Cxgj Toihibfnvl Vwx Gtbjcrvq Ykfybpn Wqijb","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":47.88,"importance":2,"type":"US","status":"draft","display_time":"2000-03-02 18:45:00","comment_disabled":true,"pageviews":2415,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]},{"id":20,"timestamp":1432012637349,"author":"Edward","reviewer":"Lisa","title":"Vsrv Chacu Hyausmctx Ncv Puje","content_short":"mock data","content":"<p>I am testing data, I am testing data.</p><p><img src=\"https://wpimg.wallstcn.com/4c69009c-0fd4-4153-b112-6cb53d1cf943\"></p>","forecast":27.78,"importance":2,"type":"US","status":"published","display_time":"1977-05-27 23:26:44","comment_disabled":true,"pageviews":2636,"image_uri":"https://wpimg.wallstcn.com/e4558086-631c-425c-9430-56ffb46e70b3","platforms":["a-platform"]}]}}
-EOF;
-        $data = json_decode($json, true)['data'];
-
-        return $data;
+        $resp = Message::select()
+            ->where('title', 'like', "%{$keyword}%")
+            ->orWhere('desc', 'like', "%{$keyword}%")
+            ->orWhere('text', 'like', "%{$keyword}%")
+            ->orderBy('id', 'desc')
+            ->paginate($pageSize, ['*'], 'page', $page)
+            ->toArray();
+        $ret['cnt'] = $resp['total'];
+        $ret['page'] = $resp['current_page'];
+        $ret['pageSize'] = $resp['per_page'];
+        foreach ($resp['data'] as $item) {
+            $item = json_decode(json_encode($item, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
+            $item['created_at'] = formatDateTime($item['created_at']);
+            $item['updated_at'] = formatDateTime($item['updated_at']);
+            $tmp = [];
+            foreach ($item as $key => $value) {
+                $tmp[Str::camel($key)] = $value;
+            }
+            $ret['list'][] = $tmp;
+        }
+        return $ret;
     }
     
-    public function add(
+    public function getDetail(int $id): array
+    {
+        $resp = Message::whereId($id)->first();
+        $ret = [];
+        if ($resp) {
+            $data = $resp->toArray();
+            $data['created_at'] = formatDateTime($data['created_at']);
+            $data['updated_at'] = formatDateTime($data['updated_at']);
+            foreach ($data as $key => $value) {
+                $ret[Str::camel($key)] = $value;
+            }
+        }
+        return $ret;
+    }
+    
+    public function save(
+        int    $id,
         string $title,
         string $banner,
         string $desc,
         string $text,
         string $releaseAt
-    ): bool
+    ): array
     {
-        return true;
-    }
-    
-    public function edit(
-        int $id,
-        string $title,
-        string $banner,
-        string $desc,
-        string $text,
-        string $releaseAt
-    ): bool
-    {
-        return true;
-    }
-    
-    public function switchHidden(int $id, int $hidden): bool
-    {
-        return true;
+        $ret = [];
+        DB::beginTransaction();
+        try {
+            if ($id > 0) {
+                $exist = Message::whereId($id)->first();
+                if ($exist) {
+                    $updateData = [];
+                    $title !== $exist->title && $updateData['title'] = $title;
+                    $desc !== $exist->desc && $updateData['desc'] = $desc;
+                    $text !== $exist->text && $updateData['text'] = $text;
+                    $banner && $banner !== $exist->banner && $updateData['banner'] = $banner;
+                    $releaseAt && $releaseAt !== $exist->release_at && $updateData['release_at'] = $releaseAt;
+                    if ($updateData) {
+                        $updateData['updated_at'] = date('Y-m-d H:i:s');
+                        foreach ($updateData as $key => $val) {
+                            $exist->setAttribute($key, $val);
+                        }
+                        $exist->save();
+                        ActionLogService::getInstance()->insert(
+                            ActionLogService::RESOURCE_MSG,
+                            $id,
+                            $this->uid,
+                            '编辑',
+                            $updateData
+                        );
+                    }
+                }
+                $data = $exist->toArray();
+            } else {
+                $data = [
+                    'title' => $title,
+                    'desc' => $desc,
+                    'banner' => $banner,
+                    'text' => $text,
+                    'author_id' => $this->uid,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ];
+                $releaseAt && $data['release_at'] = date('Y-m-d H:i:s', strtotime($releaseAt));
+                $id = Message::insertGetId($data);
+                $data['id'] = $id;
+                ActionLogService::getInstance()->insert(
+                    ActionLogService::RESOURCE_MSG,
+                    $id,
+                    $this->uid,
+                    '新增',
+                    $data
+                );
+            }
+            $data['created_at'] = formatDateTime($data['created_at']);
+            $data['updated_at'] = formatDateTime($data['updated_at']);
+            foreach ($data as $key => $value) {
+                $ret[Str::camel($key)] = $value;
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+        return $ret;
     }
 }

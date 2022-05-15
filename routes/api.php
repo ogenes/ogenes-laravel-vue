@@ -124,8 +124,9 @@ Route::middleware(['language'])->group(function () {
             });
             Route::prefix('message')->group(function () {
                 Route::any('list', [MessageController::class, 'list'])->name('MessageManage');
-                Route::any('add', [MessageController::class, 'add'])->name('MessageManageAdd');
-                Route::any('edit', [MessageController::class, 'edit'])->name('MessageManageEdit');
+                Route::any('detail', [MessageController::class, 'detail'])->name('MessageManage');
+                Route::any('add', [MessageController::class, 'save'])->name('MessageManageAdd');
+                Route::any('edit', [MessageController::class, 'save'])->name('MessageManageEdit');
                 Route::any('switchHidden', [MessageController::class, 'switchHidden'])->name('MessageManageHidden');
             });
         });

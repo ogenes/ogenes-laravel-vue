@@ -8,6 +8,13 @@ export function getList(data) {
   })
 }
 
+export function getDetail(data) {
+  return request({
+    url: '/api/message/detail',
+    method: 'get',
+    params: {data},
+  })
+}
 
 export function add(data) {
   return request({

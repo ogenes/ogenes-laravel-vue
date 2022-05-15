@@ -12,7 +12,9 @@ class MessageController extends Controller
     {
         $params = getParams($request);
         $keyword = $params['keyword'] ?? '';
-        $ret = MessageService::getInstance()->getList($keyword);
+        $page = $params['page'] ?? 1;
+        $pageSize = $params['pageSize'] ?? 30;
+        $ret = MessageService::getInstance()->getList($keyword, $page, $pageSize);
         return response()->json([
             'code' => 0,
             'msg' => 'success',
@@ -20,15 +22,11 @@ class MessageController extends Controller
         ]);
     }
     
-    public function add(Request $request)
+    public function detail(Request $request)
     {
         $params = getParams($request);
-        $title = $params['title'] ?? '';
-        $desc = $params['desc'] ?? '';
-        $banner = $params['banner'] ?? '';
-        $text = $params['text'] ?? '';
-        $releaseAt = $params['releaseAt'] ?? '';
-        $ret = MessageService::getInstance()->add($title, $banner, $desc, $text, $releaseAt);
+        $id = $params['id'] ?? 0;
+        $ret = MessageService::getInstance()->getDetail($id);
         return response()->json([
             'code' => 0,
             'msg' => 'success',
@@ -36,7 +34,7 @@ class MessageController extends Controller
         ]);
     }
     
-    public function edit(Request $request)
+    public function save(Request $request)
     {
         $params = getParams($request);
         $id = $params['id'] ?? 0;
@@ -45,7 +43,7 @@ class MessageController extends Controller
         $banner = $params['banner'] ?? '';
         $text = $params['text'] ?? '';
         $releaseAt = $params['releaseAt'] ?? '';
-        $ret = MessageService::getInstance()->edit($id, $title, $banner, $desc, $text, $releaseAt);
+        $ret = MessageService::getInstance()->save($id, $title, $banner, $desc, $text, $releaseAt);
         return response()->json([
             'code' => 0,
             'msg' => 'success',

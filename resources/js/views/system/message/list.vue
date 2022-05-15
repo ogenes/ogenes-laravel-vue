@@ -1,112 +1,154 @@
 <template>
-  <div class="app-container">
-    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%">
-      <el-table-column align="center" label="ID" width="80">
-        <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column width="180px" align="center" label="Date">
-        <template slot-scope="scope">
-          <span>{{ scope.row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column width="120px" align="center" label="Author">
-        <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column width="100px" label="Importance">
-        <template slot-scope="scope">
-          <svg-icon v-for="n in +scope.row.importance" :key="n" icon-class="star" class="meta-item__icon" />
-        </template>
-      </el-table-column>
-
-      <el-table-column class-name="status-col" label="Status" width="110">
-        <template slot-scope="{row}">
-          <el-tag :type="row.status | statusFilter">
-            {{ row.status }}
-          </el-tag>
-        </template>
-      </el-table-column>
-
-      <el-table-column min-width="300px" label="Title">
-        <template slot-scope="{row}">
-          <router-link :to="'/example/edit/'+row.id" class="link-type">
-            <span>{{ row.title }}</span>
-          </router-link>
-        </template>
-      </el-table-column>
-
-      <el-table-column align="center" label="Actions" width="120">
-        <template slot-scope="scope">
-          <router-link :to="'/example/edit/'+scope.row.id">
-            <el-button type="primary" size="small" icon="el-icon-edit">
-              Edit
-            </el-button>
-          </router-link>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+  <div>
+    <el-card>
+      <el-input
+        placeholder="请输入关键字后按回车键搜索"
+        v-model="queryParams.keyword"
+        clearable
+        style="width: 100%;"
+        @keyup.enter.native="queryList"
+      >
+      </el-input>
+      <div class="page-position">
+        <el-pagination
+          background
+          :page-size="queryParams.pageSize"
+          :page-sizes="pageSizes"
+          :current-page="queryParams.page"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="result.cnt"
+          @size-change="handleListSizeChange"
+          @current-change="handleListCurrentChange"
+        />
+      </div>
+      <el-table
+        :data="result.list"
+        v-loading.fullscreen.lock="loading"
+        border
+        :default-sort="queryParams.sort"
+        @sort-change="sortChange"
+        :max-height="tableHeight"
+      >
+        <el-table-column type="" prop="id" sortable="custom" width="100" align="center" label="ID"/>
+        <el-table-column prop="title" sortable="custom" width="200" align="left" label="标题">
+          <template v-slot="scope">
+            <span>{{ scope.row.title }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="desc" width="200" align="left" label="描述">
+          <template v-slot="scope">
+            <pre>{{ scope.row.desc }}</pre>
+          </template>
+        </el-table-column>
+        <el-table-column prop="text" align="left" label="内容">
+          <template v-slot="scope">
+            <pre v-html="scope.row.text"></pre>
+          </template>
+        </el-table-column>
+        <el-table-column prop="createdAt" sortable="custom" width="200" align="center" label="创建时间"/>
+        <el-table-column prop="updatedAt" sortable="custom" width="200" align="center" label="更新时间"/>
+        <el-table-column align="center" label="操作" width="120">
+          <template v-slot="scope">
+            <router-link :to="'/system/message/edit/'+scope.row.id">
+              <el-button type="primary" size="small" icon="el-icon-edit">
+                编辑
+              </el-button>
+            </router-link>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
   </div>
 </template>
 
 <script>
-import { fetchList } from '@/api/article'
-import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
+  import {getList} from '@/api/system/message';
 
-export default {
-  name: 'ArticleList',
-  components: { Pagination },
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
-    }
-  },
-  data() {
-    return {
-      list: null,
-      total: 0,
-      listLoading: true,
-      listQuery: {
-        page: 1,
-        limit: 20
-      }
-    }
-  },
-  created() {
-    this.getList()
-  },
-  methods: {
-    getList() {
-      this.listLoading = true
-      fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
-        this.listLoading = false
+  export default {
+    name: "MessageList",
+
+    components: {},
+
+    mounted() {
+      this.$nextTick(() => {
+        this.tableHeight = window.innerHeight - 165;
       })
+    },
+
+    data() {
+      return {
+        loading: false,
+        tableHeight: 0,
+
+        queryParams: {
+          keyword: '',
+          sort: {
+            prop: 'id',
+            order: 'descending',
+          },
+          page: 1,
+          pageSize: 20,
+        },
+        pageSizes: [10, 20, 50, 100, 200],
+        result: {
+          list: [],
+          cnt: 0
+        },
+      }
+    },
+
+    computed: {},
+
+    async created() {
+      await this.queryList();
+    },
+
+    methods: {
+      async queryList() {
+        this.queryParams.page = 1;
+        this.getList();
+      },
+
+      getList() {
+        this.loading = true;
+        getList(this.queryParams).then((res) => {
+          if (res.code > 0) {
+            this.$message.error(res.msg)
+          } else {
+            this.queryParams.page = parseInt(res.data.page);
+            this.queryParams.pageSize = parseInt(res.data.pageSize);
+            this.result.cnt = parseInt(res.data.cnt);
+            this.result.list = res.data.list;
+          }
+          this.loading = false
+        }).catch((e) => {
+          this.loading = false
+        })
+      },
+      handleListSizeChange: function (val) {
+        this.queryParams.page = 1;
+        this.queryParams.pageSize = val;
+        this.getList();
+      },
+      handleListCurrentChange: function (currentPage) {
+        this.queryParams.page = currentPage;
+        this.getList();
+      },
+      sortChange(col) {
+        this.queryParams.sort = {
+          prop: col.prop,
+          order: col.order
+        };
+        this.queryList();
+      },
     }
   }
-}
 </script>
 
-<style scoped>
-.edit-input {
-  padding-right: 100px;
-}
-.cancel-btn {
-  position: absolute;
-  right: 15px;
-  top: 10px;
-}
+<style scoped lang="scss">
+  .app-container {
+    .form-item-width {
+      width: 300px
+    }
+  }
 </style>

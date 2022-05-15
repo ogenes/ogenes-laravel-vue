@@ -27,7 +27,8 @@ class ActionLogService extends BaseService
         RESOURCE_MENU = 'menu',
         RESOURCE_ROLE = 'role',
         RESOURCE_DICT = 'dict',
-        RESOURCE_SETTING = 'setting';
+        RESOURCE_SETTING = 'setting',
+        RESOURCE_MSG = 'message';
     
     public const RESOURCE_MAP = [
         self::RESOURCE_DEPARTMENT => '部门',
@@ -36,6 +37,7 @@ class ActionLogService extends BaseService
         self::RESOURCE_ROLE => '角色',
         self::RESOURCE_DICT => '字典',
         self::RESOURCE_SETTING => '系统设置',
+        self::RESOURCE_MSG => '消息通知',
     ];
     
     public function getList(
