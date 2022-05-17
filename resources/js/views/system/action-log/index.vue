@@ -87,12 +87,7 @@
         <el-table-column prop="type" sortable="custom" width="200" align="center" label="操作类型"/>
         <el-table-column prop="remark" align="left" label="操作备注">
           <template slot-scope="scope">
-            <el-popover trigger="hover">
-              <pre>{{ handleJsonFormat(scope.row.remark) }}</pre>
-              <div slot="reference">
-                {{scope.row.remark}}
-              </div>
-            </el-popover>
+            <text-popover :text="scope.row.remark" type="json"></text-popover>
           </template>
         </el-table-column>
         <el-table-column prop="createdAt" sortable="custom" width="200" align="center" label="创建时间"/>
@@ -102,12 +97,14 @@
 </template>
 
 <script>
+  import TextPopover from '@/components/TextPopover';
   import {getOptions, getList} from '@/api/system/action-log';
-  import { handleJsonFormat } from '@/utils/index';
   export default {
     name: "ActionLogManage",
 
-    components: {},
+    components: {
+      TextPopover
+    },
 
     mounted() {
       this.$nextTick(() => {
@@ -117,7 +114,6 @@
 
     data() {
       return {
-        handleJsonFormat,
 
         loading: false,
         tableHeight: 0,
