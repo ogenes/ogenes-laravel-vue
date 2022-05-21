@@ -2,12 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Message\SaveRequest;
+use App\Models\Message;
+use App\Services\DictService;
 use App\Services\MessageService;
+use App\Services\Permission\MenuService;
 use Illuminate\Http\Request;
 use function App\Helpers\getParams;
 
 class MessageController extends Controller
 {
+    public function options(Request $request)
+    {
+        $ret['catMap'] = MessageService::CAT_MAP;
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
     public function list(Request $request)
     {
         $params = getParams($request);
@@ -34,16 +48,20 @@ class MessageController extends Controller
         ]);
     }
     
-    public function save(Request $request)
+    public function save(SaveRequest $request)
     {
         $params = getParams($request);
-        $id = $params['id'] ?? 0;
-        $title = $params['title'] ?? '';
-        $desc = $params['desc'] ?? '';
-        $banner = $params['banner'] ?? '';
-        $text = $params['text'] ?? '';
-        $releaseAt = $params['releaseAt'] ?? '';
-        $ret = MessageService::getInstance()->save($id, $title, $banner, $desc, $text, $releaseAt);
+        $obj = new Message();
+        $obj->id = $params['id'] ?? 0;
+        $obj->title = $params['title'];
+        $obj->cat_id = $params['catId'];
+        $obj->text = $params['text'];
+        $obj->publisher = $params['publisher'];
+        $obj->top = $params['top'] ?? false;
+        $obj->desc = $params['desc'] ?? '';
+        $obj->banner = $params['banner'] ?? '';
+        $obj->publish_time = $params['publishTime'] ?: date('Y-m-d H:i:s');
+        $ret = MessageService::getInstance()->save($obj);
         return response()->json([
             'code' => 0,
             'msg' => 'success',

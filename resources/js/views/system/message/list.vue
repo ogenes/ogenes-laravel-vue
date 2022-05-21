@@ -30,19 +30,22 @@
         :max-height="tableHeight"
       >
         <el-table-column type="" prop="id" sortable="custom" width="100" align="center" label="ID"/>
+        <el-table-column type="" prop="cat" sortable="custom" width="100" align="center" label="品类"/>
         <el-table-column prop="title" sortable="custom" width="200" align="left" label="标题">
           <template v-slot="scope">
             <span>{{ scope.row.title }}</span>
           </template>
         </el-table-column>
+        <el-table-column prop="top" sortable="custom" width="200" align="left" label="置顶">
+          <template v-slot="scope">
+            <span>{{ scope.row.top ? '是' : '否' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column type="" prop="publisher" sortable="custom" width="100" align="center" label="公布人"/>
+        <el-table-column type="" prop="publishTime" sortable="custom" width="100" align="center" label="公布时间"/>
         <el-table-column prop="desc" width="200" align="left" label="描述">
           <template v-slot="scope">
             <pre>{{ scope.row.desc }}</pre>
-          </template>
-        </el-table-column>
-        <el-table-column prop="text" align="left" label="内容">
-          <template v-slot="scope">
-            <pre v-html="scope.row.text"></pre>
           </template>
         </el-table-column>
         <el-table-column prop="createdAt" sortable="custom" width="200" align="center" label="创建时间"/>

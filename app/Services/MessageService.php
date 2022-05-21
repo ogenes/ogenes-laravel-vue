@@ -15,6 +15,16 @@ use function App\Helpers\formatDateTime;
 
 class MessageService extends BaseService
 {
+    public const
+        CAT_SYSTEM = 1,
+        CAT_NOTIFY = 2,
+        CAT_DYNAMIC = 3,
+        CAT_MAP = [
+        self::CAT_SYSTEM => '公司制度',
+        self::CAT_NOTIFY => '公告通知',
+        self::CAT_DYNAMIC => '公司动态',
+    ];
+    
     public function getList(string $keyword, int $page = 1, int $pageSize = 30): array
     {
         $resp = Message::select()
@@ -31,6 +41,7 @@ class MessageService extends BaseService
             $item = json_decode(json_encode($item, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
             $item['created_at'] = formatDateTime($item['created_at']);
             $item['updated_at'] = formatDateTime($item['updated_at']);
+            $item['cat'] = self::CAT_MAP[$item['cat_id']] ?? '';
             $tmp = [];
             foreach ($item as $key => $value) {
                 $tmp[Str::camel($key)] = $value;
@@ -55,27 +66,18 @@ class MessageService extends BaseService
         return $ret;
     }
     
-    public function save(
-        int    $id,
-        string $title,
-        string $banner,
-        string $desc,
-        string $text,
-        string $releaseAt
-    ): array
+    public function save(Message $obj): array
     {
         $ret = [];
         DB::beginTransaction();
         try {
-            if ($id > 0) {
-                $exist = Message::whereId($id)->first();
+            if ($obj->id > 0) {
+                $exist = Message::whereId($obj->id)->first();
                 if ($exist) {
                     $updateData = [];
-                    $title !== $exist->title && $updateData['title'] = $title;
-                    $desc !== $exist->desc && $updateData['desc'] = $desc;
-                    $text !== $exist->text && $updateData['text'] = $text;
-                    $banner && $banner !== $exist->banner && $updateData['banner'] = $banner;
-                    $releaseAt && $releaseAt !== $exist->release_at && $updateData['release_at'] = $releaseAt;
+                    foreach ($obj->getAttributes() as $k => $v) {
+                        $v !== $exist->$k && $updateData[$k] = $v;
+                    }
                     if ($updateData) {
                         $updateData['updated_at'] = date('Y-m-d H:i:s');
                         foreach ($updateData as $key => $val) {
@@ -84,7 +86,7 @@ class MessageService extends BaseService
                         $exist->save();
                         ActionLogService::getInstance()->insert(
                             ActionLogService::RESOURCE_MSG,
-                            $id,
+                            $obj->id,
                             $this->uid,
                             '编辑',
                             $updateData
@@ -93,18 +95,11 @@ class MessageService extends BaseService
                 }
                 $data = $exist->toArray();
             } else {
-                $data = [
-                    'title' => $title,
-                    'desc' => $desc,
-                    'banner' => $banner,
-                    'text' => $text,
-                    'author_id' => $this->uid,
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s'),
-                ];
-                $releaseAt && $data['release_at'] = date('Y-m-d H:i:s', strtotime($releaseAt));
-                $id = Message::insertGetId($data);
-                $data['id'] = $id;
+                $obj->created_at = $obj->updated_at = date('Y-m-d H:i:s');
+                $obj->author_id = $this->uid;
+                $obj->save();
+                $id = $obj->id;
+                $data = $obj->getAttributes();
                 ActionLogService::getInstance()->insert(
                     ActionLogService::RESOURCE_MSG,
                     $id,

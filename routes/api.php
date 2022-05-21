@@ -123,6 +123,7 @@ Route::middleware(['language'])->group(function () {
                 Route::any('list', [ActionLogController::class, 'list'])->name('ActionLogManage');
             });
             Route::prefix('message')->group(function () {
+                Route::any('options', [MessageController::class, 'options'])->name('MessageManage');
                 Route::any('list', [MessageController::class, 'list'])->name('MessageManage');
                 Route::any('detail', [MessageController::class, 'detail'])->name('MessageManage');
                 Route::any('add', [MessageController::class, 'save'])->name('MessageManageAdd');
