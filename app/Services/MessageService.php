@@ -10,8 +10,11 @@ namespace App\Services;
 
 use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
+use App\Models\Menu;
 use App\Models\Message;
+use App\Models\MessageRead;
 use App\Models\Role;
+use App\Models\RoleHasMenu;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use function App\Helpers\formatDateTime;
@@ -187,5 +190,69 @@ class MessageService extends BaseService
         }
         return true;
     }
+    
+    /**
+     * 获取系统通知， 不受权限控制
+     * 
+     * @param string $keyword
+     * @param int $type
+     * @param int $page
+     * @param int $pageSize
+     * @return array
+     *
+     * @author: ogenes
+     * @date: 2022/5/22
+     */
+    public function getMessages(string $keyword, int $type, int $page = 1, int $pageSize = 30): array
+    {
+        //获取所有没有隐藏的message， 按照top和updated_at排序, type1/2/0区分已读和未读和所有，
+        $mTb = (new Message())->getTable();
+        $rTb = (new MessageRead())->getTable();
+        
+        $uid = $this->uid;
+        $query = DB::table("{$mTb} as m")
+            ->leftJoin("{$rTb} as r",  function ($join) use ($uid) {
+                $join->on('m.id', '=','r.mid')
+                    ->on('r.uid', '=', DB::raw($uid));
+            })
+            ->where('m.hidden', '=', 0)
+            ->select(([
+                'm.id',
+                'm.title',
+                'm.desc',
+                'm.banner',
+                'm.cat_id',
+                'm.publisher',
+                'm.publish_time',
+                'm.text',
+                'm.top',
+            ]));
+        if ($type === 1) {
+            $query->whereNull('r.id');
+        }
+        if ($type === 2) {
+            $query->whereNotNull('r.id');
+        }
+        
+        $resp = $query->orderBy('m.top', 'desc')
+            ->orderBy('m.updated_at', 'desc')
+            ->paginate($pageSize, ['*'], 'page', $page)
+            ->toArray();
+            
+        $ret['cnt'] = $resp['total'];
+        $ret['page'] = $resp['current_page'];
+        $ret['pageSize'] = $resp['per_page'];
+        foreach ($resp['data'] as $item) {
+            $item = json_decode(json_encode($item, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
+            $item['cat'] = self::CAT_MAP[$item['cat_id']] ?? '';
+            $tmp = [];
+            foreach ($item as $key => $value) {
+                $tmp[Str::camel($key)] = $value;
+            }
+            $ret['list'][] = $tmp;
+        }
+        return $ret;
+    }
+    
     
 }

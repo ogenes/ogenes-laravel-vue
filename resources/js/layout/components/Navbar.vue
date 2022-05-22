@@ -17,6 +17,8 @@
           <size-select id="size-select" class="right-menu-item hover-effect"/>
         </el-tooltip>
 
+        <notify id="header-notify" class="right-menu-item"/>
+
       </template>
 
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
@@ -50,6 +52,7 @@
   import Screenfull from '@/components/Screenfull'
   import SizeSelect from '@/components/SizeSelect'
   import Search from '@/components/HeaderSearch'
+  import Notify from '@/components/Notify'
 
   export default {
     components: {
@@ -58,7 +61,8 @@
       ErrorLog,
       Screenfull,
       SizeSelect,
-      Search
+      Search,
+      Notify
     },
     computed: {
       ...mapGetters([

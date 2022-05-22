@@ -4,14 +4,28 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Message\SaveRequest;
 use App\Models\Message;
-use App\Services\DictService;
 use App\Services\MessageService;
-use App\Services\Permission\MenuService;
 use Illuminate\Http\Request;
 use function App\Helpers\getParams;
 
 class MessageController extends Controller
 {
+    
+    public function all(Request $request)
+    {
+        $params = getParams($request);
+        $keyword = $params['keyword'] ?? '';
+        $page = $params['page'] ?? 1;
+        $pageSize = $params['pageSize'] ?? 30;
+        $type = $params['type'] ?? 0;
+        $ret = MessageService::getInstance()->getMessages($keyword, $type, $page, $pageSize);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
     public function options(Request $request)
     {
         $ret['catMap'] = MessageService::CAT_MAP;

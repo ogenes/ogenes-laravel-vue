@@ -46,13 +46,12 @@ Route::middleware(['language'])->group(function () {
             Route::any('updateAvatar', [AuthController::class, 'updateAvatar']);
             Route::any('updatePass', [AuthController::class, 'updatePass']);
         });
-        Route::prefix('file')->group(function () {
-            Route::any('upload', [FileController::class, 'upload']);
-        });
-        Route::prefix('menu')->group(function () {
-            Route::any('menuMap', [MenuController::class, 'menuMap']);
-        });
-        
+
+        Route::any('file/upload', [FileController::class, 'upload']);
+        Route::any('menu/menuMap', [MenuController::class, 'menuMap']);
+        Route::any('message', [MessageController::class, 'all']);
+    
+    
         Route::prefix('actionLog')->group(function () {
             Route::any('options', [ActionLogController::class, 'options'])->name('ActionLogManage');
         });

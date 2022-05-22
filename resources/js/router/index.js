@@ -92,6 +92,20 @@ export const constantRoutes = [
         meta: {title: '用户资料', icon: 'user', noCache: true}
       }
     ]
+  },
+  {
+    path: '/notify',
+    component: Layout,
+    redirect: '/notify/index',
+    hidden: true,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/message/index'),
+        name: 'Notify',
+        meta: {title: '消息列表', icon: 'notify', noCache: true}
+      }
+    ]
   }
 ];
 
