@@ -62,8 +62,12 @@ export const BTN_MAP_DICT = {
 };
 
 export const BTN_MSG_EDIT = 'MessageManageEdit';
+export const BTN_MSG_TOP = 'MessageManageTop';
+export const BTN_MSG_HIDDEN = 'MessageManageHidden';
 export const BTN_MAP_MSG = {
-  [BTN_MSG_EDIT]: '编辑'
+  [BTN_MSG_EDIT]: '编辑',
+  [BTN_MSG_TOP]: '置顶',
+  [BTN_MSG_HIDDEN]: '隐藏',
 }
 
 export const BTN_MAP = {

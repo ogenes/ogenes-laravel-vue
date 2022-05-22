@@ -45,3 +45,11 @@ export function switchHidden(data) {
     data: {data},
   })
 }
+
+export function switchTop(data) {
+  return request({
+    url: '/api/message/switchTop',
+    method: 'post',
+    data: {data},
+  })
+}

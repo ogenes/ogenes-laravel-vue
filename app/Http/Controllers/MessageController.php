@@ -28,7 +28,8 @@ class MessageController extends Controller
         $keyword = $params['keyword'] ?? '';
         $page = $params['page'] ?? 1;
         $pageSize = $params['pageSize'] ?? 30;
-        $ret = MessageService::getInstance()->getList($keyword, $page, $pageSize);
+        $sort = $params['sort'] ?? [];
+        $ret = MessageService::getInstance()->getList($keyword, $sort, $page, $pageSize);
         return response()->json([
             'code' => 0,
             'msg' => 'success',
@@ -75,6 +76,19 @@ class MessageController extends Controller
         $id = $params['id'] ?? 0;
         $hidden = $params['hidden'] ?? 0;
         $ret = MessageService::getInstance()->switchHidden($id, $hidden);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
+    public function switchTop(Request $request)
+    {
+        $params = getParams($request);
+        $id = $params['id'] ?? 0;
+        $top = $params['top'] ?? 0;
+        $ret = MessageService::getInstance()->switchTop($id, $top);
         return response()->json([
             'code' => 0,
             'msg' => 'success',

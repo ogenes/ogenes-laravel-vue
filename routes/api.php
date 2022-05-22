@@ -129,6 +129,7 @@ Route::middleware(['language'])->group(function () {
                 Route::any('add', [MessageController::class, 'save'])->name('MessageManageAdd');
                 Route::any('edit', [MessageController::class, 'save'])->name('MessageManageEdit');
                 Route::any('switchHidden', [MessageController::class, 'switchHidden'])->name('MessageManageHidden');
+                Route::any('switchTop', [MessageController::class, 'switchTop'])->name('MessageManageTop');
             });
         });
     });
