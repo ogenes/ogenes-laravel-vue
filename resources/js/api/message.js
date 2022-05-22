@@ -7,3 +7,10 @@ export function getMessage(data) {
     params: {data},
   })
 }
+
+export function getOptions() {
+  return request({
+    url: '/api/message/options',
+    method: 'get',
+  })
+}

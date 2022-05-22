@@ -1,21 +1,22 @@
 <template>
   <div>
     <el-card>
-      <el-input
-        placeholder="请输入关键字后按回车键搜索"
-        v-model="queryParams.keyword"
-        clearable
-        style="width: 100%;"
-        @keyup.enter.native="queryList"
-      >
-      </el-input>
-
-      <div>
+      <div class="page-position" style="float: right">
+        <el-pagination
+          background
+          :page-size="queryParams.pageSize"
+          :page-sizes="pageSizes"
+          :current-page="queryParams.page"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="result.cnt"
+          @size-change="handleListSizeChange"
+          @current-change="handleListCurrentChange"
+        />
+      </div>
+      <div style="margin-top: 50px;">
         <div v-for="(item, key) in result.list" :key="key" class="message-list">
           <div class="message-list-content">
             <div style="font-weight: bold; font-size: 16px; height: 34px; line-height: 34px;">
-              <el-tag v-if="item.top" type="warning" style="margin-right: 5px;">置顶</el-tag>
-              <el-tag v-if="item.hidden" type="danger" style="margin-right: 5px;">隐藏</el-tag>
               <router-link :to="'/system/message/view/'+item.id">
                 {{ item.title }}
               </router-link>
@@ -26,7 +27,8 @@
               </router-link>
             </div>
             <div style="height: 30px; line-height: 40px;font-size: 14px;">
-              <div style="float: left; margin-right: 15px; color: #409EFF; width: 100px; border-bottom: 1px solid #DCDFE6;">
+              <div
+                style="float: left; margin-right: 15px; color: #409EFF; width: 100px; border-bottom: 1px solid #DCDFE6;">
                 <svg-icon icon-class="cat"/>
                 <span>{{ item.cat }}</span>
               </div>
@@ -37,13 +39,6 @@
               <div style="float: left;margin-right: 15px; width: 150px; border-bottom: 1px solid #DCDFE6;">
                 <svg-icon icon-class="timer"/>
                 {{ item.publishTime }}
-              </div>
-              <div v-permission="[BTN_MSG_EDIT]" style="float: left;margin-right: 15px; border-bottom: 1px solid #DCDFE6;">
-                <router-link :to="'/system/message/edit/'+item.id">
-                  <el-button type="text" icon="el-icon-edit">
-                    {{ BTN_MAP_MSG[BTN_MSG_EDIT] }}
-                  </el-button>
-                </router-link>
               </div>
             </div>
           </div>
@@ -58,58 +53,38 @@
 
         </div>
       </div>
-      <div class="page-position" style="float: right">
-        <el-pagination
-          background
-          :page-size="queryParams.pageSize"
-          :page-sizes="pageSizes"
-          :current-page="queryParams.page"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="result.cnt"
-          @size-change="handleListSizeChange"
-          @current-change="handleListCurrentChange"
-        />
-      </div>
     </el-card>
   </div>
 </template>
 
 <script>
-  import {getList} from '@/api/system/message';
-  import {
-    BTN_MAP_MSG,
-    BTN_MSG_EDIT,
-  } from '@/api/btn'
+  import {getMessage} from '@/api/message';
 
   export default {
     name: "MessageList",
 
-    components: {},
-
-    mounted() {
-      this.$nextTick(() => {
-        this.tableHeight = window.innerHeight - 165;
-      })
+    props: {
+      typeId: {
+        type: Number
+      },
+      catId: {
+        type: String
+      }
     },
+    components: {},
 
     data() {
       return {
-        BTN_MAP_MSG,
-        BTN_MSG_EDIT,
 
         loading: false,
-        tableHeight: 0,
         selectedIds: [],
         queryParams: {
-          keyword: '',
-          sort: {
-            prop: 'id',
-            order: 'descending',
-          },
+          type: 0,
+          cat: 0,
           page: 1,
-          pageSize: 20,
+          pageSize: 5,
         },
-        pageSizes: [10, 20, 50, 100, 200],
+        pageSizes: [5, 10, 20, 50],
         result: {
           list: [],
           cnt: 0
@@ -132,7 +107,9 @@
       getList() {
         console.log(this.selectedIds);
         this.loading = true;
-        getList(this.queryParams).then((res) => {
+        this.queryParams.type = this.typeId;
+        this.queryParams.cat = this.catId;
+        getMessage(this.queryParams).then((res) => {
           if (res.code > 0) {
             this.$message.error(res.msg)
           } else {

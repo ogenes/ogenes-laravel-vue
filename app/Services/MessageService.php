@@ -194,7 +194,6 @@ class MessageService extends BaseService
     /**
      * 获取系统通知， 不受权限控制
      * 
-     * @param string $keyword
      * @param int $type
      * @param int $page
      * @param int $pageSize
@@ -203,7 +202,7 @@ class MessageService extends BaseService
      * @author: ogenes
      * @date: 2022/5/22
      */
-    public function getMessages(string $keyword, int $type, int $page = 1, int $pageSize = 30): array
+    public function getMessages(int $type, int $page = 1, int $pageSize = 30): array
     {
         //获取所有没有隐藏的message， 按照top和updated_at排序, type1/2/0区分已读和未读和所有，
         $mTb = (new Message())->getTable();

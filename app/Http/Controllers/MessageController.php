@@ -14,11 +14,10 @@ class MessageController extends Controller
     public function all(Request $request)
     {
         $params = getParams($request);
-        $keyword = $params['keyword'] ?? '';
         $page = $params['page'] ?? 1;
         $pageSize = $params['pageSize'] ?? 30;
         $type = $params['type'] ?? 0;
-        $ret = MessageService::getInstance()->getMessages($keyword, $type, $page, $pageSize);
+        $ret = MessageService::getInstance()->getMessages($type, $page, $pageSize);
         return response()->json([
             'code' => 0,
             'msg' => 'success',
