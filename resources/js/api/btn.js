@@ -61,10 +61,16 @@ export const BTN_MAP_DICT = {
   [BTN_DICT_DATA_DEL]: '删除',
 };
 
+export const BTN_MSG_EDIT = 'MessageManageEdit';
+export const BTN_MAP_MSG = {
+  [BTN_MSG_EDIT]: '编辑'
+}
+
 export const BTN_MAP = {
   ...BTN_MAP_DEPT,
   ...BTN_MAP_USER,
   ...BTN_MAP_MENU,
   ...BTN_MAP_ROLE,
   ...BTN_MAP_DICT,
+  ...BTN_MAP_MSG,
 };

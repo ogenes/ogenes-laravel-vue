@@ -97,14 +97,21 @@ const systemRouter = {
         {
           path: 'create',
           component: () => import('@/views/system/message/create'),
-          name: 'CreateMessage',
+          name: 'MessageManageAdd',
           meta: { title: '新增消息', icon: 'edit' }
         },
         {
           path: 'edit/:id(\\d+)',
           component: () => import('@/views/system/message/edit'),
-          name: 'EditMessage',
+          name: 'MessageManageEdit',
           meta: { title: '编辑消息', noCache: true, activeMenu: '/system/message/list' },
+          hidden: true
+        },
+        {
+          path: 'view/:id(\\d+)',
+          component: () => import('@/views/system/message/view'),
+          name: 'ViewMessage',
+          meta: { title: '查看消息', noCache: true, activeMenu: '/system/message/list' },
           hidden: true
         },
         {

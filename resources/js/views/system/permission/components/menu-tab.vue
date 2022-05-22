@@ -135,7 +135,7 @@
           <el-input v-model="menuParams.title" placeholder="请输入" clearable style="width: 100%"/>
         </el-form-item>
         <el-form-item label="权限标识：" prop="roles">
-          <el-select v-if="menuParams.type === '3'" v-model="menuParams.roles" placeholder="请选择" style="width: 100%">
+          <el-select v-if="menuParams.type === '3'" v-model="menuParams.roles" placeholder="请选择" filterable style="width: 100%">
             <el-option
               v-for="(item, key) in BTN_MAP"
               :key="key"

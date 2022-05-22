@@ -28,7 +28,8 @@ class SaveRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'required|string',
+            'title' => 'required|string|max:64',
+            'desc' => 'max:128',
             'catId' => 'required',
             'text' => 'required|string',
             'publisher' => 'required|string',

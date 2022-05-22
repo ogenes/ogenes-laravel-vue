@@ -9,7 +9,56 @@
         @keyup.enter.native="queryList"
       >
       </el-input>
-      <div class="page-position">
+
+      <div>
+        <div v-for="(item, key) in result.list" :key="key" class="message-list">
+          <div class="message-list-content">
+            <div style="font-weight: bold; font-size: 16px; height: 34px; line-height: 34px;">
+              <el-tag v-if="item.top" type="warning" style="margin-right: 5px;">置顶</el-tag>
+              <el-tag v-if="item.hidden" type="danger" style="margin-right: 5px;">隐藏</el-tag>
+              <router-link :to="'/system/message/view/'+item.id">
+                {{ item.title }}
+              </router-link>
+            </div>
+            <div style="font-size: 12px; height: 30px; line-height: 30px; width: 800px; overflow: hidden;">
+              <router-link :to="'/system/message/view/'+item.id">
+                {{ item.desc }}……
+              </router-link>
+            </div>
+            <div style="height: 30px; line-height: 40px;font-size: 14px;">
+              <div style="float: left; margin-right: 15px; color: #409EFF; width: 100px; border-bottom: 1px solid #DCDFE6;">
+                <svg-icon icon-class="cat"/>
+                <span>{{ item.cat }}</span>
+              </div>
+              <div style="float: left; margin-right: 15px; width: 150px; border-bottom: 1px solid #DCDFE6;">
+                <i class="el-icon-user"/>
+                <span> {{ item.publisher }}</span>
+              </div>
+              <div style="float: left;margin-right: 15px; width: 150px; border-bottom: 1px solid #DCDFE6;">
+                <svg-icon icon-class="timer"/>
+                {{ item.publishTime }}
+              </div>
+              <div v-permission="[BTN_MSG_EDIT]" style="float: left;margin-right: 15px; border-bottom: 1px solid #DCDFE6;">
+                <router-link :to="'/system/message/edit/'+item.id">
+                  <el-button type="text" icon="el-icon-edit">
+                    {{ BTN_MAP_MSG[BTN_MSG_EDIT] }}
+                  </el-button>
+                </router-link>
+              </div>
+            </div>
+          </div>
+          <div class="message-list-image">
+            <el-image
+              ref="uploadImage"
+              fit="fill"
+              :src="item.banner"
+              :preview-src-list="[item.banner]"
+            />
+          </div>
+
+        </div>
+      </div>
+      <div class="page-position" style="float: right">
         <el-pagination
           background
           :page-size="queryParams.pageSize"
@@ -21,51 +70,16 @@
           @current-change="handleListCurrentChange"
         />
       </div>
-      <el-table
-        :data="result.list"
-        v-loading.fullscreen.lock="loading"
-        border
-        :default-sort="queryParams.sort"
-        @sort-change="sortChange"
-        :max-height="tableHeight"
-      >
-        <el-table-column type="" prop="id" sortable="custom" width="100" align="center" label="ID"/>
-        <el-table-column type="" prop="cat" sortable="custom" width="100" align="center" label="品类"/>
-        <el-table-column prop="title" sortable="custom" width="200" align="left" label="标题">
-          <template v-slot="scope">
-            <span>{{ scope.row.title }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="top" sortable="custom" width="200" align="left" label="置顶">
-          <template v-slot="scope">
-            <span>{{ scope.row.top ? '是' : '否' }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column type="" prop="publisher" sortable="custom" width="100" align="center" label="公布人"/>
-        <el-table-column type="" prop="publishTime" sortable="custom" width="100" align="center" label="公布时间"/>
-        <el-table-column prop="desc" width="200" align="left" label="描述">
-          <template v-slot="scope">
-            <pre>{{ scope.row.desc }}</pre>
-          </template>
-        </el-table-column>
-        <el-table-column prop="createdAt" sortable="custom" width="200" align="center" label="创建时间"/>
-        <el-table-column prop="updatedAt" sortable="custom" width="200" align="center" label="更新时间"/>
-        <el-table-column align="center" label="操作" width="120">
-          <template v-slot="scope">
-            <router-link :to="'/system/message/edit/'+scope.row.id">
-              <el-button type="primary" size="small" icon="el-icon-edit">
-                编辑
-              </el-button>
-            </router-link>
-          </template>
-        </el-table-column>
-      </el-table>
     </el-card>
   </div>
 </template>
 
 <script>
   import {getList} from '@/api/system/message';
+  import {
+    BTN_MAP_MSG,
+    BTN_MSG_EDIT,
+  } from '@/api/btn'
 
   export default {
     name: "MessageList",
@@ -80,9 +94,12 @@
 
     data() {
       return {
+        BTN_MAP_MSG,
+        BTN_MSG_EDIT,
+
         loading: false,
         tableHeight: 0,
-
+        selectedIds: [],
         queryParams: {
           keyword: '',
           sort: {
@@ -113,6 +130,7 @@
       },
 
       getList() {
+        console.log(this.selectedIds);
         this.loading = true;
         getList(this.queryParams).then((res) => {
           if (res.code > 0) {
@@ -149,9 +167,28 @@
 </script>
 
 <style scoped lang="scss">
-  .app-container {
-    .form-item-width {
-      width: 300px
+  .message-list {
+    padding: 10px;
+    margin-top: 20px;
+    height: 129px;
+    border: 1px solid #DCDFE6;
+    border-radius: 5px;
+
+    .message-list-content {
+      float: left;
+    }
+
+    .message-list-image {
+      float: right;
+      width: 194px;
+      height: 99px;
+      border-radius: 5px;
+
+      .el-image {
+        border: 1px solid #DCDFE6;
+        border-radius: 5px;
+        height: 100%;
+      }
     }
   }
 </style>

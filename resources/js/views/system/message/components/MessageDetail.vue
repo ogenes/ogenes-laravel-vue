@@ -21,7 +21,8 @@
         </el-col>
         <el-col :span="20">
           <el-form-item prop="title">
-            <el-input type="text" placeholder="请输入标题" size="medium" class="message-header" v-model="messageParams.title"/>
+            <el-input type="text" placeholder="请输入标题" size="medium" class="message-header"
+                      v-model="messageParams.title"/>
           </el-form-item>
         </el-col>
       </el-row>
@@ -95,6 +96,20 @@
         </el-col>
       </el-row>
     </el-form>
+
+    <el-dialog
+      title="保存成功"
+      :visible.sync="successDialog"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :center="true"
+      :destroy-on-close="true"
+      width="30%">
+      <div style="width: 50%; margin: 20px auto; padding-bottom: 20px; text-align: center">
+        <el-button style="float: left" type="primary" @click="jumpView">去查看</el-button>
+        <el-button style="float: right" type="info" @click="closeDialog">知道了</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -162,7 +177,9 @@
           catId: [{required: true, message: '请选择类型', trigger: 'change'}],
           publisher: [{required: true, message: '请输入公布人', trigger: 'change'}],
         },
-        tempRoute: {}
+        tempRoute: {},
+        successDialog: false,
+        jumperId: 0,
       }
     },
     computed: {
@@ -210,7 +227,8 @@
               if (res.code > 0) {
                 this.$message.error(res.msg)
               } else {
-                this.$message.success('操作成功')
+                this.jumperId = res.data.id;
+                this.successDialog = true;
               }
             })
             this.loading = false
@@ -223,6 +241,18 @@
 
       uploadBanner(url) {
         this.messageParams.banner = url;
+      },
+      closeDialog() {
+        if (this.messageParams.id > 0) {
+          this.fetchData(this.messageParams.id)
+        } else {
+          this.messageParams = Object.assign({}, defaultForm);
+        }
+        this.successDialog = false;
+      },
+
+      jumpView() {
+        this.$router.push(`/system/message/view/${this.jumperId}`);
       }
     }
   }
@@ -236,6 +266,7 @@
 
     .message-form {
       margin-top: 50px;
+
       .message-header ::v-deep {
         .el-input__inner {
           resize: none;
