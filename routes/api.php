@@ -51,6 +51,7 @@ Route::middleware(['language'])->group(function () {
         Route::any('menu/menuMap', [MenuController::class, 'menuMap']);
         Route::any('message', [MessageController::class, 'all']);
         Route::any('message/options', [MessageController::class, 'options']);
+        Route::any('message/read', [MessageController::class, 'read']);
     
     
         Route::prefix('actionLog')->group(function () {

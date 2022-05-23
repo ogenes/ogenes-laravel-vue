@@ -17,7 +17,20 @@ class MessageController extends Controller
         $page = $params['page'] ?? 1;
         $pageSize = $params['pageSize'] ?? 30;
         $type = $params['type'] ?? 0;
-        $ret = MessageService::getInstance()->getMessages($type, $page, $pageSize);
+        $cat = $params['cat'] ?? 0;
+        $ret = MessageService::getInstance()->getMessages($type, $cat, $page, $pageSize);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
+    public function read(Request $request)
+    {
+        $params = getParams($request);
+        $mid = $params['mid'] ?? 0;
+        $ret = MessageService::getInstance()->read($mid);
         return response()->json([
             'code' => 0,
             'msg' => 'success',

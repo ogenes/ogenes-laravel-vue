@@ -1,30 +1,14 @@
 <template>
   <div>
     <el-card>
-      <div class="page-position" style="float: right">
-        <el-pagination
-          background
-          :page-size="queryParams.pageSize"
-          :page-sizes="pageSizes"
-          :current-page="queryParams.page"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="result.cnt"
-          @size-change="handleListSizeChange"
-          @current-change="handleListCurrentChange"
-        />
-      </div>
-      <div style="margin-top: 50px;">
+      <div>
         <div v-for="(item, key) in result.list" :key="key" class="message-list">
-          <div class="message-list-content">
+          <div class="message-list-content" @click="showView(item)">
             <div style="font-weight: bold; font-size: 16px; height: 34px; line-height: 34px;">
-              <router-link :to="'/system/message/view/'+item.id">
-                {{ item.title }}
-              </router-link>
+              {{ item.title }}
             </div>
             <div style="font-size: 12px; height: 30px; line-height: 30px; width: 800px; overflow: hidden;">
-              <router-link :to="'/system/message/view/'+item.id">
-                {{ item.desc }}……
-              </router-link>
+              {{ item.desc }}
             </div>
             <div style="height: 30px; line-height: 40px;font-size: 14px;">
               <div
@@ -53,12 +37,40 @@
 
         </div>
       </div>
+
+      <div class="page-position" style="float: right">
+        <el-pagination
+          background
+          :page-size="queryParams.pageSize"
+          :page-sizes="pageSizes"
+          :current-page="queryParams.page"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="result.cnt"
+          @size-change="handleListSizeChange"
+          @current-change="handleListCurrentChange"
+        />
+      </div>
     </el-card>
+
+    <el-drawer
+      v-if="viewDialog"
+      :title="`查看消息-${viewData.id}`"
+      direction="rtl"
+      size="50%"
+      :visible.sync="viewDialog"
+      :wrapper-closable="false"
+      style="padding-left: 20px"
+      custom-class="overflow-auto"
+      :before-close="closeView"
+    >
+      <view-message :notify="viewData"/>
+    </el-drawer>
   </div>
 </template>
 
 <script>
   import {getMessage} from '@/api/message';
+  import ViewMessage from './view';
 
   export default {
     name: "MessageList",
@@ -71,7 +83,9 @@
         type: String
       }
     },
-    components: {},
+    components: {
+      ViewMessage
+    },
 
     data() {
       return {
@@ -89,6 +103,9 @@
           list: [],
           cnt: 0
         },
+
+        viewDialog: false,
+        viewData: {},
       }
     },
 
@@ -139,6 +156,17 @@
         };
         this.queryList();
       },
+
+      showView(row) {
+        this.viewData = row;
+        console.log(row, 'row')
+        this.viewDialog = true;
+      },
+
+      closeView() {
+        console.log(this.viewData, 'data');
+        this.viewDialog = false;
+      }
     }
   }
 </script>

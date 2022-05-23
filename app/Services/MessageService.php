@@ -193,7 +193,7 @@ class MessageService extends BaseService
     
     /**
      * 获取系统通知， 不受权限控制
-     * 
+     *
      * @param int $type
      * @param int $page
      * @param int $pageSize
@@ -202,7 +202,7 @@ class MessageService extends BaseService
      * @author: ogenes
      * @date: 2022/5/22
      */
-    public function getMessages(int $type, int $page = 1, int $pageSize = 30): array
+    public function getMessages(int $type, int $cat, int $page = 1, int $pageSize = 30): array
     {
         //获取所有没有隐藏的message， 按照top和updated_at排序, type1/2/0区分已读和未读和所有，
         $mTb = (new Message())->getTable();
@@ -210,8 +210,8 @@ class MessageService extends BaseService
         
         $uid = $this->uid;
         $query = DB::table("{$mTb} as m")
-            ->leftJoin("{$rTb} as r",  function ($join) use ($uid) {
-                $join->on('m.id', '=','r.mid')
+            ->leftJoin("{$rTb} as r", function ($join) use ($uid) {
+                $join->on('m.id', '=', 'r.mid')
                     ->on('r.uid', '=', DB::raw($uid));
             })
             ->where('m.hidden', '=', 0)
@@ -232,12 +232,13 @@ class MessageService extends BaseService
         if ($type === 2) {
             $query->whereNotNull('r.id');
         }
+        $cat && $query->where('cat_id', '=', $cat);
         
         $resp = $query->orderBy('m.top', 'desc')
             ->orderBy('m.updated_at', 'desc')
             ->paginate($pageSize, ['*'], 'page', $page)
             ->toArray();
-            
+        
         $ret['cnt'] = $resp['total'];
         $ret['page'] = $resp['current_page'];
         $ret['pageSize'] = $resp['per_page'];
@@ -253,5 +254,29 @@ class MessageService extends BaseService
         return $ret;
     }
     
-    
+    public function read(int $mid): bool
+    {
+        if ($mid <= 0) {
+            return false;
+        }
+        $exist = MessageRead::where('mid', '=', $mid)
+            ->where('uid', '=', $this->uid)
+            ->first();
+        $now = date('Y-m-d H:i:s');
+        if ($exist) {
+            $exist->updated_at = $now;
+            ++$exist->times;
+            $exist->save();
+        } else {
+            MessageRead::insertGetId([
+                'mid' => $mid,
+                'uid' => $this->uid,
+                'times' => 1,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+        }
+        
+        return true;
+    }
 }

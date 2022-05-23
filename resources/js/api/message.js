@@ -14,3 +14,11 @@ export function getOptions() {
     method: 'get',
   })
 }
+
+export function readMessage(data) {
+  return request({
+    url: '/api/message/read',
+    method: 'get',
+    data: {data},
+  })
+}
