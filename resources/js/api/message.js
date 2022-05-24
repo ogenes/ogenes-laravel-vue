@@ -18,7 +18,7 @@ export function getOptions() {
 export function readMessage(data) {
   return request({
     url: '/api/message/read',
-    method: 'get',
+    method: 'post',
     data: {data},
   })
 }

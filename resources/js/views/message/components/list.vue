@@ -58,9 +58,9 @@
       direction="rtl"
       size="50%"
       :visible.sync="viewDialog"
-      :wrapper-closable="false"
       style="padding-left: 20px"
       custom-class="overflow-auto"
+      :show-close="false"
       :before-close="closeView"
     >
       <view-message :notify="viewData"/>
@@ -69,7 +69,7 @@
 </template>
 
 <script>
-  import {getMessage} from '@/api/message';
+  import {getMessage, readMessage} from '@/api/message';
   import ViewMessage from './view';
 
   export default {
@@ -166,6 +166,7 @@
       closeView() {
         console.log(this.viewData, 'data');
         this.viewDialog = false;
+        readMessage({mid: this.viewData.id})
       }
     }
   }
