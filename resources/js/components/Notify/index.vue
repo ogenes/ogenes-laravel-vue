@@ -1,7 +1,7 @@
 <template>
-  <div style="cursor: pointer;" @click="Btn_Test_Click">
+  <div style="cursor: pointer;" @click="click">
     <svg-icon icon-class="notify1"/>
-    <el-badge :value="total" class="notify-badge">
+    <el-badge v-if="total>0" :value="total" class="notify-badge">
     </el-badge>
   </div>
 </template>
@@ -21,21 +21,27 @@
       const ret = await getMessage({type: 1});
       this.total = ret?.data?.cnt;
       this.list = ret?.data?.list;
-      this.Btn_Test_Click();
+      this.$WebSocket.WebSocketBandMsgReceivedEvent(this.WebSocket_OnMessage)
     },
     methods: {
       click() {
-        this.$router.push('/notify')
-      },
-      Btn_Test_Click() {
-
-        const param = {
-          event: 'notify',
-          data: {},
+        if (this.$route.path !== '/notify/index') {
+          this.$router.push("/notify");
         }
-        console.log(JSON.stringify(param), 'JSON.stringify(param)')
-        //发送消息
-        this.$WebSocket.WebSocketHandle.send(JSON.stringify(param))
+      },
+      WebSocket_OnMessage(msg) {
+        const ret = JSON.parse(msg.data);
+        if(ret.event === 'notify-refresh') {
+           const data = JSON.parse(ret.data);
+          if (data.type === 'incr') {
+            this.total += 1;
+          }
+          console.log('ret.data.type', data.type);
+          if (data.type === 'decr') {
+            this.total -= 1;
+            console.log('total', this.total);
+          }
+        }
       }
     }
   }

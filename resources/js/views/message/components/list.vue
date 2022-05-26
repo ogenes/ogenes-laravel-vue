@@ -91,7 +91,6 @@
       return {
 
         loading: false,
-        selectedIds: [],
         queryParams: {
           type: 0,
           cat: 0,
@@ -122,7 +121,6 @@
       },
 
       getList() {
-        console.log(this.selectedIds);
         this.loading = true;
         this.queryParams.type = this.typeId;
         this.queryParams.cat = this.catId;
@@ -159,14 +157,15 @@
 
       showView(row) {
         this.viewData = row;
-        console.log(row, 'row')
         this.viewDialog = true;
       },
 
       closeView() {
-        console.log(this.viewData, 'data');
         this.viewDialog = false;
         readMessage({mid: this.viewData.id})
+        if (this.typeId === 1)  {
+          this.queryList();
+        }
       }
     }
   }

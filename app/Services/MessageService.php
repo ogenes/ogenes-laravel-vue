@@ -10,11 +10,8 @@ namespace App\Services;
 
 use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
-use App\Models\Menu;
 use App\Models\Message;
 use App\Models\MessageRead;
-use App\Models\Role;
-use App\Models\RoleHasMenu;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use function App\Helpers\formatDateTime;
@@ -76,6 +73,7 @@ class MessageService extends BaseService
             $data = $resp->toArray();
             $data['created_at'] = formatDateTime($data['created_at']);
             $data['updated_at'] = formatDateTime($data['updated_at']);
+            $data['cat'] = self::CAT_MAP[$data['cat_id']] ?? '';
             foreach ($data as $key => $value) {
                 $ret[Str::camel($key)] = $value;
             }
@@ -267,6 +265,7 @@ class MessageService extends BaseService
             $exist->updated_at = $now;
             ++$exist->times;
             $exist->save();
+            $ret = false;
         } else {
             MessageRead::insertGetId([
                 'mid' => $mid,
@@ -275,8 +274,9 @@ class MessageService extends BaseService
                 'created_at' => $now,
                 'updated_at' => $now,
             ]);
+            $ret = true;
         }
         
-        return true;
+        return $ret;
     }
 }

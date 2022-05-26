@@ -13,8 +13,19 @@ class WebsocketController extends Controller
 {
     public function notify(Websocket $websocket, $data)
     {
-        echo 'UID' . $websocket->getUserId() . PHP_EOL;
-        WebsocketFacades::toUserId([1])->emit('message', 'hi there');
+        $uid = $websocket->getUserId();
+        if ($data['type'] === 'read') {
+            $ret['type'] = 'decr';
+            echo "{$uid} - decr" . PHP_EOL;
+            WebsocketFacades::toUserId($uid)->emit('notify-refresh', json_encode($ret));
+        }
+        
+        if ($data['type'] === 'add') {
+            $ret['type'] = 'incr';
+            echo "all user - incr" . PHP_EOL;
+            WebsocketFacades::broadcast()->emit('notify-refresh', json_encode($ret));
+        }
+    
     }
     
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\WebsocketClientHelper;
 use App\Http\Requests\Message\SaveRequest;
 use App\Models\Message;
 use App\Services\MessageService;
@@ -31,6 +32,11 @@ class MessageController extends Controller
         $params = getParams($request);
         $mid = $params['mid'] ?? 0;
         $ret = MessageService::getInstance()->read($mid);
+        $ret && WebsocketClientHelper::send(
+            $request->header('Authorization'),
+            'notify',
+            ['type' => 'read']
+        );
         return response()->json([
             'code' => 0,
             'msg' => 'success',
@@ -80,6 +86,7 @@ class MessageController extends Controller
         $params = getParams($request);
         $obj = new Message();
         $obj->id = $params['id'] ?? 0;
+        $isNew = $obj->id <= 0;
         $obj->title = $params['title'];
         $obj->cat_id = $params['catId'];
         $obj->text = $params['text'];
@@ -89,6 +96,12 @@ class MessageController extends Controller
         $obj->banner = $params['banner'] ?? '';
         $obj->publish_time = $params['publishTime'] ?: date('Y-m-d H:i:s');
         $ret = MessageService::getInstance()->save($obj);
+    
+        $ret && $isNew && WebsocketClientHelper::send(
+            $request->header('Authorization'),
+            'notify',
+            ['type' => 'add']
+        );
         return response()->json([
             'code' => 0,
             'msg' => 'success',

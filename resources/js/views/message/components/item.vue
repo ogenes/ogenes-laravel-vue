@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-tabs tab-position="left" :stretch="true">
+    <el-tabs tab-position="left" :stretch="true" :lazy="true">
       <el-tab-pane
         v-for="(value, key) in catMap"
         :key="key"
