@@ -11,30 +11,31 @@ use SwooleTW\Http\Server\Facades\Server as ClientServer;
 
 class WebsocketHandler implements HandlerContract
 {
-
+    
     private $server;
-
+    
     public function __construct()
     {
         /** @var Manager $manager */
         $this->server = App::make(ClientServer::class);
     }
-
+    
     /**
      * "onOpen" listener.
      * @param int $fd
      * @param \Illuminate\Http\Request $request
      * @return bool
+     * @throws \JsonException
      */
     public function onOpen($fd, Request $request)
     {
         /**
          * 客户端建立起长链接后，返回客户端fd
          */
-        $this->server->push($fd, json_encode(['event' => 'open', 'data' => ['fd' => $fd]]));
+        $this->server->push($fd, json_encode(['event' => 'open', 'data' => ['fd' => $fd]], JSON_THROW_ON_ERROR));
         return true;
     }
-
+    
     /**
      * "onMessage" listener.
      *  only triggered when event handler not found
@@ -44,7 +45,7 @@ class WebsocketHandler implements HandlerContract
     {
         return true;
     }
-
+    
     /**
      * "onClose" listener.
      * @param int $fd

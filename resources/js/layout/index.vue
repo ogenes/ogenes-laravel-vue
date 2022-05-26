@@ -41,9 +41,18 @@
         }
       }
     },
+    created() {
+      setInterval(this.ping, 5000);
+    },
     methods: {
       handleClickOutside() {
         this.$store.dispatch('app/closeSideBar', { withoutAnimation: false })
+      },
+      ping() {
+        const params = {
+          event: 'ping'
+        };
+        this.$WebSocket.WebSocketHandle.send(JSON.stringify(params))
       }
     }
   }

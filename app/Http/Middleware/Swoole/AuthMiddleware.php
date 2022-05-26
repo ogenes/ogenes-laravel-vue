@@ -25,7 +25,6 @@ class AuthMiddleware
     {
         $token =$request->query('Authorization');
         if ($token && AuthService::getInstance()->checkLogin($token)) {
-            echo 'AUTH-UID' . AuthService::getInstance()->uid;
             Websocket::loginUsingId(AuthService::getInstance()->uid);
         }
         return $next($request);

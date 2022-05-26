@@ -1,9 +1,10 @@
 <?php
 
 
+use App\Http\Controllers\WebsocketController;
 use Illuminate\Http\Request;
 use SwooleTW\Http\Websocket\Facades\Websocket;
-use App\Http\Middleware\Swoole\AuthMiddleware as SwooleAuthMiddleware;
+use App\Http\Middleware\Swoole\AuthMiddleware;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,21 +15,20 @@ use App\Http\Middleware\Swoole\AuthMiddleware as SwooleAuthMiddleware;
 |
 */
 
-Websocket::on('connect', function ($websocket, Request $request) {
-    // called while socket on connect
-    echo 'connect' . $request->url() . PHP_EOL;
-})->middleware(SwooleAuthMiddleware::class);
+Websocket::on('connect', function ($websocket) {
+    $uid = $websocket->getUserId() ? : 0;
+    echo $uid . ':connect'. PHP_EOL;
+})->middleware(AuthMiddleware::class);
 
 Websocket::on('disconnect', function ($websocket) {
-    // called while socket on disconnect
-    echo "disconnect" . PHP_EOL;
+    $websocket->logout();
+    $uid = $websocket->getUserId() ? : 0;
+    echo "{$uid}:disconnect" . PHP_EOL;
 });
 
-Websocket::on('ping', function ($websocket, Request $request) {
-    // called while socket on connect
-    $data = [];
-    $websocket->emit('pong', json_encode($data, JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR));
+Websocket::on('ping', function ($websocket) {
+    $websocket->emit('pong', '');
     
 });
 
-Websocket::on('notify', [\App\Http\Controllers\WebsocketController::class, 'notify']);
+Websocket::on('notify', [WebsocketController::class, 'notify']);

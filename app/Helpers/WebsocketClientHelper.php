@@ -14,13 +14,12 @@ class WebsocketClientHelper
     
     public static function send(string $token, string $event, array $data)
     {
-        $host = '127.0.0.1';
-        $port = '8888';
-        $uri = "ws://{$host}:{$port}?Authorization={$token}";
-        $options = array_merge([
-            'uri' => $uri,
+        $host = config('swoole_http.server.host');
+        $port = config('swoole_http.server.port');
+        $options = [
+            'uri' => "ws://{$host}:{$port}?Authorization={$token}",
             'opcode' => 'text',
-        ]);
+        ];
         try {
             $param = [
                 'event' => $event,
