@@ -13,6 +13,7 @@ export function getToken() {
 
 export function setToken(token, persistent = false) {
   if (persistent) {
+    Cookies.set(TokenKey, token);
     return localStorageSetItem(TokenKey, token)
   } else {
     return Cookies.set(TokenKey, token)

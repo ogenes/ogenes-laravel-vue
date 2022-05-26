@@ -179,6 +179,7 @@ return [
 
         IdeHelperServiceProvider::class,
         \App\Providers\HelperProvider::class,
+        \SwooleTW\Http\LaravelServiceProvider::class,
 
     ],
 

@@ -13,13 +13,13 @@ use Illuminate\Http\Request;
 
 function getRealIp(): string
 {
-    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+    if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR']) {
         $IP = $_SERVER['HTTP_X_FORWARDED_FOR'];
-    } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+    } elseif (isset($_SERVER['HTTP_CLIENT_IP']) && $_SERVER['HTTP_CLIENT_IP']) {
         $IP = getenv('HTTP_CLIENT_IP');
-    } elseif (!empty($_SERVER['REMOTE_ADDR'])) {
+    } elseif (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR']) {
         $IP = $_SERVER['REMOTE_ADDR'];
-    } elseif ($_SERVER['HTTP_VIA']) {
+    } elseif (isset($_SERVER['HTTP_VIA']) && $_SERVER['HTTP_VIA']) {
         $IP = $_SERVER['HTTP_VIA'];
     } else {
         $IP = '';

@@ -24,6 +24,7 @@ import router from '@/router';
 import store from '@/store';
 import '@/permission' // permission control
 import '@/icons' // icon
+import '@/websocket.js' // websockets
 
 Vue.use(ElementUI, {
   i18n: (key, value) => i18n.t(key, value),
