@@ -50,7 +50,8 @@
       },
       ping() {
         const params = {
-          event: 'ping'
+          event: 'ping',
+          data: {}
         };
         this.$WebSocket.WebSocketHandle.send(JSON.stringify(params))
       }
