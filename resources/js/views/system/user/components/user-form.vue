@@ -114,7 +114,7 @@
     },
 
     methods: {
-      async save() {
+      save() {
         this.$refs.userParams.validate(valid => {
           if (valid) {
             this.loading = true;

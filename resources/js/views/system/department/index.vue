@@ -6,6 +6,7 @@
           placeholder="输入部门进行搜索"
           v-model="filterText"
           clearable
+          size="small"
           style="width: 100%;"
         >
         </el-input>
@@ -15,6 +16,7 @@
           row-key="id"
           :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
           default-expand-all
+          :max-height="tableHeight"
           :row-class-name="departmentRowClassName"
           :cell-class-name="departmentColClassName"
         >
@@ -140,6 +142,7 @@
         loading: false,
         isExpansion: true,
         showHasUsers: false,
+        tableHeight: 0,
         hasUsers: [],
 
         filterText: '',
@@ -195,6 +198,11 @@
         }
         return this.list;
       }
+    },
+    mounted() {
+      this.$nextTick(() => {
+        this.tableHeight = window.innerHeight - 158;
+      })
     },
 
     async created() {

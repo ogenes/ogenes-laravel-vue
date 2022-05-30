@@ -33,7 +33,7 @@
             <span style="display:block; color: #5a5e66;">@{{ account }}</span>
           </el-dropdown-item>
           <router-link to="/profile/index">
-            <el-dropdown-item divided>用户资料</el-dropdown-item>
+            <el-dropdown-item divided>个人中心</el-dropdown-item>
           </router-link>
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">退出</span>

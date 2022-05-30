@@ -16,6 +16,7 @@ class CommonException extends Exception
 {
     public function __construct($code = ErrorCode::SYSTEM, $msg = '')
     {
+        parent::__construct();
         $msg || $msg = ErrorCode::getMsg($code);
         Log::warning("CommonException", [
             'file' => $this->getFile(),

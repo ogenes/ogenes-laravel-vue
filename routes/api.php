@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DictController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\Permission\DataController;
@@ -52,10 +53,12 @@ Route::middleware(['language'])->group(function () {
         Route::any('message', [MessageController::class, 'all']);
         Route::any('message/options', [MessageController::class, 'options']);
         Route::any('message/read', [MessageController::class, 'read']);
+        Route::any('actionLog/options', [ActionLogController::class, 'options']);
     
     
-        Route::prefix('actionLog')->group(function () {
-            Route::any('options', [ActionLogController::class, 'options'])->name('ActionLogManage');
+        Route::prefix('feedback')->group(function () {
+            Route::any('options', [FeedbackController::class, 'options']);
+            Route::any('add', [FeedbackController::class, 'add']);
         });
         
         Route::middleware(['api.permission'])->group(function () {

@@ -13,7 +13,7 @@
         <Calendar/>
       </el-card>
       <el-card class="home-item-card">
-<!--        <Feedback/>-->
+        <Feedback/>
       </el-card>
     </el-col>
   </div>
