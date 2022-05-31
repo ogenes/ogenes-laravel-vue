@@ -13,6 +13,9 @@
         <Calendar/>
       </el-card>
       <el-card class="home-item-card">
+        <div slot="header">
+          意见反馈
+        </div>
         <Feedback/>
       </el-card>
     </el-col>
