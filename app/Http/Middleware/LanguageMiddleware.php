@@ -18,8 +18,8 @@ class LanguageMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $lang = LanguageService::getInstance()->getLang();
-        App::setLocale($lang);
+        $locale = $request->header('locale');
+        App::setLocale($locale ? : 'zh');
         return $next($request);
     }
 }

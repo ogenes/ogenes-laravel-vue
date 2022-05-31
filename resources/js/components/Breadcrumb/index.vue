@@ -1,6 +1,9 @@
 <template>
   <el-breadcrumb class="app-breadcrumb" separator="/">
     <transition-group name="breadcrumb">
+      <el-breadcrumb-item key="0">
+        <span style="color:#F56C6C">{{ env }}</span>
+      </el-breadcrumb-item>
       <el-breadcrumb-item v-for="(item,index) in levelList" :key="item.path">
         <span v-if="item.redirect==='noRedirect'||index==levelList.length-1" class="no-redirect">{{ item.meta.title }}</span>
         <a v-else @click.prevent="handleLink(item)">{{ item.meta.title }}</a>
@@ -15,7 +18,8 @@ import pathToRegexp from 'path-to-regexp'
 export default {
   data() {
     return {
-      levelList: null
+      levelList: null,
+      env: process.env.MIX_APP_ENV,
     }
   },
   watch: {
@@ -37,7 +41,7 @@ export default {
       const first = matched[0]
 
       if (!this.isDashboard(first)) {
-        matched = [{ path: '/dashboard', meta: { title: 'Dashboard' }}].concat(matched)
+        matched = [{ path: '/dashboard', meta: { title: '首页' }}].concat(matched)
       }
 
       this.levelList = matched.filter(item => item.meta && item.meta.title && item.meta.breadcrumb !== false)
