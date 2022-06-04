@@ -18,7 +18,7 @@ class LanguageMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $locale = $request->header('locale');
+        $locale = $request->header('locale') ? : $request->query('locale');
         App::setLocale($locale ? : 'zh');
         return $next($request);
     }
