@@ -11,6 +11,7 @@
     name: 'App',
 
     async created() {
+      this.$i18n.locale = this.$store.state.settings.locale;
       await this.WebSocketINI();
       // 因为我的页面有缓存机制，用户下次有可能直接打开某个登录后才能访问的页面 比如F5刷新了某个页面 需要重连
       // 又比如后端服务器因为什么原因突然中断了一下 也需要重新连接WebSocket
@@ -40,7 +41,8 @@
           return
         }
 
-        const tmpWebsocketServerAddress = 'ws://permission.dev.com:8888?Authorization=' + getToken();//可以直接赋值如：ws://127.0.0.1:1234
+        const queryStr = `Authorization=`+getToken() + `&locale=` + this.$store.state.settings.locale;
+        const tmpWebsocketServerAddress = 'ws://permission.dev.com:8888?'+ queryStr;//可以直接赋值如：ws://127.0.0.1:1234
 
         // 3、创建Websocket连接
         const tmpWebsocket = new WebSocket(tmpWebsocketServerAddress)

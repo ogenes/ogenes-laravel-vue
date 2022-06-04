@@ -19,13 +19,14 @@
 
         <notify id="header-notify" class="right-menu-item"/>
 
+        <languages id="header-language" class="right-menu-item"/>
+
       </template>
 
-      <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
+      <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="hover">
         <div class="avatar-wrapper">
-          <el-avatar v-if="avatar" :src="avatar+'?imageView2/1/w/80/h/80'" />
-          <el-avatar v-else icon="el-icon-user-solid" />
-          <i class="el-icon-caret-bottom"/>
+          <el-avatar v-if="avatar" :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar"/>
+          <el-avatar v-else class="user-avatar" icon="el-icon-user-solid"/>
         </div>
         <el-dropdown-menu slot="dropdown" style="width: 200px;">
           <el-dropdown-item disabled>
@@ -53,9 +54,11 @@
   import SizeSelect from '@/components/SizeSelect'
   import Search from '@/components/HeaderSearch'
   import Notify from '@/components/Notify'
+  import Languages from "@/components/Language";
 
   export default {
     components: {
+      Languages,
       Breadcrumb,
       Hamburger,
       ErrorLog,
@@ -151,8 +154,8 @@
 
           .user-avatar {
             cursor: pointer;
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border-radius: 10px;
           }
 

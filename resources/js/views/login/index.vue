@@ -4,7 +4,7 @@
              label-position="left">
 
       <div class="title-container">
-        <h3 class="title">请登录</h3>
+        <h3 class="title">{{ $t("loginForm.loginTitle") }}</h3>
       </div>
 
       <el-form-item prop="account">
@@ -14,7 +14,7 @@
         <el-input
           ref="account"
           v-model="loginForm.account"
-          placeholder="Account"
+          :placeholder="$t('loginForm.account')"
           name="account"
           type="text"
           tabindex="1"
@@ -32,7 +32,7 @@
             ref="password"
             v-model="loginForm.password"
             :type="passwordType"
-            placeholder="Password"
+            :placeholder="$t('loginForm.password')"
             name="password"
             tabindex="2"
             autocomplete="on"
@@ -48,12 +48,13 @@
 
       <div style="margin-bottom: 20px;">
         <el-checkbox v-model="loginForm.rememberMe">
-          <span style="color: #000; font-size: 12px;"> 记住我 </span>
+          <span style="color: #000; font-size: 12px;"> {{ $t("loginForm.rememberMe") }} </span>
         </el-checkbox>
       </div>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;"
-                 @click.native.prevent="handleLogin">Login
+                 @click.native.prevent="handleLogin">
+        {{ $t("loginForm.login") }}
       </el-button>
     </el-form>
   </div>
@@ -69,14 +70,16 @@
     data() {
       const validateAccount = (rule, value, callback) => {
         if (!validAlphabets(value)) {
-          callback(new Error('Please enter the correct account'))
+          const _this = this;
+          callback(new Error(_this.$t("loginForm.accountError")))
         } else {
           callback()
         }
       }
       const validatePassword = (rule, value, callback) => {
+        const _this = this;
         if (value.length < 6) {
-          callback(new Error('The password can not be less than 6 digits'))
+          callback(new Error(_this.$t("loginForm.passwordError")))
         } else {
           callback()
         }

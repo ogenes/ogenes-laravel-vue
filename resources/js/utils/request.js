@@ -13,6 +13,7 @@ const service = axios.create({
 // request interceptor
 service.interceptors.request.use(
   config => {
+    config.headers['locale'] = store.state.settings.locale;
     if (store.getters.token) {
       config.headers['Authorization'] = getToken()
     }

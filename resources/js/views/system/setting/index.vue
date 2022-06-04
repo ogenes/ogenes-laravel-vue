@@ -19,11 +19,6 @@
         <el-switch v-model="sidebarLogo" class="setting-switch" />
       </div>
 
-      <div class="setting-item">
-        <span>Language English</span>
-        <el-switch v-model="englishLanguage" class="setting-switch" />
-      </div>
-
     </el-card>
   </div>
 </template>
@@ -68,19 +63,6 @@
           })
         }
       },
-      englishLanguage: {
-        get() {
-          let val = this.$store.state.settings.englishLanguage;
-          this.$i18n.locale = val ? 'en' : 'zh';
-          return val;
-        },
-        set(val) {
-          this.$store.dispatch('settings/changeSetting', {
-            key: 'englishLanguage',
-            value: val
-          })
-        }
-      }
     },
     methods: {
     }
