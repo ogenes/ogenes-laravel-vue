@@ -86,4 +86,29 @@ class MenuController extends Controller
             'data' => $ret,
         ]);
     }
+    public function trans(Request $request)
+    {
+        $params = getParams($request);
+        $id = $params['id'] ?? 0;
+        $locale = $params['locale'] ?? '';
+        $title = $params['title'] ?? '';
+        $ret = MenuService::getInstance()->trans($id, $locale, $title);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
+    
+    public function transList(Request $request)
+    {
+        $params = getParams($request);
+        $ids = $params['ids'] ?? [];
+        $ret = MenuService::getInstance()->transList($ids);
+        return response()->json([
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $ret,
+        ]);
+    }
 }

@@ -46,3 +46,19 @@ export function remove(data) {
     data: {data},
   })
 }
+
+export function getTransList(data) {
+  return request({
+    url: '/api/menu/transList',
+    method: 'get',
+    params: {data},
+  })
+}
+
+export function trans(data) {
+  return request({
+    url: '/api/menu/trans',
+    method: 'post',
+    data: {data},
+  })
+}

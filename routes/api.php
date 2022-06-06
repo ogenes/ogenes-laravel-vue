@@ -92,6 +92,8 @@ Route::middleware(['language'])->group(function () {
                 Route::any('add', [MenuController::class, 'save'])->name('PermissionMenuManageAdd');
                 Route::any('edit', [MenuController::class, 'save'])->name('PermissionMenuManageEdit');
                 Route::any('remove', [MenuController::class, 'remove'])->name('PermissionMenuManageDel');
+                Route::any('transList', [MenuController::class, 'transList'])->name('PermissionMenuManageTrans');
+                Route::any('trans', [MenuController::class, 'trans'])->name('PermissionMenuManageTrans');
             });
             Route::prefix('data-permission')->group(function () {
                 Route::any('options', [DataController::class, 'options'])->name('data-permission.options');

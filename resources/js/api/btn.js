@@ -27,10 +27,12 @@ export const BTN_MAP_USER = {
 export const BTN_MENU_ADD = 'PermissionMenuManageAdd';
 export const BTN_MENU_EDIT = 'PermissionMenuManageEdit';
 export const BTN_MENU_DEL = 'PermissionMenuManageDel';
+export const BTN_MENU_TRANS = 'PermissionMenuManageTrans';
 export const BTN_MAP_MENU = {
   [BTN_MENU_ADD]: '新增',
   [BTN_MENU_EDIT]: '编辑',
   [BTN_MENU_DEL]: '删除',
+  [BTN_MENU_TRANS]: '翻译',
 };
 
 export const BTN_ROLE_ADD = 'RoleManageAdd';

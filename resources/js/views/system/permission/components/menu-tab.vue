@@ -3,34 +3,34 @@
     <!--表单-->
     <el-card>
       <el-input
-        placeholder="输入菜单|Name|权限标识进行搜索"
         v-model="filterText"
         clearable
+        placeholder="输入菜单|Name|权限标识进行搜索"
         style="width: 100%;"
       >
       </el-input>
       <el-table
         ref="menuTree"
         :data="treeData"
-        row-key="id"
+        :max-height="tableHeight"
+        :row-class-name="menuRowClassName"
         :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
         default-expand-all
-        :row-class-name="menuRowClassName"
-        :max-height="tableHeight"
+        row-key="id"
       >
-        <el-table-column type="" fixed prop="id" width="100" align="center" label="菜单ID"/>
-        <el-table-column fixed prop="title" width="200" align="left" label="菜单">
+        <el-table-column align="center" fixed label="菜单ID" prop="id" type="" width="100"/>
+        <el-table-column align="left" fixed label="菜单" prop="title" width="200">
           <template slot="header" slot-scope="scope">
             <span>菜单 </span>
-            <el-button type="text" style="margin-left: 20px;"
-                       :icon="isExpansion ? 'el-icon-folder-remove' : 'el-icon-folder-add'"
+            <el-button :icon="isExpansion ? 'el-icon-folder-remove' : 'el-icon-folder-add'" style="margin-left: 20px;"
+                       type="text"
                        @click="toggleRowExpansion">
               全部{{ isExpansion ? "收缩" : "展开" }}
             </el-button>
           </template>
         </el-table-column>
-        <el-table-column fixed prop="menuName" label="Name" width="300"/>
-        <el-table-column prop="类型" width="150" align="center" label="type">
+        <el-table-column fixed label="Name" prop="menuName" width="300"/>
+        <el-table-column align="center" label="type" prop="类型" width="150">
           <template slot-scope="scope">
             <el-tag :type="`${(scope.row.type === 1 && 'info') ||
                   (scope.row.type === 2 && 'success') ||
@@ -39,35 +39,39 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="parentId" width="150" align="center" label="上级ID"/>
-        <el-table-column prop="icon" width="150" align="center" label="图标">
+        <el-table-column align="center" label="上级ID" prop="parentId" width="150"/>
+        <el-table-column align="center" label="图标" prop="icon" width="150">
           <template slot-scope="scope">
             <svg-icon :icon-class="scope.row.icon"/>
           </template>
         </el-table-column>
-        <el-table-column prop="roles" width="300" align="left" label="权限标识"/>
-        <el-table-column prop="createdAt" width="160" align="center" label="创建时间"/>
-        <el-table-column prop="updatedAt" width="160" align="center" label="更新时间"/>
-        <el-table-column fixed="right" label="操作" width="200" align="center">
+        <el-table-column align="left" label="权限标识" prop="roles" width="300"/>
+        <el-table-column align="center" label="创建时间" prop="createdAt" width="160"/>
+        <el-table-column align="center" label="更新时间" prop="updatedAt" width="160"/>
+        <el-table-column align="center" fixed="right" label="操作" width="200">
           <template slot="header" slot-scope="scope">
             <span>操作 </span>
             <el-button
               v-permission="[BTN_MENU_ADD]"
-              type="text"
               class="el-icon-plus"
               style="margin-left: 20px;"
+              type="text"
               @click="showDialog=true"
             >
               {{ BTN_MAP_MENU[BTN_MENU_ADD] }}
             </el-button>
           </template>
-          <template slot-scope="scope">
-            <el-button v-permission="[BTN_MENU_EDIT]" type="text" icon="el-icon-edit" @click="showEdit(scope.row)">
+          <template v-slot="scope">
+            <el-button v-permission="[BTN_MENU_EDIT]" icon="el-icon-edit" type="text" @click="showEdit(scope.row)">
               {{ BTN_MAP_MENU[BTN_MENU_EDIT] }}
             </el-button>
-            <el-button v-permission="[BTN_MENU_DEL]" :disabled="scope.row.children !== undefined" type="text"
-                       icon="el-icon-delete" style="color:#F56C6C;" @click="remove(scope.row.id)">
+            <el-button v-permission="[BTN_MENU_DEL]" :disabled="scope.row.children !== undefined" icon="el-icon-delete"
+                       style="color:#F56C6C;" type="text" @click="remove(scope.row.id)">
               {{ BTN_MAP_MENU[BTN_MENU_DEL] }}
+            </el-button>
+            <el-button v-permission="[BTN_MENU_TRANS]" style="color:#93f56c;"
+                       type="text" @click="showTrans(scope.row)">
+              {{ BTN_MAP_MENU[BTN_MENU_TRANS] }}
             </el-button>
           </template>
         </el-table-column>
@@ -76,14 +80,14 @@
 
     <!--编辑弹窗-->
     <el-dialog
+      :before-close="closeDialog"
+      :close-on-click-modal="false"
+      :destroy-on-close="true"
       :title="dialogTitle"
       :visible.sync="showDialog"
-      :destroy-on-close="true"
-      :close-on-click-modal="false"
-      :before-close="closeDialog"
     >
-      <el-form ref="menuParams" v-loading="loading" :rules="menuRules" :model="menuParams"
-               label-width="120px" label-position="right">
+      <el-form ref="menuParams" v-loading="loading" :model="menuParams" :rules="menuRules"
+               label-position="right" label-width="120px">
         <el-form-item label="System：" prop="systemId">
           <el-input v-model="system" placeholder="请输入" readonly style="width: 100%"/>
         </el-form-item>
@@ -94,11 +98,11 @@
               <div>
                 此内容请跟开发人员确认，需要与代码中保持一致！
               </div>
-              <i class="el-icon-question" slot="reference"></i>
+              <i slot="reference" class="el-icon-question"></i>
             </el-popover>
             <span>：</span>
           </template>
-          <el-input v-model="menuParams.menuName" placeholder="Name 需与代码中保持一致！" clearable style="width: 100%"/>
+          <el-input v-model="menuParams.menuName" clearable placeholder="Name 需与代码中保持一致！" style="width: 100%"/>
         </el-form-item>
         <el-form-item label="上级菜单：" prop="parentId">
           <template slot="label">
@@ -107,7 +111,7 @@
               <div>
                 此内容请跟开发人员确认，需要与代码中保持一致！
               </div>
-              <i class="el-icon-question" slot="reference"></i>
+              <i slot="reference" class="el-icon-question"></i>
             </el-popover>
             <span>：</span>
           </template>
@@ -115,9 +119,9 @@
             v-model="menuParams.parentId"
             :options="selectOptions"
             :props="defaultProps"
-            placeholder="上级菜单 需与代码中保持一致！"
-            filterable
             clearable
+            filterable
+            placeholder="上级菜单 需与代码中保持一致！"
             style="width: 100%"
           />
         </el-form-item>
@@ -132,10 +136,11 @@
           </el-select>
         </el-form-item>
         <el-form-item label="菜单名称：" prop="title">
-          <el-input v-model="menuParams.title" placeholder="请输入" clearable style="width: 100%"/>
+          <el-input v-model="menuParams.title" clearable placeholder="请输入" style="width: 100%"/>
         </el-form-item>
         <el-form-item label="权限标识：" prop="roles">
-          <el-select v-if="menuParams.type === '3'" v-model="menuParams.roles" placeholder="请选择" filterable style="width: 100%">
+          <el-select v-if="menuParams.type === '3'" v-model="menuParams.roles" filterable placeholder="请选择"
+                     style="width: 100%">
             <el-option
               v-for="(item, key) in BTN_MAP"
               :key="key"
@@ -145,16 +150,16 @@
           </el-select>
           <el-input
             v-else
-            type="textarea"
-            :autosize="{ minRows: 1, maxRows: 6}"
             v-model="menuParams.roles"
-            placeholder="请输入"
+            :autosize="{ minRows: 1, maxRows: 6}"
             clearable
+            placeholder="请输入"
             style="width: 100%"
+            type="textarea"
           />
         </el-form-item>
         <el-form-item label="图标：" prop="icon">
-          <el-select v-model="menuParams.icon" placeholder="请选择" clearable filterable style="width: 100%">
+          <el-select v-model="menuParams.icon" clearable filterable placeholder="请选择" style="width: 100%">
             <el-option
               v-for="(item, key) in svgIcons"
               :key="key"
@@ -167,11 +172,20 @@
         </el-form-item>
       </el-form>
       <div slot="footer">
-        <el-button type="primary" @click="save"> {{menuParams.id > 0 ? '保存' : '新增'}}</el-button>
+        <el-button type="primary" @click="save"> {{ menuParams.id > 0 ? '保存' : '新增' }}</el-button>
         <el-button type="info" @click="closeDialog">取消</el-button>
       </div>
     </el-dialog>
 
+    <el-dialog
+      v-if="transDialog"
+      :close-on-click-modal="false"
+      :destroy-on-close="true"
+      :visible.sync="transDialog"
+      title=""
+    >
+      <menu-trans :menu-id="transRow.id" :title="transRow.title"/>
+    </el-dialog>
   </div>
 </template>
 
@@ -189,8 +203,10 @@
     BTN_MENU_ADD,
     BTN_MENU_EDIT,
     BTN_MENU_DEL,
+    BTN_MENU_TRANS,
   } from '@/api/btn'
-  import {deepClone} from "../../../../utils";
+  import {deepClone} from "@/utils";
+  import MenuTrans from "./menu-trans"
 
   export default {
     name: "MenuManage",
@@ -209,9 +225,12 @@
         default: {}
       },
     },
+    components: {
+      MenuTrans
+    },
     mounted() {
       this.$nextTick(() => {
-        this.tableHeight = window.innerHeight -250;
+        this.tableHeight = window.innerHeight - 250;
       })
     },
     data() {
@@ -221,6 +240,7 @@
         BTN_MENU_ADD,
         BTN_MENU_EDIT,
         BTN_MENU_DEL,
+        BTN_MENU_TRANS,
         svgIcons,
 
         loading: false,
@@ -255,6 +275,8 @@
         },
 
         list: [],
+        transRow: {},
+        transDialog: false,
       }
     },
 
@@ -420,6 +442,10 @@
           }
         });
       },
+      showTrans(row) {
+        this.transRow = row;
+        this.transDialog = true;
+      }
     }
   }
 </script>

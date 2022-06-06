@@ -1,10 +1,10 @@
 <template>
   <el-select v-model="locale" placeholder="请选择语言" style="width:120px;">
     <el-option
-      v-for="(item, key) in languages"
+      v-for="(lang, key) in languages"
       :key="key"
-      :label="item"
-      :value="key">
+      :label="lang"
+      :value="lang">
     </el-option>
   </el-select>
 </template>
@@ -14,11 +14,11 @@
     name: "Language",
     data() {
       return {
-        languages: {
-          'zh': '中文',
-          'en': 'English',
-          'zh-tw': '中文-繁体'
-        },
+        languages: [
+          'zh',
+          'en',
+          'zh_TW'
+        ],
       }
     },
     computed: {

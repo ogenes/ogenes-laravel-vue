@@ -6,6 +6,7 @@ namespace App\Services\Permission;
 use App\Exceptions\CommonException;
 use App\Exceptions\ErrorCode;
 use App\Models\Menu;
+use App\Models\MenuTrans;
 use App\Models\RoleHasMenu;
 use App\Models\UserHasRole;
 use App\Services\ActionLogService;
@@ -90,11 +91,11 @@ class MenuService extends BaseService
     }
     
     public function save(
-        int $id,
-        int $systemId,
+        int    $id,
+        int    $systemId,
         string $menuName,
-        int $type,
-        int $parentId,
+        int    $type,
+        int    $parentId,
         string $title,
         string $icon,
         string $roles
@@ -110,6 +111,9 @@ class MenuService extends BaseService
         $ret = false;
         if ($id > 0) {
             $exist = Menu::whereId($id)->first();
+            if (empty($exist)) {
+                return false;
+            }
             $data = [];
             $systemId !== $exist->system_id && $data['system_id'] = $systemId;
             $menuName !== $exist->menu_name && $data['menu_name'] = $menuName;
@@ -118,7 +122,7 @@ class MenuService extends BaseService
             $title !== $exist->title && $data['title'] = $title;
             $icon !== $exist->icon && $data['icon'] = $icon;
             $roles !== $exist->roles && $data['roles'] = $roles;
-    
+            
             if ($data) {
                 $data['updated_at'] = date('Y-m-d H:i:s');
                 foreach ($data as $key => $val) {
@@ -154,7 +158,7 @@ class MenuService extends BaseService
                 $data
             );
         }
-
+        
         return $ret;
     }
     
@@ -268,5 +272,77 @@ class MenuService extends BaseService
             $ret[$item['role_id']][$item['system_id']][] = $item;
         }
         return $ret;
+    }
+    
+    public function trans(int $id, string $locale, string $title): bool
+    {
+        $ret = false;
+        $exist = MenuTrans::whereMenuId($id)
+            ->where('language', '=', $locale)
+            ->first();
+        if ($exist) {
+            $data = [];
+            $exist->title !== $title && $data['title'] = $title;
+            if ($data) {
+                $data['updated_at'] = date('Y-m-d H:i:s');
+                foreach ($data as $key => $val) {
+                    $exist->setAttribute($key, $val);
+                }
+                $ret = $exist->save();
+                ActionLogService::getInstance()->insert(
+                    ActionLogService::RESOURCE_MENU,
+                    $id,
+                    $this->uid,
+                    '修改翻译',
+                    $data
+                );
+            }
+            
+        } else {
+            $data = [
+                'menu_id' => $id,
+                'language' => $locale,
+                'title' => $title,
+                'created_at' => date('Y-m-d H:i:s'),
+            ];
+            $id = MenuTrans::insertGetId($data);
+            $ret = $id > 0;
+            ActionLogService::getInstance()->insert(
+                ActionLogService::RESOURCE_MENU,
+                $id,
+                $this->uid,
+                '新增翻译',
+                $data
+            );
+        }
+        return $ret;
+    }
+    
+    public function transList(array $ids): array
+    {
+        $mTb = (new Menu())->getTable();
+        $mtTb = (new MenuTrans())->getTable();
+        $data = MenuTrans::from("{$mtTb} as mt")
+            ->join("{$mTb} as m", 'm.id', '=', 'mt.menu_id')
+            ->select([
+                'm.id',
+                DB::raw('m.title as defaultTitle'),
+                DB::raw('mt.language as locale'),
+                'mt.title',
+            ])
+            ->whereIn('mt.menu_id', $ids)
+            ->get()
+            ->toArray();
+        return $data ? : [];
+    }
+    
+    public function transMap(array $ids, string $locale): array
+    {
+        $data = MenuTrans::whereLanguage($locale)
+            ->whereIn('menu_id', $ids)
+            ->get()
+            ->toArray();
+        
+        return $data ? array_column($data, 'title', 'menu_id') : [];
     }
 }

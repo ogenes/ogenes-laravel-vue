@@ -6,6 +6,7 @@ Vue.use(VueI18n);
 const i18n = new VueI18n({
   locale: localStorage.lang || 'en',
   messages,
+  silentTranslationWarn: true,
 });
 
 export default i18n
