@@ -33,6 +33,7 @@
             key: 'locale',
             value: val
           })
+          location.reload();
         }
       },
     },

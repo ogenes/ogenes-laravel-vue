@@ -30,6 +30,19 @@
           </template>
         </el-table-column>
         <el-table-column fixed label="Name" prop="menuName" width="300"/>
+        <el-table-column label="Trans" prop="localeName" width="300">
+          <template slot="header" slot-scope="scope">
+            <el-select v-model="locale" size="mini" style="width: 200px">
+              <el-option v-for="(v, k) in languages" :key="k" :value="v" :label="v"/>
+            </el-select>
+          </template>
+          <template slot-scope="scope">
+            <div style="width: 200px; float: left">{{  scope.row.trans[locale] || scope.row.title}}</div>
+            <el-button v-permission="[BTN_MENU_TRANS]" type="text" @click="showTrans(scope.row, scope.$index)">
+              {{ BTN_MAP_MENU[BTN_MENU_TRANS] }}
+            </el-button>
+          </template>
+        </el-table-column>
         <el-table-column align="center" label="type" prop="类型" width="150">
           <template slot-scope="scope">
             <el-tag :type="`${(scope.row.type === 1 && 'info') ||
@@ -68,10 +81,6 @@
             <el-button v-permission="[BTN_MENU_DEL]" :disabled="scope.row.children !== undefined" icon="el-icon-delete"
                        style="color:#F56C6C;" type="text" @click="remove(scope.row.id)">
               {{ BTN_MAP_MENU[BTN_MENU_DEL] }}
-            </el-button>
-            <el-button v-permission="[BTN_MENU_TRANS]" style="color:#93f56c;"
-                       type="text" @click="showTrans(scope.row)">
-              {{ BTN_MAP_MENU[BTN_MENU_TRANS] }}
             </el-button>
           </template>
         </el-table-column>
@@ -184,7 +193,11 @@
       :visible.sync="transDialog"
       title=""
     >
-      <menu-trans :menu-id="transRow.id" :title="transRow.title"/>
+      <menu-trans
+        :trans-row="transRow"
+        :locale="locale"
+        @closeTrans="closeTrans"
+      />
     </el-dialog>
   </div>
 </template>
@@ -276,7 +289,14 @@
 
         list: [],
         transRow: {},
+        transIndex: 0,
         transDialog: false,
+        locale: 'zh',
+        languages: [
+          'zh',
+          'en',
+          'zh_TW'
+        ]
       }
     },
 
@@ -312,6 +332,7 @@
 
     async created() {
       await this.queryList();
+      this.locale = this.$store.state.settings.locale;
     },
 
     methods: {
@@ -442,9 +463,13 @@
           }
         });
       },
-      showTrans(row) {
+      showTrans(row, index) {
         this.transRow = row;
+        this.transIndex = index;
         this.transDialog = true;
+      },
+      closeTrans() {
+        this.transDialog = false;
       }
     }
   }

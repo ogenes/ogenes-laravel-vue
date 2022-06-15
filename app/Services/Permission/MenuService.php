@@ -43,6 +43,7 @@ class MenuService extends BaseService
         }
         $ret = [];
         foreach ($exists as $item) {
+            $item['trans'] = $this->getTrans($item['id'], $item['title']);
             $item['parent'] = '';
             $item['parents'] = [];
             $item['role_arr'] = explode(PHP_EOL, $item['roles']);
@@ -72,6 +73,7 @@ class MenuService extends BaseService
         }
         $ret = [];
         foreach ($data as $item) {
+            $item['trans'] = $this->getTrans($item['id'], $item['title']);
             $item['parents'] = $menu['parents'];
             $item['parents'][] = $menu['title'];
             $item['level'] = count($item['parents']) + 1;
@@ -202,6 +204,7 @@ class MenuService extends BaseService
         $ret = [];
         $map = array_column($exists, null, 'id');
         foreach ($exists as $item) {
+            $item['trans'] = $this->getTrans($item['id'], $item['title']);
             $item['roles'] = explode(PHP_EOL, $item['roles']);
             $parents = array_filter($this->getParents($item['parent_id'], $map));
             $item['level'] = count($parents) + 1;
@@ -333,7 +336,7 @@ class MenuService extends BaseService
             ->whereIn('mt.menu_id', $ids)
             ->get()
             ->toArray();
-        return $data ? : [];
+        return $data ?: [];
     }
     
     public function transMap(array $ids, string $locale): array
@@ -344,5 +347,21 @@ class MenuService extends BaseService
             ->toArray();
         
         return $data ? array_column($data, 'title', 'menu_id') : [];
+    }
+    
+    protected function getTrans(int $id, string $default = ''): array
+    {
+        $languages = [
+            'zh',
+            'en',
+            'zh_TW',
+        ];
+        $data = MenuTrans::whereMenuId($id)->get()->toArray();
+        $data = array_column($data, 'title', 'language');
+        $ret = [];
+        foreach ($languages as $locale) {
+            $ret[$locale] = $data[$locale] ?? $default;
+        }
+        return $ret;
     }
 }
