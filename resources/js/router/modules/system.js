@@ -6,7 +6,7 @@ const systemRouter = {
   redirect: '/system/department',
   alwaysShow: true, // will always show the root menu
   name: 'System',
-  meta: {},
+  meta: {title: '系统管理', icon: 'system'},
   children: [
     {
       path: 'department',
@@ -117,7 +117,7 @@ const systemRouter = {
         {
           path: 'list',
           component: () => import('@/views/system/message/list'),
-          name: 'MessageList',
+          name: 'MessageManageList',
           meta: { title: '消息列表', icon: 'list' }
         }
       ]

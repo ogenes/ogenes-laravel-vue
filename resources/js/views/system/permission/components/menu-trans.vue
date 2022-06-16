@@ -2,7 +2,7 @@
   <div>
     <el-form  ref="transForm">
       <el-form-item label=" " prop="title">
-        <el-input v-model="transRow.trans[locale]" placeholder="请输入" style="width: 100%"/>
+        <el-input v-model="title" placeholder="请输入" style="width: 100%"/>
       </el-form-item>
     </el-form>
     <div slot="footer">
@@ -16,6 +16,7 @@
   import {
     trans,
   } from '@/api/system/menu';
+  import {locale} from "../../../../settings";
 
   export default {
     name: "",
@@ -32,6 +33,7 @@
     data() {
       return {
         loading: false,
+        title: this.transRow.trans[this.locale]
       }
     },
     methods: {
@@ -40,13 +42,14 @@
         const params = {
           id: this.transRow.id,
           locale: this.locale,
-          title: this.transRow.trans[this.locale]
+          title: this.title
         }
         trans(params).then((res) => {
           if (res.code > 0) {
             this.$message.error(res.msg)
           } else {
             this.$message.success('操作成功');
+            this.transRow.trans[locale] = this.title;
             this.$emit('closeTrans', this.transRow)
           }
           this.loading = false

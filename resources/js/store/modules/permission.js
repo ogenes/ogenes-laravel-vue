@@ -25,15 +25,10 @@ export function filterAsyncRoutes(routes, roles) {
   routes.forEach(route => {
     const tmp = { ...route };
     const map = store.getters.menuMap[tmp?.name || ''] || {};
-    const locale = store.state.settings.locale;
     if (Object.keys(map).length > 0) {
-      let title = map.title;
-      if (typeof map.trans === 'object') {
-        title = map.trans[locale]
-      }
       tmp.meta = {
         ...tmp.meta,
-        title: title,
+        title: map.title,
         icon: map.icon,
         roles: map.roles,
       };
