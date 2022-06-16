@@ -52,9 +52,37 @@ const state = {
 const mutations = {
   SET_ROUTES: (state, routes) => {
     state.addRoutes = routes;
-    state.routes = constantRoutes.concat(routes)
+    state.routes = transRoutes(constantRoutes.concat(routes))
   }
 };
+
+function transRoutes(routes) {
+  const res = [];
+  routes.forEach(item => {
+    const map = store.getters.menuMap[item?.name || ''] || {};
+    if (Object.keys(map).length > 0) {
+      item.meta = {
+        ...item.meta,
+        title: transTitle(item, map),
+      };
+    }
+    if (item.children) {
+      item.children = transRoutes(item.children)
+    }
+    res.push(item)
+  })
+  return res;
+}
+function transTitle(route, map) {
+  if (Object.keys(map).length > 0) {
+    route.title = map.title;
+    if (typeof map.trans === 'object') {
+      const locale = store.state.settings.locale;
+      route.title = map.trans[locale]
+    }
+  }
+  return route.title;
+}
 
 const actions = {
   generateRoutes({ commit }, roles) {

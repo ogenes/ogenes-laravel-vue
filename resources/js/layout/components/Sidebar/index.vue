@@ -20,7 +20,6 @@
 
 <script>
   import {mapGetters} from 'vuex'
-  import store from '@/store'
   import Logo from './Logo'
   import SidebarItem from './SidebarItem'
   import variables from '@/styles/variables.module.scss'
@@ -50,44 +49,6 @@
       isCollapse() {
         return !this.sidebar.opened
       }
-    },
-    data() {
-      return {
-        routes: [],
-      }
-    },
-    created() {
-      this.transRoutes(this.permission_routes);
-    },
-    methods: {
-      transRoutes(routes) {
-        const res = [];
-        routes.forEach(item => {
-          const map = store.getters.menuMap[item?.name || ''] || {};
-          if (Object.keys(map).length > 0) {
-            item.meta = {
-              ...item.meta,
-              title: this.transTitle(item, map),
-            };
-          }
-          if (item.children) {
-            item.children = this.transRoutes(item.children)
-          }
-          res.push(item)
-        })
-        return res;
-      },
-      transTitle(route, map) {
-        if (Object.keys(map).length > 0) {
-          route.title = map.title;
-          if (typeof map.trans === 'object') {
-            const locale = store.state.settings.locale;
-            route.title = map.trans[locale]
-          }
-        }
-        return route.title;
-      },
-
     }
   }
 </script>
