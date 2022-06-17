@@ -12,6 +12,7 @@ npm-debug.log
 yarn-error.log
 .idea
 package-lock.json
+composer.lock
 _ide_helper.php
 
 .php-cs-fixer.cache

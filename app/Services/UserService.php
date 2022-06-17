@@ -18,6 +18,7 @@ use App\Models\UserHasRole;
 use Excel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Ogenes\Exceler\ExcelClient;
 use function App\Helpers\formatDateTime;
 use function App\Helpers\getRandStr;
 
@@ -462,9 +463,7 @@ class UserService extends BaseService
             $item['roles'] = implode(PHP_EOL, $item['roles']);
             $item['departments'] = implode(PHP_EOL, $item['departments']);
             $item['avatar'] = $item['avatar'] ? <<<EOF
-<table>
-  <img   src={$item['avatar']}   height=80 width=80 />
-</table>
+<table><img src={$item['avatar']} height=80 width=80 /></table>
 EOF
  : '';
             return $item;
@@ -483,7 +482,7 @@ EOF
             ['bindKey' => 'lastLoginIp', 'columnName' => '最近一次登录地', 'align' => 'center', 'width' => 30, 'height' => 80, 'format' => 'General'],
             ['bindKey' => 'updatedAt', 'columnName' => '最近一次修改时间', 'align' => 'center', 'width' => 30, 'height' => 80, 'format' => 'General'],
         ];
-        $filepath = Excel::export($filename, $config, $list);
+        $filepath = ExcelClient::getInstance()->export($filename, $config, $list, '../storage/');
     
         $pathinfo = pathinfo($filepath);
         $ext = $pathinfo['extension'] ?: 'xlsx';

@@ -32,7 +32,11 @@
     computed: {
       fixedHeader: {
         get() {
-          return this.$store.state.settings.fixedHeader
+          if (typeof this.$store.state.settings.fixedHeader === 'string') {
+            return this.$store.state.settings.fixedHeader === 'true';
+          } else {
+            return this.$store.state.settings.fixedHeader;
+          }
         },
         set(val) {
           this.$store.dispatch('settings/changeSetting', {
@@ -43,7 +47,11 @@
       },
       tagsView: {
         get() {
-          return this.$store.state.settings.tagsView
+          if (typeof this.$store.state.settings.tagsView === 'string') {
+            return this.$store.state.settings.tagsView === 'true';
+          } else {
+            return this.$store.state.settings.tagsView;
+          }
         },
         set(val) {
           this.$store.dispatch('settings/changeSetting', {
@@ -54,7 +62,11 @@
       },
       sidebarLogo: {
         get() {
-          return this.$store.state.settings.sidebarLogo
+          if (typeof this.$store.state.settings.sidebarLogo === 'string') {
+            return this.$store.state.settings.sidebarLogo === 'true';
+          } else {
+            return this.$store.state.settings.sidebarLogo;
+          }
         },
         set(val) {
           this.$store.dispatch('settings/changeSetting', {
