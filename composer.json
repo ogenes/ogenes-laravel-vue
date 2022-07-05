@@ -20,7 +20,7 @@
     "laravel/framework": "^8.0",
     "laravel/tinker": "^2.0",
     "laravel/ui": "^3.3",
-    "ogenes/exceler": "^1.0",
+    "ogenes/exceler": "2.0.2",
     "phpoffice/phpspreadsheet": "^1.23",
     "swooletw/laravel-swoole": "^2.11",
     "textalk/websocket": "^1.5"
